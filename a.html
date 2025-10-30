@@ -3,27 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Cuestionario Ambiental</title>
+  <title>Dashboard Ambiental - Supabase</title>
+
+  <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .fade-in { animation: fadeIn 0.6s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
 </head>
+
 <body class="bg-gray-50 text-gray-800">
-  <header class="bg-green-600 text-white shadow p-5">
-    <h1 class="text-3xl font-bold text-center">Dashboard de Comportamiento Proambiental</h1>
-    <p class="text-center text-sm opacity-90 mt-1">Visualización de datos desde Supabase</p>
+  <!-- NAVBAR -->
+  <header class="bg-green-700 text-white p-5 shadow-lg flex justify-between items-center">
+    <h1 class="text-2xl font-semibold tracking-wide">🌱 Cuestionario Ambiental</h1>
+    <button id="refreshBtn" class="bg-white text-green-700 font-medium px-4 py-2 rounded-lg shadow hover:bg-green-100 transition">
+      🔄 Actualizar
+    </button>
   </header>
 
-  <main class="max-w-7xl mx-auto p-6">
-    <!-- Controles -->
-    <section class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="flex gap-3">
-        <button id="refreshBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
-          🔄 Actualizar datos
-        </button>
-        <input type="text" id="searchInput" placeholder="Buscar por encuestado..." class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none" />
-      </div>
+  <!-- CONTENIDO -->
+  <main class="max-w-7xl mx-auto p-6 space-y-6">
 
+    <!-- MÉTRICAS -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-500">Total Encuestas</h2>
+        <p id="totalRegistros" class="text-3xl font-bold text-green-700">0</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-500">Edad Promedio</h2>
+        <p id="edadPromedio" class="text-3xl font-bold text-green-700">0</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-500">Masculinos</h2>
+        <p id="totalMasculino" class="text-3xl font-bold text-green-700">0</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow p-4 text-center">
+        <h2 class="text-sm text-gray-500">Femeninos</h2>
+        <p id="totalFemenino" class="text-3xl font-bold text-green-700">0</p>
+      </div>
+    </section>
+
+    <!-- FILTROS -->
+    <section class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow">
+      <input type="text" id="searchInput" placeholder="🔍 Buscar por encuestado..." class="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/3 focus:ring-2 focus:ring-green-400 focus:outline-none" />
       <div class="flex gap-3">
         <select id="filterSexo" class="border border-gray-300 rounded-lg px-3 py-2">
           <option value="">Sexo: Todos</option>
@@ -39,20 +68,8 @@
       </div>
     </section>
 
-    <!-- Métricas -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white p-4 rounded-xl shadow text-center">
-        <h3 class="text-gray-500 text-sm">Total de Encuestas</h3>
-        <p id="totalRegistros" class="text-2xl font-bold text-green-600">0</p>
-      </div>
-      <div class="bg-white p-4 rounded-xl shadow text-center">
-        <h3 class="text-gray-500 text-sm">Edad Promedio</h3>
-        <p id="edadPromedio" class="text-2xl font-bold text-green-600">0</p>
-      </div>
-    </section>
-
-    <!-- Tabla -->
-    <section class="bg-white shadow rounded-xl overflow-hidden">
+    <!-- TABLA -->
+    <section class="bg-white rounded-2xl shadow overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm text-left">
           <thead class="bg-green-100 text-gray-700 uppercase">
@@ -67,55 +84,83 @@
               <th class="px-4 py-2">Subgrupo</th>
             </tr>
           </thead>
-          <tbody id="tablaDatos" class="divide-y divide-gray-200 text-gray-700">
-          </tbody>
+          <tbody id="tablaDatos" class="divide-y divide-gray-200 text-gray-700"></tbody>
         </table>
       </div>
 
-      <div id="loader" class="text-center p-4 text-green-600 hidden">
-        Cargando datos...
-      </div>
+      <div id="loader" class="text-center p-4 text-green-600 hidden">Cargando datos...</div>
     </section>
 
-    <!-- Gráfico -->
-    <section class="bg-white mt-8 p-6 rounded-xl shadow">
-      <h3 class="text-xl font-semibold text-center mb-4">Distribución por Sexo</h3>
-      <canvas id="graficoSexo" height="100"></canvas>
+    <!-- PAGINACIÓN -->
+    <div class="flex justify-center items-center gap-4 mt-4">
+      <button id="prevPage" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">⬅️ Anterior</button>
+      <span id="pageIndicator" class="text-gray-600"></span>
+      <button id="nextPage" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">Siguiente ➡️</button>
+    </div>
+
+    <!-- GRÁFICOS -->
+    <section class="grid md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl p-6 shadow">
+        <h3 class="text-xl font-semibold mb-4 text-center">Distribución por Sexo</h3>
+        <canvas id="graficoSexo" height="120"></canvas>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow">
+        <h3 class="text-xl font-semibold mb-4 text-center">Edades por Grupo</h3>
+        <canvas id="graficoEdad" height="120"></canvas>
+      </div>
     </section>
   </main>
 
-  <footer class="text-center text-gray-500 py-4 text-sm">
-    © 2025 Dashboard Ambiental — Desarrollado con Supabase & TailwindCSS
+  <footer class="text-center text-gray-500 py-6 text-sm">
+    © 2025 Dashboard Ambiental — Desarrollado con Supabase, TailwindCSS y Chart.js
   </footer>
 
   <script>
-    // Configura tus credenciales de Supabase
+    // ==============================
+    // CONFIGURACIÓN SUPABASE
+    // ==============================
     const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ==============================
+    // VARIABLES GLOBALES
+    // ==============================
     const tabla = document.getElementById("tablaDatos");
     const loader = document.getElementById("loader");
-    const totalRegistros = document.getElementById("totalRegistros");
-    const edadPromedio = document.getElementById("edadPromedio");
     const searchInput = document.getElementById("searchInput");
     const filterSexo = document.getElementById("filterSexo");
     const filterGrupo = document.getElementById("filterGrupo");
+    const totalRegistros = document.getElementById("totalRegistros");
+    const edadPromedio = document.getElementById("edadPromedio");
+    const totalMasculino = document.getElementById("totalMasculino");
+    const totalFemenino = document.getElementById("totalFemenino");
     const refreshBtn = document.getElementById("refreshBtn");
-    let grafico;
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const pageIndicator = document.getElementById("pageIndicator");
 
+    let currentPage = 1;
+    const pageSize = 10;
+    let totalPages = 1;
+    let allData = [];
+    let graficoSexo, graficoEdad;
+
+    // ==============================
+    // FUNCIÓN PRINCIPAL
+    // ==============================
     async function cargarDatos() {
       loader.classList.remove("hidden");
       tabla.innerHTML = "";
 
       let query = supabaseClient.from("cuestionario_comportamiento_proambiental_autosustentabilidad").select("*");
 
-      // Filtros
       if (filterSexo.value) query = query.eq("sexo", filterSexo.value);
       if (filterGrupo.value) query = query.eq("grupo", filterGrupo.value);
 
       const { data, error } = await query.order("id", { ascending: false });
+
       loader.classList.add("hidden");
 
       if (error) {
@@ -124,65 +169,90 @@
       }
 
       const searchTerm = searchInput.value.toLowerCase();
-      const filtrados = data.filter(d =>
-        d.nombre_encuestado?.toLowerCase().includes(searchTerm)
-      );
-
-      if (filtrados.length === 0) {
-        tabla.innerHTML = `<tr><td colspan="8" class="text-center p-4">No se encontraron resultados.</td></tr>`;
-        return;
-      }
-
-      filtrados.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="px-4 py-2">${row.id}</td>
-          <td class="px-4 py-2">${row.fecha || ""}</td>
-          <td class="px-4 py-2">${row.nombre_encuestador || ""}</td>
-          <td class="px-4 py-2">${row.nombre_encuestado || ""}</td>
-          <td class="px-4 py-2">${row.sexo || ""}</td>
-          <td class="px-4 py-2">${row.edad || ""}</td>
-          <td class="px-4 py-2">${row.grupo || ""}</td>
-          <td class="px-4 py-2">${row.subgrupo || ""}</td>
-        `;
-        tabla.appendChild(tr);
-      });
-
-      totalRegistros.textContent = filtrados.length;
-      edadPromedio.textContent = Math.round(filtrados.reduce((a, b) => a + (b.edad || 0), 0) / filtrados.length);
-
-      actualizarGrafico(filtrados);
+      allData = data.filter(d => d.nombre_encuestado?.toLowerCase().includes(searchTerm));
+      totalPages = Math.ceil(allData.length / pageSize);
+      renderizarPagina();
+      actualizarMétricas();
     }
 
-    function actualizarGrafico(data) {
-      const sexos = ["Masculino", "Femenino"];
-      const conteos = sexos.map(s => data.filter(d => d.sexo === s).length);
+    function renderizarPagina() {
+      tabla.innerHTML = "";
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = allData.slice(start, end);
 
-      if (grafico) grafico.destroy();
+      pageData.forEach(row => {
+        tabla.innerHTML += `
+          <tr class="hover:bg-green-50 fade-in">
+            <td class="px-4 py-2">${row.id}</td>
+            <td class="px-4 py-2">${row.fecha || ""}</td>
+            <td class="px-4 py-2">${row.nombre_encuestador || ""}</td>
+            <td class="px-4 py-2">${row.nombre_encuestado || ""}</td>
+            <td class="px-4 py-2">${row.sexo || ""}</td>
+            <td class="px-4 py-2">${row.edad || ""}</td>
+            <td class="px-4 py-2">${row.grupo || ""}</td>
+            <td class="px-4 py-2">${row.subgrupo || ""}</td>
+          </tr>
+        `;
+      });
 
-      const ctx = document.getElementById("graficoSexo").getContext("2d");
-      grafico = new Chart(ctx, {
+      pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+      prevPage.disabled = currentPage === 1;
+      nextPage.disabled = currentPage === totalPages;
+    }
+
+    function actualizarMétricas() {
+      totalRegistros.textContent = allData.length;
+      edadPromedio.textContent = Math.round(allData.reduce((a, b) => a + (b.edad || 0), 0) / allData.length) || 0;
+
+      const masculinos = allData.filter(d => d.sexo === "Masculino").length;
+      const femeninos = allData.filter(d => d.sexo === "Femenino").length;
+      totalMasculino.textContent = masculinos;
+      totalFemenino.textContent = femeninos;
+
+      actualizarGráficos(masculinos, femeninos);
+    }
+
+    function actualizarGráficos(masculinos, femeninos) {
+      if (graficoSexo) graficoSexo.destroy();
+      if (graficoEdad) graficoEdad.destroy();
+
+      graficoSexo = new Chart(document.getElementById("graficoSexo"), {
         type: "doughnut",
         data: {
-          labels: sexos,
-          datasets: [{
-            data: conteos,
-            backgroundColor: ["#16a34a", "#86efac"]
-          }]
+          labels: ["Masculino", "Femenino"],
+          datasets: [{ data: [masculinos, femeninos], backgroundColor: ["#16a34a", "#86efac"] }]
         },
-        options: {
-          plugins: { legend: { position: "bottom" } }
-        }
+        options: { plugins: { legend: { position: "bottom" } } }
+      });
+
+      const grupos = [...new Set(allData.map(d => d.grupo).filter(Boolean))];
+      const promedios = grupos.map(g => {
+        const subset = allData.filter(d => d.grupo === g);
+        return Math.round(subset.reduce((a, b) => a + (b.edad || 0), 0) / subset.length);
+      });
+
+      graficoEdad = new Chart(document.getElementById("graficoEdad"), {
+        type: "bar",
+        data: {
+          labels: grupos,
+          datasets: [{ label: "Edad promedio", data: promedios, backgroundColor: "#16a34a" }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
       });
     }
 
-    // Eventos
+    // ==============================
+    // EVENTOS
+    // ==============================
     refreshBtn.addEventListener("click", cargarDatos);
     searchInput.addEventListener("input", cargarDatos);
     filterSexo.addEventListener("change", cargarDatos);
     filterGrupo.addEventListener("change", cargarDatos);
+    prevPage.addEventListener("click", () => { currentPage--; renderizarPagina(); });
+    nextPage.addEventListener("click", () => { currentPage++; renderizarPagina(); });
 
-    // Carga inicial
+    // CARGA INICIAL
     cargarDatos();
   </script>
 </body>
