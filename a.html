@@ -1,215 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Supabase - Cuestionario Proambiental</title>
-
-  <!-- Fuentes y librerías -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Cuestionario Ambiental</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    :root {
-      --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#06b6d4;
-      font-family:'Inter',sans-serif;
-    }
-    body {
-      margin:0; background:linear-gradient(180deg,#071426 0%, #081727 60%);
-      color:#e6eef6; min-height:100vh;
-    }
-    header {
-      display:flex; justify-content:space-between; align-items:center;
-      padding:20px 28px; background:rgba(255,255,255,0.02); backdrop-filter:blur(6px);
-      border-bottom:1px solid rgba(255,255,255,0.05);
-    }
-    .branding { display:flex; align-items:center; gap:10px; }
-    .logo { background:linear-gradient(135deg,var(--accent),#60a5fa);
-      color:#07203a; font-weight:700; border-radius:8px; width:44px; height:44px;
-      display:flex; align-items:center; justify-content:center;
-    }
-    main { max-width:1200px; margin:20px auto; padding:24px; }
-    .grid { display:grid; grid-template-columns:1fr 360px; gap:20px; }
-    .card {
-      background:var(--card); border-radius:12px; padding:18px;
-      box-shadow:0 6px 18px rgba(2,6,23,0.6);
-      border:1px solid rgba(255,255,255,0.05);
-    }
-    input, select, button {
-      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);
-      border-radius:8px; color:inherit; padding:8px 10px;
-    }
-    table { width:100%; border-collapse:collapse; font-size:13px; }
-    th, td { padding:8px; border-bottom:1px solid rgba(255,255,255,0.05); text-align:left; }
-    th { color:var(--muted); font-size:12px; text-transform:uppercase; }
-    .controls { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
-    .btn { cursor:pointer; }
-    .loading { text-align:center; color:var(--muted); padding:20px; }
-    @media(max-width:900px){ .grid{grid-template-columns:1fr;} }
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <header>
-    <div class="branding">
-      <div class="logo">CP</div>
-      <div>
-        <h1 style="margin:0;font-size:18px;">Cuestionario Proambiental</h1>
-        <p style="margin:0;font-size:13px;color:var(--muted);">
-          Visualización de datos desde Supabase
-        </p>
-      </div>
-    </div>
+<body class="bg-gray-50 text-gray-800">
+  <header class="bg-green-600 text-white shadow p-5">
+    <h1 class="text-3xl font-bold text-center">Dashboard de Comportamiento Proambiental</h1>
+    <p class="text-center text-sm opacity-90 mt-1">Visualización de datos desde Supabase</p>
   </header>
 
-  <main>
-    <div class="grid">
-      <section class="card">
-        <div class="controls">
-          <input id="search" placeholder="Buscar por nombre o encuestador">
-          <select id="filterSexo">
-            <option value="">Todos los sexos</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-          </select>
-          <button id="btnRefresh" class="btn">Actualizar</button>
-          <button id="btnExport" class="btn">Exportar CSV</button>
-        </div>
+  <main class="max-w-7xl mx-auto p-6">
+    <!-- Controles -->
+    <section class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex gap-3">
+        <button id="refreshBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
+          🔄 Actualizar datos
+        </button>
+        <input type="text" id="searchInput" placeholder="Buscar por encuestado..." class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none" />
+      </div>
 
-        <div id="tableWrap">
-          <div id="loading" class="loading">Cargando datos...</div>
-          <table id="dataTable" style="display:none;">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Fecha registro</th>
-                <th>Encuestador</th>
-                <th>Encuestado</th>
-                <th>Sexo</th>
-                <th>Edad</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-      </section>
+      <div class="flex gap-3">
+        <select id="filterSexo" class="border border-gray-300 rounded-lg px-3 py-2">
+          <option value="">Sexo: Todos</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+        </select>
+        <select id="filterGrupo" class="border border-gray-300 rounded-lg px-3 py-2">
+          <option value="">Grupo: Todos</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
+      </div>
+    </section>
 
-      <aside class="card">
-        <h3 style="margin-top:0;">Resumen</h3>
-        <p style="font-size:13px;color:var(--muted);">Gráfico por sexo y estadísticas</p>
-        <div style="height:200px;">
-          <canvas id="sexoChart"></canvas>
-        </div>
-        <hr style="opacity:0.1;margin:12px 0;">
-        <p>Total registros: <span id="total">0</span></p>
-        <p>Edad promedio: <span id="avgEdad">—</span></p>
-      </aside>
-    </div>
+    <!-- Métricas -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-xl shadow text-center">
+        <h3 class="text-gray-500 text-sm">Total de Encuestas</h3>
+        <p id="totalRegistros" class="text-2xl font-bold text-green-600">0</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow text-center">
+        <h3 class="text-gray-500 text-sm">Edad Promedio</h3>
+        <p id="edadPromedio" class="text-2xl font-bold text-green-600">0</p>
+      </div>
+    </section>
+
+    <!-- Tabla -->
+    <section class="bg-white shadow rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left">
+          <thead class="bg-green-100 text-gray-700 uppercase">
+            <tr>
+              <th class="px-4 py-2">ID</th>
+              <th class="px-4 py-2">Fecha</th>
+              <th class="px-4 py-2">Encuestador</th>
+              <th class="px-4 py-2">Encuestado</th>
+              <th class="px-4 py-2">Sexo</th>
+              <th class="px-4 py-2">Edad</th>
+              <th class="px-4 py-2">Grupo</th>
+              <th class="px-4 py-2">Subgrupo</th>
+            </tr>
+          </thead>
+          <tbody id="tablaDatos" class="divide-y divide-gray-200 text-gray-700">
+          </tbody>
+        </table>
+      </div>
+
+      <div id="loader" class="text-center p-4 text-green-600 hidden">
+        Cargando datos...
+      </div>
+    </section>
+
+    <!-- Gráfico -->
+    <section class="bg-white mt-8 p-6 rounded-xl shadow">
+      <h3 class="text-xl font-semibold text-center mb-4">Distribución por Sexo</h3>
+      <canvas id="graficoSexo" height="100"></canvas>
+    </section>
   </main>
 
-  <script>
-    const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-    const SUPABASE_ANON_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+  <footer class="text-center text-gray-500 py-4 text-sm">
+    © 2025 Dashboard Ambiental — Desarrollado con Supabase & TailwindCSS
+  </footer>
 
+  <script>
+    // Configura tus credenciales de Supabase
+    const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const tableName = "cuestionario_comportamiento_proambiental_autosustentabilidad";
 
-    const tbody = document.getElementById("tbody");
-    const loading = document.getElementById("loading");
-    const dataTable = document.getElementById("dataTable");
-    const search = document.getElementById("search");
+    const tabla = document.getElementById("tablaDatos");
+    const loader = document.getElementById("loader");
+    const totalRegistros = document.getElementById("totalRegistros");
+    const edadPromedio = document.getElementById("edadPromedio");
+    const searchInput = document.getElementById("searchInput");
     const filterSexo = document.getElementById("filterSexo");
-    const totalEl = document.getElementById("total");
-    const avgEdadEl = document.getElementById("avgEdad");
-    let allData = [];
+    const filterGrupo = document.getElementById("filterGrupo");
+    const refreshBtn = document.getElementById("refreshBtn");
+    let grafico;
 
-    async function fetchData() {
-      loading.style.display = "block";
-      dataTable.style.display = "none";
+    async function cargarDatos() {
+      loader.classList.remove("hidden");
+      tabla.innerHTML = "";
 
-      let query = supabaseClient.from(tableName).select("*").order("id", { ascending: false });
+      let query = supabaseClient.from("cuestionario_comportamiento_proambiental_autosustentabilidad").select("*");
+
+      // Filtros
       if (filterSexo.value) query = query.eq("sexo", filterSexo.value);
-      if (search.value.trim()) {
-        const s = search.value.trim();
-        query = query.or(`nombre_encuestado.ilike.%${s}%,nombre_encuestador.ilike.%${s}%`);
-      }
+      if (filterGrupo.value) query = query.eq("grupo", filterGrupo.value);
 
-      const { data, error } = await query;
+      const { data, error } = await query.order("id", { ascending: false });
+      loader.classList.add("hidden");
+
       if (error) {
-        loading.textContent = "Error al cargar: " + error.message;
+        tabla.innerHTML = `<tr><td colspan="8" class="text-center text-red-500 p-4">Error al cargar datos: ${error.message}</td></tr>`;
         return;
       }
 
-      allData = data;
-      renderTable(data);
-      renderCharts(data);
-      loading.style.display = "none";
-      dataTable.style.display = "table";
-    }
+      const searchTerm = searchInput.value.toLowerCase();
+      const filtrados = data.filter(d =>
+        d.nombre_encuestado?.toLowerCase().includes(searchTerm)
+      );
 
-    function renderTable(rows) {
-      tbody.innerHTML = "";
-      rows.forEach(r => {
+      if (filtrados.length === 0) {
+        tabla.innerHTML = `<tr><td colspan="8" class="text-center p-4">No se encontraron resultados.</td></tr>`;
+        return;
+      }
+
+      filtrados.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${r.id}</td>
-          <td>${r.fecha_registro ? new Date(r.fecha_registro).toLocaleString("es-EC") : ""}</td>
-          <td>${r.nombre_encuestador || ""}</td>
-          <td>${r.nombre_encuestado || ""}</td>
-          <td>${r.sexo || ""}</td>
-          <td>${r.edad ?? ""}</td>`;
-        tbody.appendChild(tr);
+          <td class="px-4 py-2">${row.id}</td>
+          <td class="px-4 py-2">${row.fecha || ""}</td>
+          <td class="px-4 py-2">${row.nombre_encuestador || ""}</td>
+          <td class="px-4 py-2">${row.nombre_encuestado || ""}</td>
+          <td class="px-4 py-2">${row.sexo || ""}</td>
+          <td class="px-4 py-2">${row.edad || ""}</td>
+          <td class="px-4 py-2">${row.grupo || ""}</td>
+          <td class="px-4 py-2">${row.subgrupo || ""}</td>
+        `;
+        tabla.appendChild(tr);
       });
+
+      totalRegistros.textContent = filtrados.length;
+      edadPromedio.textContent = Math.round(filtrados.reduce((a, b) => a + (b.edad || 0), 0) / filtrados.length);
+
+      actualizarGrafico(filtrados);
     }
 
-    function renderCharts(rows) {
-      const total = rows.length;
-      totalEl.textContent = total;
+    function actualizarGrafico(data) {
+      const sexos = ["Masculino", "Femenino"];
+      const conteos = sexos.map(s => data.filter(d => d.sexo === s).length);
 
-      const edades = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
-      const avg = edades.length ? (edades.reduce((a, b) => a + b, 0) / edades.length).toFixed(1) : "—";
-      avgEdadEl.textContent = avg;
+      if (grafico) grafico.destroy();
 
-      const counts = {};
-      rows.forEach(r => {
-        const s = r.sexo || "No declarado";
-        counts[s] = (counts[s] || 0) + 1;
-      });
-
-      const labels = Object.keys(counts);
-      const data = Object.values(counts);
-
-      new Chart(document.getElementById("sexoChart"), {
+      const ctx = document.getElementById("graficoSexo").getContext("2d");
+      grafico = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels,
-          datasets: [{ data, backgroundColor: ["#3b82f6", "#f472b6", "#a3a3a3"] }]
+          labels: sexos,
+          datasets: [{
+            data: conteos,
+            backgroundColor: ["#16a34a", "#86efac"]
+          }]
         },
-        options: { plugins: { legend: { position: "bottom" } } }
+        options: {
+          plugins: { legend: { position: "bottom" } }
+        }
       });
     }
 
-    document.getElementById("btnRefresh").addEventListener("click", fetchData);
-    search.addEventListener("keyup", fetchData);
-    filterSexo.addEventListener("change", fetchData);
-    document.getElementById("btnExport").addEventListener("click", () => {
-      if (!allData.length) return alert("No hay datos para exportar");
-      const keys = Object.keys(allData[0]);
-      const csv = [keys.join(",")].concat(allData.map(r => keys.map(k => `"${(r[k] ?? "").toString().replace(/"/g, '""')}"`).join(",")));
-      const blob = new Blob([csv.join("\\n")], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "cuestionario.csv";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    });
+    // Eventos
+    refreshBtn.addEventListener("click", cargarDatos);
+    searchInput.addEventListener("input", cargarDatos);
+    filterSexo.addEventListener("change", cargarDatos);
+    filterGrupo.addEventListener("change", cargarDatos);
 
-    fetchData();
+    // Carga inicial
+    cargarDatos();
   </script>
 </body>
 </html>
