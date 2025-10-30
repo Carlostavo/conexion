@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard - Cuestionario Comportamiento Proambiental</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#06b6d4; --glass: rgba(255,255,255,0.03);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#071426 0%, #081727 60%);color:#e6eef6;min-height:100vh}
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent);backdrop-filter: blur(6px);border-bottom:1px solid rgba(255,255,255,0.03)}
+    .branding{display:flex;gap:14px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:700;color:#07203a}
+    h1{font-size:16px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    main{padding:24px;max-width:1200px;margin:20px auto}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .controls{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .search{flex:1}
+    input,select,button{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:8px;color:inherit;font-size:14px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    thead th{text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;font-size:12px}
+    tbody td{padding:10px 8px;border-top:1px solid rgba(255,255,255,0.02)}
+    .small{font-size:12px;color:var(--muted)}
+    .row-actions{display:flex;gap:8px}
+    .btn{cursor:pointer}
+    .pill{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px;font-size:12px}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .loading{padding:20px;text-align:center;color:var(--muted)}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}.card{padding:14px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="branding">
+      <div class="logo">CP</div>
+      <div>
+        <h1>Cuestionario - Proambiental</h1>
+        <p class="lead">Visualización profesional de la tabla <span class="pill">cuestionario_comportamiento_proambiental_autosustentabilidad</span></p>
+      </div>
+    </div>
+    <div class="user small">Conectado a Supabase (cliente público)</div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card">
+        <div class="controls">
+          <input id="search" class="search" placeholder="Buscar por nombre, encuestador, sexo..." />
+          <select id="filterSexo">
+            <option value="">Todos los sexos</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <button id="btnRefresh" class="btn">Actualizar</button>
+          <button id="btnExport" class="btn">Exportar CSV</button>
+        </div>
+
+        <div id="tableWrap">
+          <div id="loading" class="loading">Cargando datos...</div>
+          <table id="dataTable" style="display:none">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha Registro</th>
+                <th>Encuestador</th>
+                <th>Encuestado</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Sexo</th>
+                <th>Edad</th>
+                <th class="small">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="footer">
+          <div class="small" id="summary">—</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="prev" class="btn">« Anterior</button>
+            <span id="pageInfo" class="small">1</span>
+            <button id="next" class="btn">Siguiente »</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h3 style="margin-top:0">Resumen</h3>
+        <p class="small">Gráficos rápidos y métricas</p>
+        <div style="margin-top:12px">
+          <div style="height:180px">
+            <canvas id="sexoChart"></canvas>
+          </div>
+        </div>
+        <hr style="opacity:0.06;margin:12px 0">
+        <div>
+          <strong>Total registros:</strong> <span id="total">0</span>
+        </div>
+        <div style="margin-top:8px">
+          <strong>Edad promedio:</strong> <span id="avgEdad">—</span>
+        </div>
+        <div style="margin-top:12px">
+          <button id="reloadSmall" class="btn">Recargar</button>
+        </div>
+        <p class="small" style="margin-top:12px">Consejo de seguridad: evite usar la clave ANON pública en código cliente para producción. Use un endpoint servidor.</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // ---------- CONFIG - reemplaza si ya tienes variables de entorno ----------
+    const SUPABASE_URL = 'https://dutapywxsiuxboqsjqvf.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4';
+    // -------------------------------------------------------------------------
+
+    const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const tableName = 'cuestionario_comportamiento_proambiental_autosustentabilidad';
+
+    // state
+    let page = 0;
+    const pageSize = 12;
+    let totalRows = 0;
+    let lastFilter = {};
+    let allDataCache = null; // used for charts & export
+
+    const elements = {
+      tbody: document.getElementById('tbody'),
+      loading: document.getElementById('loading'),
+      table: document.getElementById('dataTable'),
+      search: document.getElementById('search'),
+      filterSexo: document.getElementById('filterSexo'),
+      btnRefresh: document.getElementById('btnRefresh'),
+      btnExport: document.getElementById('btnExport'),
+      total: document.getElementById('total'),
+      avgEdad: document.getElementById('avgEdad'),
+      pageInfo: document.getElementById('pageInfo'),
+      prev: document.getElementById('prev'),
+      next: document.getElementById('next'),
+      summary: document.getElementById('summary'),
+      reloadSmall: document.getElementById('reloadSmall')
+    };
+
+    // util: format date
+    function fmt(dt){ if(!dt) return ''; try{ const d=new Date(dt); return d.toLocaleString('es-EC'); }catch(e){return dt}}
+
+    async function fetchPage(){
+      showLoading(true);
+      const q = supabase.from(tableName).select('*', {count: 'exact'})
+        .range(page*pageSize, page*pageSize + pageSize - 1)
+        .order('id', {ascending:false});
+
+      // apply simple filters
+      const s = elements.search.value.trim();
+      const sexo = elements.filterSexo.value;
+      if(sexo) q.eq('sexo', sexo);
+      if(s){
+        // search across a few text fields
+        q.ilike('nombre_encuestado', `%${s}%`).or(`nombre_encuestador.ilike.%${s}%,nombre_encuestado.ilike.%${s}%`);
+      }
+
+      const {data, error, count} = await q;
+      if(error){
+        elements.loading.textContent = 'Error cargando datos: ' + error.message;
+        console.error(error);
+        return;
+      }
+      totalRows = count || (data? data.length:0);
+      renderTable(data || []);
+      elements.pageInfo.textContent = `Página ${page+1} — mostrando ${data?data.length:0} filas`;
+      elements.summary.textContent = `Total registros: ${totalRows}`;
+      showLoading(false);
+    }
+
+    function renderTable(rows){
+      elements.tbody.innerHTML = '';
+      if(!rows || rows.length===0){ elements.table.style.display='none'; elements.loading.textContent='No hay resultados'; elements.loading.style.display='block'; return; }
+      elements.table.style.display='table'; elements.loading.style.display='none';
+      rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${r.id}</td>
+          <td>${fmt(r.fecha_registro)}</td>
+          <td>${escapeHtml(r.nombre_encuestador)}</td>
+          <td>${escapeHtml(r.nombre_encuestado)}</td>
+          <td>${r.fecha || ''}</td>
+          <td>${r.hora || ''}</td>
+          <td>${r.sexo || ''}</td>
+          <td>${r.edad ?? ''}</td>
+          <td class="row-actions small"><button class="btn" onclick="viewRecord(${r.id})">Ver</button></td>
+        `;
+        elements.tbody.appendChild(tr);
+      });
+    }
+
+    // simple XSS-escape
+    function escapeHtml(s){ if(s==null) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    window.viewRecord = async function(id){
+      const {data,error} = await supabase.from(tableName).select('*').eq('id',id).single();
+      if(error){ alert('Error al obtener registro: '+error.message); return; }
+      const details = Object.entries(data).map(([k,v])=>`${k}: ${v}`).join('\n');
+      alert(details);
+    }
+
+    // charts & metrics
+    let sexoChart = null;
+    async function loadAllForCharts(){
+      const {data,error} = await supabase.from(tableName).select('*');
+      if(error){ console.error(error); return; }
+      allDataCache = data;
+      renderMetrics();
+    }
+
+    function renderMetrics(){
+      if(!allDataCache) return;
+      const total = allDataCache.length;
+      document.getElementById('total').textContent = total;
+      const edades = allDataCache.map(r=>Number(r.edad)).filter(n=>!Number.isNaN(n));
+      const avg = edades.length? (edades.reduce((a,b)=>a+b,0)/edades.length).toFixed(1) : '—';
+      document.getElementById('avgEdad').textContent = avg;
+
+      const counts = {};
+      allDataCache.forEach(r=>{ const s = r.sexo || 'No declarado'; counts[s] = (counts[s]||0)+1; });
+      const labels = Object.keys(counts);
+      const values = labels.map(l=>counts[l]);
+
+      if(sexoChart){ sexoChart.data.labels = labels; sexoChart.data.datasets[0].data = values; sexoChart.update(); }
+      else{
+        const ctx = document.getElementById('sexoChart');
+        sexoChart = new Chart(ctx, {
+          type: 'bar',
+          data:{ labels, datasets:[{ label:'Por sexo', data: values, backgroundColor: undefined }] },
+          options:{ responsive:true, plugins:{legend:{display:false}} }
+        });
+      }
+    }
+
+    // CSV export
+    function exportCSV(){
+      if(!allDataCache){ alert('Cargando datos para exportar. Presiona Recargar si es necesario.'); return; }
+      const keys = Object.keys(allDataCache[0]||{});
+      const rows = [keys.join(',')];
+      allDataCache.forEach(r=>{
+        const vals = keys.map(k=>`"${String(r[k] ?? '').replace(/"/g,'""')}"`);
+        rows.push(vals.join(','));
+      });
+      const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download = 'cuestionario_export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    // helpers
+    function showLoading(show){ elements.loading.style.display = show ? 'block' : 'none'; elements.table.style.display = show ? 'none' : 'table'; }
+
+    // events
+    elements.btnRefresh.addEventListener('click', ()=>{ page=0; fetchPage(); loadAllForCharts(); });
+    elements.reloadSmall.addEventListener('click', ()=>{ page=0; fetchPage(); loadAllForCharts(); });
+    elements.btnExport.addEventListener('click', exportCSV);
+    elements.next.addEventListener('click', ()=>{ page++; fetchPage(); });
+    elements.prev.addEventListener('click', ()=>{ if(page>0) page--; fetchPage(); });
+    elements.search.addEventListener('keyup', ()=>{ page=0; fetchPage(); });
+    elements.filterSexo.addEventListener('change', ()=>{ page=0; fetchPage(); });
+
+    // initial load
+    (async ()=>{
+      await fetchPage();
+      await loadAllForCharts();
+    })();
+
+  </script>
+</body>
+</html>
