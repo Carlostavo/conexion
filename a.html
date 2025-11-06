@@ -3,209 +3,210 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indicadores - Plataforma de Seguimiento Ambiental</title>
-
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase -->
+  <title>Dashboard Proambiental</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .fade-in { animation: fadeIn 0.6s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    body {
+      background-color: #f9fafb;
+    }
   </style>
 </head>
 
-<body class="bg-gray-50 text-gray-900 font-sans">
-  <!-- Encabezado -->
-  <header class="bg-emerald-700 text-white shadow-lg p-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold tracking-wide">📊 Panel de Indicadores Ambientales</h1>
-      <button id="refreshBtn" class="bg-white text-emerald-700 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-50 shadow transition">
-        🔄 Actualizar
-      </button>
+<body class="min-h-screen flex flex-col text-gray-800">
+  <!-- HEADER -->
+  <header class="bg-emerald-600 text-white py-4 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold tracking-wide">🌱 Dashboard Proambiental</h1>
+      <p class="text-sm opacity-90">Encuesta de comportamiento proambiental y autosustentabilidad</p>
     </div>
-    <p class="text-sm opacity-80 mt-1">Seguimiento de indicadores del proyecto FCI-087 - Daule</p>
   </header>
 
-  <!-- Contenido -->
-  <main class="max-w-7xl mx-auto p-6 space-y-8">
-    
-    <!-- Filtros -->
-    <section class="bg-white rounded-xl shadow-md p-4 flex flex-col md:flex-row justify-between items-center gap-4">
-      <input type="text" id="searchInput" placeholder="Buscar por encuestado o grupo..." class="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/3 focus:ring-2 focus:ring-emerald-400 focus:outline-none" />
-      <div class="flex gap-3">
-        <select id="filterSexo" class="border border-gray-300 rounded-lg px-3 py-2">
-          <option value="">Sexo: Todos</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-        </select>
-        <select id="filterGrupo" class="border border-gray-300 rounded-lg px-3 py-2">
-          <option value="">Grupo: Todos</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-grow max-w-7xl mx-auto px-6 py-8">
+    <div class="mb-6 grid md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">Filtrar por sexo</label>
+        <select id="filtroSexo" class="w-full border rounded-lg px-3 py-2">
+          <option value="todos">Todos</option>
+          <option value="masculino">Masculino</option>
+          <option value="femenino">Femenino</option>
         </select>
       </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Dimensión</label>
+        <select id="filtroDimension" class="w-full border rounded-lg px-3 py-2">
+          <option value="conocimiento">Conocimiento</option>
+          <option value="percepcion">Percepción</option>
+          <option value="actitud">Actitud</option>
+          <option value="participacion">Participación</option>
+          <option value="impacto">Impacto y oportunidades</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Tipo de gráfico</label>
+        <select id="tipoGrafico" class="w-full border rounded-lg px-3 py-2">
+          <option value="bar">Barras</option>
+          <option value="pie">Pastel</option>
+          <option value="radar">Radar</option>
+        </select>
+      </div>
+
+      <div class="flex items-end">
+        <button id="btnActualizar" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg w-full">Actualizar</button>
+      </div>
+    </div>
+
+    <div id="loading" class="text-center text-gray-500 py-8">Cargando datos desde Supabase...</div>
+
+    <section id="contenidoDashboard" class="hidden">
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow p-5">
+          <h2 class="text-lg font-semibold mb-3">Distribución por Sexo</h2>
+          <canvas id="graficoSexo"></canvas>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-5">
+          <h2 class="text-lg font-semibold mb-3">Promedio de Edad</h2>
+          <p id="promedioEdad" class="text-2xl font-bold text-emerald-700"></p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-5">
+        <h2 id="tituloGrafico" class="text-lg font-semibold mb-3"></h2>
+        <canvas id="graficoPrincipal"></canvas>
+      </div>
     </section>
-
-    <!-- Indicadores -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 fade-in">
-      <div class="bg-white rounded-xl shadow-md p-5 text-center border-t-4 border-emerald-600">
-        <h3 class="text-gray-500 text-sm">Total de Registros</h3>
-        <p id="totalRegistros" class="text-3xl font-bold text-emerald-700">0</p>
-      </div>
-      <div class="bg-white rounded-xl shadow-md p-5 text-center border-t-4 border-blue-600">
-        <h3 class="text-gray-500 text-sm">Edad Promedio</h3>
-        <p id="edadPromedio" class="text-3xl font-bold text-blue-700">0</p>
-      </div>
-      <div class="bg-white rounded-xl shadow-md p-5 text-center border-t-4 border-pink-600">
-        <h3 class="text-gray-500 text-sm">Femenino (%)</h3>
-        <p id="porcentajeFemenino" class="text-3xl font-bold text-pink-600">0%</p>
-      </div>
-      <div class="bg-white rounded-xl shadow-md p-5 text-center border-t-4 border-indigo-600">
-        <h3 class="text-gray-500 text-sm">Masculino (%)</h3>
-        <p id="porcentajeMasculino" class="text-3xl font-bold text-indigo-600">0%</p>
-      </div>
-    </section>
-
-    <!-- Gráficos -->
-    <section class="grid md:grid-cols-2 gap-8 fade-in">
-      <div class="bg-white p-6 rounded-xl shadow-md">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">Distribución por Sexo</h3>
-        <canvas id="graficoSexo" height="150"></canvas>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl shadow-md">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">Distribución por Grupo</h3>
-        <canvas id="graficoGrupo" height="150"></canvas>
-      </div>
-    </section>
-
-    <div id="loader" class="text-center text-emerald-600 mt-8 hidden">Cargando indicadores...</div>
   </main>
 
-  <!-- Pie de página -->
-  <footer class="text-center text-gray-500 py-6 text-sm">
-    © 2025 Plataforma de Seguimiento Ambiental — Basado en Supabase & Chart.js
+  <footer class="bg-gray-100 text-center text-sm py-4 text-gray-500">
+    © 2025 Proyecto Proambiental — Desarrollado con Supabase & Vercel
   </footer>
 
   <script>
-    // Configuración Supabase
-    const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // --- CONFIGURACIÓN SUPABASE ---
+    const supabaseUrl = "https://dutapywxsiuxboqsjqvf.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Referencias DOM
-    const totalRegistros = document.getElementById("totalRegistros");
-    const edadPromedio = document.getElementById("edadPromedio");
-    const porcentajeFemenino = document.getElementById("porcentajeFemenino");
-    const porcentajeMasculino = document.getElementById("porcentajeMasculino");
-    const loader = document.getElementById("loader");
-    const graficoSexo = document.getElementById("graficoSexo");
-    const graficoGrupo = document.getElementById("graficoGrupo");
-    const searchInput = document.getElementById("searchInput");
-    const filterSexo = document.getElementById("filterSexo");
-    const filterGrupo = document.getElementById("filterGrupo");
-    const refreshBtn = document.getElementById("refreshBtn");
+    let chartPrincipal = null;
+    let chartSexo = null;
 
-    let chartSexo, chartGrupo;
-
-    // Función principal
-    async function cargarIndicadores() {
-      loader.classList.remove("hidden");
-
-      let query = supabaseClient.from("cuestionario_comportamiento_proambiental_autosustentabilidad").select("*");
-      if (filterSexo.value) query = query.eq("sexo", filterSexo.value);
-      if (filterGrupo.value) query = query.eq("grupo", filterGrupo.value);
-
-      const { data, error } = await query;
-      loader.classList.add("hidden");
+    async function cargarDatos() {
+      const { data, error } = await supabase
+        .from("cuestionario_comportamiento_proambiental_autosustentabilidad")
+        .select("*");
 
       if (error) {
-        alert("Error al cargar indicadores: " + error.message);
-        return;
+        console.error(error);
+        document.getElementById("loading").innerText = "Error al cargar los datos.";
+        return [];
       }
 
-      const search = searchInput.value.toLowerCase();
-      const filtrados = data.filter(d =>
-        d.nombre_encuestado?.toLowerCase().includes(search)
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("contenidoDashboard").classList.remove("hidden");
+      return data;
+    }
+
+    function filtrarData(data, sexo) {
+      if (sexo === "todos") return data;
+      return data.filter(d => d.sexo?.toLowerCase() === sexo);
+    }
+
+    function contarLikert(respuestas) {
+      const niveles = ["Totalmente en desacuerdo", "En desacuerdo", "Indiferente", "De acuerdo", "Totalmente de acuerdo"];
+      return niveles.map(nivel =>
+        respuestas.filter(r => r?.toLowerCase() === nivel.toLowerCase()).length
       );
-
-      actualizarIndicadores(filtrados);
     }
 
-    function actualizarIndicadores(data) {
-      const total = data.length;
-      totalRegistros.textContent = total;
+    function crearGrafico(canvasId, tipo, titulo, labels, dataValues, color = "#2a9d8f") {
+      const ctx = document.getElementById(canvasId).getContext("2d");
+      if (chartPrincipal && canvasId === "graficoPrincipal") chartPrincipal.destroy();
+      if (chartSexo && canvasId === "graficoSexo") chartSexo.destroy();
 
-      const edades = data.map(d => d.edad).filter(n => !isNaN(n));
-      edadPromedio.textContent = edades.length ? Math.round(edades.reduce((a, b) => a + b, 0) / edades.length) : 0;
-
-      const totalF = data.filter(d => d.sexo === "Femenino").length;
-      const totalM = data.filter(d => d.sexo === "Masculino").length;
-
-      porcentajeFemenino.textContent = total ? ((totalF / total) * 100).toFixed(1) + "%" : "0%";
-      porcentajeMasculino.textContent = total ? ((totalM / total) * 100).toFixed(1) + "%" : "0%";
-
-      actualizarGraficos(data);
-    }
-
-    function actualizarGraficos(data) {
-      const sexoLabels = ["Masculino", "Femenino"];
-      const sexoData = [
-        data.filter(d => d.sexo === "Masculino").length,
-        data.filter(d => d.sexo === "Femenino").length,
-      ];
-
-      const grupos = [...new Set(data.map(d => d.grupo).filter(Boolean))];
-      const conteoGrupos = grupos.map(g => data.filter(d => d.grupo === g).length);
-
-      if (chartSexo) chartSexo.destroy();
-      if (chartGrupo) chartGrupo.destroy();
-
-      chartSexo = new Chart(graficoSexo, {
-        type: "doughnut",
+      const nuevoChart = new Chart(ctx, {
+        type: tipo,
         data: {
-          labels: sexoLabels,
-          datasets: [
-            { data: sexoData, backgroundColor: ["#16a34a", "#86efac"] },
-          ],
-        },
-        options: { plugins: { legend: { position: "bottom" } } },
-      });
-
-      chartGrupo = new Chart(graficoGrupo, {
-        type: "bar",
-        data: {
-          labels: grupos,
+          labels,
           datasets: [
             {
-              label: "Registros por grupo",
-              data: conteoGrupos,
-              backgroundColor: "#16a34a",
-            },
-          ],
+              label: titulo,
+              data: dataValues,
+              backgroundColor: [
+                "#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d"
+              ]
+            }
+          ]
         },
         options: {
           responsive: true,
-          scales: { y: { beginAtZero: true } },
-          plugins: { legend: { display: false } },
-        },
+          scales: tipo === "bar" ? { y: { beginAtZero: true } } : {}
+        }
       });
+      if (canvasId === "graficoPrincipal") chartPrincipal = nuevoChart;
+      if (canvasId === "graficoSexo") chartSexo = nuevoChart;
     }
 
-    // Eventos
-    searchInput.addEventListener("input", cargarIndicadores);
-    filterSexo.addEventListener("change", cargarIndicadores);
-    filterGrupo.addEventListener("change", cargarIndicadores);
-    refreshBtn.addEventListener("click", cargarIndicadores);
+    function generarIndicadores(data, dimension, tipoGrafico) {
+      // SEXO
+      const sexos = data.map(d => d.sexo);
+      const hombres = sexos.filter(s => s?.toLowerCase() === "masculino").length;
+      const mujeres = sexos.filter(s => s?.toLowerCase() === "femenino").length;
+      crearGrafico("graficoSexo", "pie", "Distribución por sexo", ["Masculino", "Femenino"], [hombres, mujeres]);
 
-    // Carga inicial
-    cargarIndicadores();
+      // EDAD
+      const edades = data.map(d => d.edad).filter(e => e != null);
+      const promedio = (edades.reduce((a, b) => a + b, 0) / edades.length).toFixed(1);
+      document.getElementById("promedioEdad").innerText = `${promedio} años`;
+
+      // DIMENSIONES
+      let campos = [];
+      if (dimension === "conocimiento")
+        campos = ["conoce_desechos_solidos", "clasificacion_correcta_desechos", "beneficios_reutilizar_residuo"];
+      else if (dimension === "percepcion")
+        campos = ["desechos_solidos_problema_comunidad", "preocupa_exceso_desechos", "desechos_contaminan_ambiente"];
+      else if (dimension === "actitud")
+        campos = ["dedica_tiempo_reducir_reutilizar_reciclar", "falta_informacion_obstaculo_gestion", "reduccion_reciclaje_reutilizacion_cuida_ambiente"];
+      else if (dimension === "participacion")
+        campos = ["participaria_talleres_buenas_practicas", "dispuesto_participar_emprendimiento_desechos", "participaria_feria_emprendimientos_desechos"];
+      else if (dimension === "impacto")
+        campos = ["manejo_adecuado_desechos_aporta_desarrollo", "emprendimientos_reutilizacion_aportan_economia", "manejo_adecuado_desechos_impacto_ambiente"];
+
+      const labels = ["Totalmente en desacuerdo", "En desacuerdo", "Indiferente", "De acuerdo", "Totalmente de acuerdo"];
+      const valoresTotales = Array(5).fill(0);
+
+      campos.forEach(campo => {
+        const respuestas = data.map(d => d[campo]);
+        const conteo = contarLikert(respuestas);
+        for (let i = 0; i < valoresTotales.length; i++) {
+          valoresTotales[i] += conteo[i];
+        }
+      });
+
+      document.getElementById("tituloGrafico").innerText = `Indicadores: ${dimension.charAt(0).toUpperCase() + dimension.slice(1)}`;
+      crearGrafico("graficoPrincipal", tipoGrafico, "Escala Likert", labels, valoresTotales);
+    }
+
+    async function iniciarDashboard() {
+      const datos = await cargarDatos();
+
+      const aplicarFiltros = () => {
+        const sexo = document.getElementById("filtroSexo").value;
+        const dimension = document.getElementById("filtroDimension").value;
+        const tipoGrafico = document.getElementById("tipoGrafico").value;
+        const filtrado = filtrarData(datos, sexo);
+        generarIndicadores(filtrado, dimension, tipoGrafico);
+      };
+
+      document.getElementById("btnActualizar").addEventListener("click", aplicarFiltros);
+      aplicarFiltros(); // carga inicial
+    }
+
+    iniciarDashboard();
   </script>
 </body>
 </html>
