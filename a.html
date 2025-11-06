@@ -1,212 +1,483 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Proambiental</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Proambiental — Indicadores</title>
+
+  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
   <style>
-    body {
-      background-color: #f9fafb;
-    }
+    /* pequeñas personalizaciones */
+    body { background: linear-gradient(180deg,#f7fafc 0%, #ffffff 100%); }
+    .card { background: white; border-radius: 14px; box-shadow: 0 6px 18px rgba(15,23,42,0.06); }
+    .muted { color: #6b7280; }
   </style>
 </head>
+<body class="min-h-screen font-sans antialiased text-slate-800">
 
-<body class="min-h-screen flex flex-col text-gray-800">
   <!-- HEADER -->
-  <header class="bg-emerald-600 text-white py-4 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold tracking-wide">🌱 Dashboard Proambiental</h1>
-      <p class="text-sm opacity-90">Encuesta de comportamiento proambiental y autosustentabilidad</p>
+  <header class="bg-emerald-600 text-white">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none"><path d="M12 2l3 6 6 .5-4.5 4 1 6L12 17l-5.5 2.5 1-6L3 8.5 9 8 12 2z" fill="#fff"/></svg>
+        <div>
+          <h1 class="text-xl font-semibold">Dashboard Proambiental</h1>
+          <p class="text-sm muted">Indicadores — comportamiento proambiental y autosustentabilidad</p>
+        </div>
+      </div>
+      <div class="text-sm muted">Tabla: <span class="font-medium text-emerald-100">cuestionario_comportamiento_proambiental_autosustentabilidad</span></div>
     </div>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="flex-grow max-w-7xl mx-auto px-6 py-8">
-    <div class="mb-6 grid md:grid-cols-4 gap-4">
-      <div>
-        <label class="block text-sm font-medium mb-1">Filtrar por sexo</label>
-        <select id="filtroSexo" class="w-full border rounded-lg px-3 py-2">
-          <option value="todos">Todos</option>
-          <option value="masculino">Masculino</option>
-          <option value="femenino">Femenino</option>
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- panel controles -->
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
+      <div class="card p-4">
+        <label class="block text-sm text-slate-600 mb-2">Indicador</label>
+        <select id="selectIndicador" class="w-full rounded-lg border py-2 px-3">
+          <!-- opciones se definen en JS (para mantener el código limpio) -->
         </select>
+        <p class="text-xs muted mt-2">Elige la métrica que quieres visualizar.</p>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium mb-1">Dimensión</label>
-        <select id="filtroDimension" class="w-full border rounded-lg px-3 py-2">
-          <option value="conocimiento">Conocimiento</option>
-          <option value="percepcion">Percepción</option>
-          <option value="actitud">Actitud</option>
-          <option value="participacion">Participación</option>
-          <option value="impacto">Impacto y oportunidades</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Tipo de gráfico</label>
-        <select id="tipoGrafico" class="w-full border rounded-lg px-3 py-2">
+      <div class="card p-4">
+        <label class="block text-sm text-slate-600 mb-2">Tipo de gráfico</label>
+        <select id="selectTipoGrafico" class="w-full rounded-lg border py-2 px-3">
           <option value="bar">Barras</option>
           <option value="pie">Pastel</option>
+          <option value="doughnut">Doughnut</option>
+          <option value="line">Línea</option>
           <option value="radar">Radar</option>
+          <option value="polarArea">Polar Area</option>
+          <option value="scatter">Scatter</option>
+          <option value="bubble">Bubble</option>
+          <option value="mixed">Mixed (barras + línea)</option>
         </select>
+        <p class="text-xs muted mt-2">Puedes experimentar con diferentes tipos para ver cuál comunica mejor el dato.</p>
       </div>
 
-      <div class="flex items-end">
-        <button id="btnActualizar" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg w-full">Actualizar</button>
+      <div class="card p-4 flex flex-col justify-between">
+        <div>
+          <label class="block text-sm text-slate-600 mb-2">Filtros rápidos</label>
+          <div class="flex gap-2">
+            <select id="filtroSexo" class="flex-1 rounded-lg border py-2 px-3">
+              <option value="todos">Sexo: Todos</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+            </select>
+            <select id="filtroGrupo" class="w-40 rounded-lg border py-2 px-3">
+              <option value="todos">Grupo: Todos</option>
+            </select>
+          </div>
+          <p class="text-xs muted mt-2">Aplica filtro por sexo o por grupo (si tienes grupos definidos en datos).</p>
+        </div>
+
+        <div class="mt-3 flex items-center gap-2">
+          <button id="btnActualizar" class="ml-auto bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">Actualizar</button>
+          <button id="btnExportarImagen" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-sm">Exportar imagen</button>
+        </div>
       </div>
     </div>
 
-    <div id="loading" class="text-center text-gray-500 py-8">Cargando datos desde Supabase...</div>
+    <!-- summary cards -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-4">
+        <div class="text-sm muted">Total encuestas</div>
+        <div id="totalEncuestas" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm muted">Promedio edad</div>
+        <div id="promedioEdad" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm muted">Separación en hogar (%)</div>
+        <div id="porcentajeSepara" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm muted">Participaría en talleres (%)</div>
+        <div id="porcentajeTalleres" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+    </div>
 
-    <section id="contenidoDashboard" class="hidden">
-      <div class="grid md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow p-5">
-          <h2 class="text-lg font-semibold mb-3">Distribución por Sexo</h2>
-          <canvas id="graficoSexo"></canvas>
+    <!-- grafico principal -->
+    <div class="card p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 id="tituloPrincipal" class="text-lg font-semibold">Indicador</h2>
+          <p id="subtituloPrincipal" class="text-xs muted mt-1">Selecciona un indicador y tipo de gráfico, luego haz clic en <strong>Actualizar</strong>.</p>
         </div>
-
-        <div class="bg-white rounded-xl shadow p-5">
-          <h2 class="text-lg font-semibold mb-3">Promedio de Edad</h2>
-          <p id="promedioEdad" class="text-2xl font-bold text-emerald-700"></p>
-        </div>
+        <div class="text-sm muted">Datos cargados desde Supabase</div>
       </div>
 
-      <div class="bg-white rounded-xl shadow p-5">
-        <h2 id="tituloGrafico" class="text-lg font-semibold mb-3"></h2>
-        <canvas id="graficoPrincipal"></canvas>
-      </div>
-    </section>
+      <canvas id="chartCanvas" style="max-height:520px;"></canvas>
+      <div id="mensajeSinDatos" class="text-center muted mt-4 hidden">No hay datos que mostrar para este filtro.</div>
+    </div>
+
+    <!-- footer -->
+    <footer class="text-center text-sm muted mb-8">© 2025 Proyecto Proambiental — Hecho con Supabase & Chart.js</footer>
   </main>
 
-  <footer class="bg-gray-100 text-center text-sm py-4 text-gray-500">
-    © 2025 Proyecto Proambiental — Desarrollado con Supabase & Vercel
-  </footer>
-
   <script>
-    // --- CONFIGURACIÓN SUPABASE ---
-    const supabaseUrl = "https://dutapywxsiuxboqsjqvf.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    /**************************************************************************
+     * CONFIGURACIÓN SUPABASE (ya con tus credenciales proporcionadas)
+     * Nota: Ya diste la URL y la ANON KEY — si decides cambiarlas, actualiza aquí.
+     **************************************************************************/
+    const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
 
-    let chartPrincipal = null;
-    let chartSexo = null;
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const TABLE_NAME = "cuestionario_comportamiento_proambiental_autosustentabilidad";
 
-    async function cargarDatos() {
+    /**************************************************************************
+     * INDICADORES configurables: cada entrada tiene:
+     *  - id: clave interna
+     *  - title: título visible
+     *  - type: 'likert' | 'categorical' | 'numeric' (define cómo procesar)
+     *  - fields: columnas relacionadas (array)
+     **************************************************************************/
+    const INDICADORES = [
+      { id: "sexo", title: "Distribución por sexo", type: "categorical", fields: ["sexo"] },
+      { id: "promedio_edad", title: "Promedio de edad", type: "numeric", fields: ["edad"] },
+      { id: "educacion_jefe", title: "Nivel de educación del jefe del hogar", type: "categorical", fields: ["educacion_jefe_hogar"] },
+      { id: "separa_desechos", title: "¿Practica separación de residuos en su hogar?", type: "categorical", fields: ["practica_separacion_reciclaje_ingreso"] },
+      { id: "conocimiento_desechos", title: "Conocimiento sobre desechos sólidos (Likert)", type: "likert", fields: ["conoce_desechos_solidos"] },
+      { id: "dispuesto_talleres", title: "Disposición a participar en talleres (Likert)", type: "likert", fields: ["participaria_talleres_buenas_practicas"] },
+      { id: "dispuesto_emprender", title: "Dispuesto a participar en emprendimientos (Likert)", type: "likert", fields: ["dispuesto_participar_emprendimiento_desechos"] },
+      { id: "emprendimiento_economico", title: "Percepción: emprendimientos aportan a la economía (Likert)", type: "likert", fields: ["emprendimientos_reutilizacion_aportan_economia"] },
+      { id: "impacto_medio", title: "Considera que los desechos contaminan el ambiente (Likert)", type: "likert", fields: ["desechos_contaminan_ambiente"] }
+    ];
+
+    /**************************************************************************
+     * UTILIDADES: manejo de Likert, conteos, transformación para Chart.js
+     **************************************************************************/
+    const LIKERT_LEVELS = [
+      "Totalmente en desacuerdo",
+      "En desacuerdo",
+      "Indiferente",
+      "De acuerdo",
+      "Totalmente de acuerdo"
+    ];
+
+    // map para normalizar respuestas (minimizar errores por mayúsculas/minúsculas/acentos)
+    function normalizeStr(s) {
+      if (s === null || s === undefined) return null;
+      return String(s).trim();
+    }
+
+    // cuenta valores categóricos y devuelve labels/values ordenados
+    function contarCategorico(values) {
+      const counts = {};
+      values.forEach(v => {
+        const x = normalizeStr(v) ?? "No declarado";
+        counts[x] = (counts[x] || 0) + 1;
+      });
+      // ordenar por mayor a menor
+      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
+      return { labels: entries.map(e => e[0]), values: entries.map(e => e[1]) };
+    }
+
+    // cuenta Likert, devolviendo en orden LIKERT_LEVELS
+    function contarLikert(values) {
+      const lowerMap = LIKERT_LEVELS.map(l => l.toLowerCase());
+      const counts = LIKERT_LEVELS.map(() => 0);
+      values.forEach(v => {
+        const s = normalizeStr(v);
+        if (!s) return;
+        const idx = lowerMap.indexOf(s.toLowerCase());
+        if (idx !== -1) counts[idx] += 1;
+        else {
+          // si la respuesta no coincide exactamente, intentar coincidencia parcial (e.g., "de acuerdo")
+          const found = lowerMap.findIndex(l => s.toLowerCase().includes(l.split(' ')[0]));
+          if (found !== -1) counts[found] += 1;
+        }
+      });
+      return { labels: LIKERT_LEVELS.slice(), values: counts };
+    }
+
+    // preparar datos para scatter/bubble: convertir índices a puntos
+    function countsToScatter(values) {
+      // values: [v0, v1, ...] -> [{x:0, y:v0}, ...]
+      return values.map((v,i) => ({ x: i + 1, y: v }));
+    }
+    function countsToBubble(values) {
+      // size proporcional al valor
+      const max = Math.max(...values, 1);
+      return values.map((v,i) => ({ x: i + 1, y: v, r: Math.max(3, (v / max) * 20) }));
+    }
+
+    /**************************************************************************
+     * RENDER: Chart.js instancia única (se destruye y recrea cuando cambian)
+     **************************************************************************/
+    let chart = null;
+
+    function destroyChart() {
+      if (chart) {
+        try { chart.destroy(); } catch(e) {}
+        chart = null;
+      }
+    }
+
+    function renderChart(type, labels, dataValues, title) {
+      const ctx = document.getElementById("chartCanvas").getContext("2d");
+      destroyChart();
+
+      // ajustes para tipos especiales
+      let config = null;
+      if (type === "scatter") {
+        config = {
+          type: 'scatter',
+          data: { datasets: [{ label: title, data: countsToScatter(dataValues), backgroundColor: "#2a9d8f" }] },
+          options: { scales: { x: { title: { display: true, text: 'Índice' } }, y: { beginAtZero: true } } }
+        };
+      } else if (type === "bubble") {
+        config = {
+          type: 'bubble',
+          data: { datasets: [{ label: title, data: countsToBubble(dataValues), backgroundColor: "#2a9d8f" }] },
+          options: { scales: { x: { title: { display: true, text: 'Índice' } }, y: { beginAtZero: true } } }
+        };
+      } else if (type === "mixed") {
+        // mixed: barras para totales + línea superpuesta
+        config = {
+          data: {
+            labels,
+            datasets: [
+              { type: 'bar', label: 'Conteo', data: dataValues, backgroundColor: "#2a9d8f" },
+              { type: 'line', label: 'Tendencia', data: dataValues.map((v,i)=> i>0? (dataValues[i]+dataValues[i-1])/2 : dataValues[i]), borderColor: "#e76f51", tension: 0.3, fill: false, yAxisID: 'y' }
+            ]
+          },
+          options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        };
+      } else {
+        // tipos: bar, pie, doughnut, line, radar, polarArea
+        const dataset = {
+          label: title,
+          data: dataValues,
+          backgroundColor: [
+            "#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"
+          ].slice(0, labels.length),
+          borderColor: "#ffffff",
+          borderWidth: 0.6
+        };
+        config = {
+          type,
+          data: { labels, datasets: [dataset] },
+          options: { responsive: true, scales: type === 'bar' ? { y: { beginAtZero: true } } : {} }
+        };
+      }
+
+      chart = new Chart(ctx, config);
+    }
+
+    /**************************************************************************
+     * FUNCIONES PRINCIPALES: fetch, procesar y mostrar
+     **************************************************************************/
+    async function fetchDatos() {
+      // Traer todos los registros (puedes añadir .order() o filtros aquí)
       const { data, error } = await supabase
-        .from("cuestionario_comportamiento_proambiental_autosustentabilidad")
+        .from(TABLE_NAME)
         .select("*");
 
       if (error) {
-        console.error(error);
-        document.getElementById("loading").innerText = "Error al cargar los datos.";
-        return [];
+        console.error("Error Supabase:", error);
+        return { data: [], error };
+      }
+      return { data, error: null };
+    }
+
+    // actualizar resúmenes superiores (totales, promedios)
+    function actualizarResumenes(data) {
+      const total = data.length;
+      document.getElementById("totalEncuestas").innerText = total;
+
+      const edades = data.map(d => Number(d.edad)).filter(n => !isNaN(n));
+      const promedio = edades.length ? (edades.reduce((a,b)=>a+b,0)/edades.length).toFixed(1) : "—";
+      document.getElementById("promedioEdad").innerText = promedio === "—" ? "—" : `${promedio} años`;
+
+      // porcentaje que indica separación en hogar (consideramos respuestas que contienen 'si' o 'de acuerdo' como positivo)
+      const separa = data.map(d => normalizeStr(d.practica_separacion_reciclaje_ingreso)).filter(Boolean);
+      const separaPos = separa.filter(s => /si|sí|de acuerdo|totalmente de acuerdo|deacuerdo/i.test(s)).length;
+      const porcSepara = separa.length ? Math.round((separaPos / separa.length) * 100) : "—";
+      document.getElementById("porcentajeSepara").innerText = porcSepara === "—" ? "—" : `${porcSepara}%`;
+
+      // porcentaje que participaría en talleres
+      const talleres = data.map(d => normalizeStr(d.participaria_talleres_buenas_practicas)).filter(Boolean);
+      const talleresPos = talleres.filter(s => /si|sí|de acuerdo|totalmente de acuerdo/i.test(s)).length;
+      const porcTaller = talleres.length ? Math.round((talleresPos / talleres.length) * 100) : "—";
+      document.getElementById("porcentajeTalleres").innerText = porcTaller === "—" ? "—" : `${porcTaller}%`;
+    }
+
+    // genera el dataset y renderiza según la selección
+    async function generarIndicador(tipoIndicadorId, tipoGrafico, filtros = {}) {
+      const { data, error } = await fetchDatos();
+      if (error) {
+        document.getElementById("mensajeSinDatos").classList.remove("hidden");
+        return;
       }
 
-      document.getElementById("loading").style.display = "none";
-      document.getElementById("contenidoDashboard").classList.remove("hidden");
-      return data;
-    }
+      // aplicar filtros simples (sexo y grupo)
+      let filtered = data.slice();
+      if (filtros.sexo && filtros.sexo !== "todos") {
+        filtered = filtered.filter(r => (r.sexo || "").toLowerCase() === filtros.sexo.toLowerCase());
+      }
+      if (filtros.grupo && filtros.grupo !== "todos") {
+        filtered = filtered.filter(r => (r.grupo || "").toLowerCase() === filtros.grupo.toLowerCase());
+      }
 
-    function filtrarData(data, sexo) {
-      if (sexo === "todos") return data;
-      return data.filter(d => d.sexo?.toLowerCase() === sexo);
-    }
+      actualizarResumenes(filtered);
 
-    function contarLikert(respuestas) {
-      const niveles = ["Totalmente en desacuerdo", "En desacuerdo", "Indiferente", "De acuerdo", "Totalmente de acuerdo"];
-      return niveles.map(nivel =>
-        respuestas.filter(r => r?.toLowerCase() === nivel.toLowerCase()).length
-      );
-    }
+      // encontrar indicador
+      const indicador = INDICADORES.find(i => i.id === tipoIndicadorId);
+      if (!indicador) {
+        console.warn("Indicador no encontrado:", tipoIndicadorId);
+        return;
+      }
 
-    function crearGrafico(canvasId, tipo, titulo, labels, dataValues, color = "#2a9d8f") {
-      const ctx = document.getElementById(canvasId).getContext("2d");
-      if (chartPrincipal && canvasId === "graficoPrincipal") chartPrincipal.destroy();
-      if (chartSexo && canvasId === "graficoSexo") chartSexo.destroy();
+      let labels = [], values = [];
 
-      const nuevoChart = new Chart(ctx, {
-        type: tipo,
-        data: {
-          labels,
-          datasets: [
-            {
-              label: titulo,
-              data: dataValues,
-              backgroundColor: [
-                "#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d"
-              ]
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          scales: tipo === "bar" ? { y: { beginAtZero: true } } : {}
+      if (indicador.type === "categorical") {
+        // tomamos la primera columna listada
+        const col = indicador.fields[0];
+        const arr = filtered.map(r => r[col]);
+        const res = contarCategorico(arr);
+        labels = res.labels;
+        values = res.values;
+      } else if (indicador.type === "numeric") {
+        const col = indicador.fields[0];
+        const nums = filtered.map(r => Number(r[col])).filter(n => !isNaN(n));
+        if (!nums.length) {
+          labels = ["No hay datos"];
+          values = [0];
+        } else {
+          // ejemplo: mostrar histograma simple por rangos (0-10,11-25,26-50,51-90)
+          const ranges = [
+            { label: "0-10", min: 0, max: 10, count: 0 },
+            { label: "11-25", min: 11, max: 25, count: 0 },
+            { label: "26-50", min: 26, max: 50, count: 0 },
+            { label: "51-90", min: 51, max: 90, count: 0 }
+          ];
+          nums.forEach(n => {
+            const r = ranges.find(rr => n >= rr.min && n <= rr.max);
+            if (r) r.count++;
+          });
+          labels = ranges.map(r => r.label);
+          values = ranges.map(r => r.count);
         }
-      });
-      if (canvasId === "graficoPrincipal") chartPrincipal = nuevoChart;
-      if (canvasId === "graficoSexo") chartSexo = nuevoChart;
+      } else if (indicador.type === "likert") {
+        // campo principal
+        const col = indicador.fields[0];
+        const arr = filtered.map(r => r[col]);
+        const res = contarLikert(arr);
+        labels = res.labels;
+        values = res.values;
+      }
+
+      // si no hay valores válidos
+      const totalValues = values.reduce((a,b)=>a+b,0);
+      if (totalValues === 0) {
+        document.getElementById("mensajeSinDatos").classList.remove("hidden");
+        destroyChart();
+      } else {
+        document.getElementById("mensajeSinDatos").classList.add("hidden");
+        // título
+        document.getElementById("tituloPrincipal").innerText = indicador.title;
+        document.getElementById("subtituloPrincipal").innerText = `Tipo: ${tipoGrafico} — ${filtered.length} respuestas (filtros aplicados)`;
+        renderChart(tipoGrafico, labels, values, indicador.title);
+      }
     }
 
-    function generarIndicadores(data, dimension, tipoGrafico) {
-      // SEXO
-      const sexos = data.map(d => d.sexo);
-      const hombres = sexos.filter(s => s?.toLowerCase() === "masculino").length;
-      const mujeres = sexos.filter(s => s?.toLowerCase() === "femenino").length;
-      crearGrafico("graficoSexo", "pie", "Distribución por sexo", ["Masculino", "Femenino"], [hombres, mujeres]);
-
-      // EDAD
-      const edades = data.map(d => d.edad).filter(e => e != null);
-      const promedio = (edades.reduce((a, b) => a + b, 0) / edades.length).toFixed(1);
-      document.getElementById("promedioEdad").innerText = `${promedio} años`;
-
-      // DIMENSIONES
-      let campos = [];
-      if (dimension === "conocimiento")
-        campos = ["conoce_desechos_solidos", "clasificacion_correcta_desechos", "beneficios_reutilizar_residuo"];
-      else if (dimension === "percepcion")
-        campos = ["desechos_solidos_problema_comunidad", "preocupa_exceso_desechos", "desechos_contaminan_ambiente"];
-      else if (dimension === "actitud")
-        campos = ["dedica_tiempo_reducir_reutilizar_reciclar", "falta_informacion_obstaculo_gestion", "reduccion_reciclaje_reutilizacion_cuida_ambiente"];
-      else if (dimension === "participacion")
-        campos = ["participaria_talleres_buenas_practicas", "dispuesto_participar_emprendimiento_desechos", "participaria_feria_emprendimientos_desechos"];
-      else if (dimension === "impacto")
-        campos = ["manejo_adecuado_desechos_aporta_desarrollo", "emprendimientos_reutilizacion_aportan_economia", "manejo_adecuado_desechos_impacto_ambiente"];
-
-      const labels = ["Totalmente en desacuerdo", "En desacuerdo", "Indiferente", "De acuerdo", "Totalmente de acuerdo"];
-      const valoresTotales = Array(5).fill(0);
-
-      campos.forEach(campo => {
-        const respuestas = data.map(d => d[campo]);
-        const conteo = contarLikert(respuestas);
-        for (let i = 0; i < valoresTotales.length; i++) {
-          valoresTotales[i] += conteo[i];
-        }
+    /**************************************************************************
+     * UI: rellenar selector de indicadores, grupos (si existen), y listeners
+     **************************************************************************/
+    function initUI() {
+      const sel = document.getElementById("selectIndicador");
+      INDICADORES.forEach(i => {
+        const opt = document.createElement("option");
+        opt.value = i.id;
+        opt.textContent = i.title;
+        sel.appendChild(opt);
       });
 
-      document.getElementById("tituloGrafico").innerText = `Indicadores: ${dimension.charAt(0).toUpperCase() + dimension.slice(1)}`;
-      crearGrafico("graficoPrincipal", tipoGrafico, "Escala Likert", labels, valoresTotales);
-    }
+      // intentar rellenar filtro grupo (consultando datos y extrayendo grupos)
+      // Se hace en la primera carga de datos (función loadInitialData).
 
-    async function iniciarDashboard() {
-      const datos = await cargarDatos();
-
-      const aplicarFiltros = () => {
+      // listeners
+      document.getElementById("btnActualizar").addEventListener("click", async () => {
+        const indicador = document.getElementById("selectIndicador").value;
+        const tipoGrafico = document.getElementById("selectTipoGrafico").value;
         const sexo = document.getElementById("filtroSexo").value;
-        const dimension = document.getElementById("filtroDimension").value;
-        const tipoGrafico = document.getElementById("tipoGrafico").value;
-        const filtrado = filtrarData(datos, sexo);
-        generarIndicadores(filtrado, dimension, tipoGrafico);
-      };
+        const grupo = document.getElementById("filtroGrupo").value;
+        await generarIndicador(indicador, tipoGrafico, { sexo, grupo });
+      });
 
-      document.getElementById("btnActualizar").addEventListener("click", aplicarFiltros);
-      aplicarFiltros(); // carga inicial
+      document.getElementById("btnExportarImagen").addEventListener("click", () => {
+        if (!chart) return alert("No hay gráfico para exportar.");
+        const link = document.createElement("a");
+        link.href = document.getElementById("chartCanvas").toDataURL("image/png", 1);
+        link.download = `indicador_${Date.now()}.png`;
+        link.click();
+      });
+
+      // cambio de tipo de gráfico también puede actualizar al instante (opcional)
+      document.getElementById("selectTipoGrafico").addEventListener("change", () => {
+        // solo re-render si ya hay datos (mejor usar botón Actualizar)
+      });
     }
 
-    iniciarDashboard();
+    // cargar datos iniciales y popular dropdown de grupos
+    async function loadInitialData() {
+      const { data, error } = await fetchDatos();
+      if (error) {
+        document.getElementById("mensajeSinDatos").classList.remove("hidden");
+        return;
+      }
+
+      // popular filtro grupo si existen valores
+      const grupos = Array.from(new Set(data.map(d => normalizeStr(d.grupo)).filter(Boolean)));
+      const selGrupo = document.getElementById("filtroGrupo");
+      // limpiar opciones extra (solo si tenemos valores)
+      if (grupos.length) {
+        // agregar opciones después de 'todos'
+        grupos.forEach(g => {
+          const opt = document.createElement("option");
+          opt.value = g;
+          opt.textContent = g;
+          selGrupo.appendChild(opt);
+        });
+      }
+
+      // actualizar resumenes iniciales y mostrar indicador por defecto
+      actualizarResumenes(data);
+      // mostrar primer indicador por defecto con tipo 'bar'
+      const primerIndicador = INDICADORES[0].id;
+      document.getElementById("selectIndicador").value = primerIndicador;
+      await generarIndicador(primerIndicador, document.getElementById("selectTipoGrafico").value, { sexo: "todos", grupo: "todos" });
+    }
+
+    /**************************************************************************
+     * Inicialización
+     **************************************************************************/
+    (async function main() {
+      initUI();
+      await loadInitialData();
+
+      // (Opcional) Actualización automática cada N segundos:
+      // setInterval(async () => {
+      //   const indicador = document.getElementById("selectIndicador").value;
+      //   const tipoGrafico = document.getElementById("selectTipoGrafico").value;
+      //   const sexo = document.getElementById("filtroSexo").value;
+      //   const grupo = document.getElementById("filtroGrupo").value;
+      //   await generarIndicador(indicador, tipoGrafico, { sexo, grupo });
+      // }, 60000); // cada minuto
+    })();
   </script>
 </body>
 </html>
