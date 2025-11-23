@@ -28,6 +28,7 @@
     table.dataTable thead th { background: transparent; }
     .loading { opacity: 0.6; pointer-events: none; }
     .error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 1rem; border-radius: 8px; }
+    .success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 1rem; border-radius: 8px; }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -184,10 +185,10 @@
 
   <script>
   /***************************************************************************
-   * CONFIG SUPABASE (usa tus credenciales)
+   * CONFIG SUPABASE
    ***************************************************************************/
   const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzYSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouYgRB9Y4";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzYSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
   const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
   
   // Inicializar Supabase con manejo de errores
@@ -201,7 +202,7 @@
   }
 
   /***************************************************************************
-   * INDICATORS (los que nos diste)
+   * INDICATORS
    ***************************************************************************/
   const INDICATORS = [
     { value: 'sexo', label: 'Sexo' },
@@ -241,7 +242,7 @@
 
   function showConnectionSuccess(message) {
     const statusEl = document.getElementById('connectionStatus');
-    statusEl.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+    statusEl.className = 'success';
     statusEl.innerHTML = `
       <div class="flex items-center justify-between">
         <div>
@@ -302,39 +303,124 @@
     const ctx = document.getElementById('mainChart').getContext('2d');
     destroyChart();
 
-    // if numeric totals = show percentages optionally convert to percentages
+    if (!labels.length || !values.length) {
+      console.warn("No data to render chart");
+      return;
+    }
+
     const total = values.reduce((a,b)=>a+b,0);
     const percentData = values.map(v=> total? Math.round((v/total)*10000)/100 : 0);
 
-    // for pie/doughnut/polarArea show percentages inside the table and percent labels
     if(type==='mixed'){
       chart = new Chart(ctx, {
-        data: { labels, datasets: [{ type:'bar', label:'Conteo', data: values, backgroundColor:'#2a9d8f' }, { type:'line', label:'% (tendencia)', data: percentData, borderColor:'#e76f51', yAxisID:'percent', tension:0.25, fill:false }] },
-        options:{ scales:{ y:{ beginAtZero:true }, percent:{ display:false } }, plugins:{ tooltip:{ callbacks:{ label(ctx){ const i=ctx.dataIndex; const v=values[i]; const p = percentData[i]; return `${v} (${p}%)`; } } } }
+        data: { 
+          labels, 
+          datasets: [{ 
+            type:'bar', 
+            label:'Conteo', 
+            data: values, 
+            backgroundColor:'#2a9d8f' 
+          }, { 
+            type:'line', 
+            label:'% (tendencia)', 
+            data: percentData, 
+            borderColor:'#e76f51', 
+            yAxisID:'percent', 
+            tension:0.25, 
+            fill:false 
+          }] 
+        },
+        options:{ 
+          scales:{ 
+            y:{ beginAtZero:true }, 
+            percent:{ display:false } 
+          }, 
+          plugins:{ 
+            tooltip:{ 
+              callbacks:{ 
+                label(ctx){ 
+                  const i=ctx.dataIndex; 
+                  const v=values[i]; 
+                  const p = percentData[i]; 
+                  return `${v} (${p}%)`; 
+                } 
+              } 
+            } 
+          } 
+        }
       });
       return;
     }
 
-    // special types
     if(type==='scatter' || type==='bubble'){
-      // scatter/bubble handled as indices for display only
-      const ds = type==='scatter' ? values.map((v,i)=>({x:i+1,y:v})) : values.map((v,i)=>({x:i+1,y:v,r: Math.max(4, (v/Math.max(...values,1))*18)}));
-      chart = new Chart(ctx, { type, data: { datasets:[{ label:title, data:ds, backgroundColor:'#2a9d8f' }] }, options:{ scales:{ x:{ title:{ display:true, text:'Índice' }}, y:{ beginAtZero:true } }, plugins:{ tooltip:{ callbacks:{ label(tp){ if(tp.raw.r) return `x:${tp.raw.x} y:${tp.raw.y} (r:${tp.raw.r})`; return `x:${tp.raw.x} y:${tp.raw.y}` } } } } });
+      const ds = type==='scatter' ? 
+        values.map((v,i)=>({x:i+1,y:v})) : 
+        values.map((v,i)=>({x:i+1,y:v,r: Math.max(4, (v/Math.max(...values,1))*18)}));
+      
+      chart = new Chart(ctx, { 
+        type, 
+        data: { 
+          datasets:[{ 
+            label:title, 
+            data:ds, 
+            backgroundColor:'#2a9d8f' 
+          }] 
+        }, 
+        options:{ 
+          scales:{ 
+            x:{ title:{ display:true, text:'Índice' }}, 
+            y:{ beginAtZero:true } 
+          }, 
+          plugins:{ 
+            tooltip:{ 
+              callbacks:{ 
+                label(tp){ 
+                  if(tp.raw.r) return `x:${tp.raw.x} y:${tp.raw.y} (r:${tp.raw.r})`; 
+                  return `x:${tp.raw.x} y:${tp.raw.y}`; 
+                } 
+              } 
+            } 
+          } 
+        } 
+      });
       return;
     }
 
-    // default charts
     const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
     const bg = palette.slice(0, labels.length);
+    
     chart = new Chart(ctx, {
       type,
-      data: { labels, datasets:[{ label:title, data: values, backgroundColor: bg, borderColor:'#fff', borderWidth:0.6 }] },
-      options:{ responsive:true, plugins:{ tooltip:{ callbacks:{ label(ctx){ const i=ctx.dataIndex; const v=values[i]; const p = total?Math.round((v/total)*10000)/100:0; return `${v} (${p}%)`; } } } }, scales: type==='bar' ? { y:{ beginAtZero:true } } : {} }
+      data: { 
+        labels, 
+        datasets:[{ 
+          label:title, 
+          data: values, 
+          backgroundColor: bg, 
+          borderColor:'#fff', 
+          borderWidth:0.6 
+        }] 
+      },
+      options:{ 
+        responsive:true, 
+        plugins:{ 
+          tooltip:{ 
+            callbacks:{ 
+              label(ctx){ 
+                const i=ctx.dataIndex; 
+                const v=values[i]; 
+                const p = total?Math.round((v/total)*10000)/100:0; 
+                return `${v} (${p}%)`; 
+              } 
+            } 
+          } 
+        }, 
+        scales: type==='bar' ? { y:{ beginAtZero:true } } : {} 
+      }
     });
 
-    // update percent legend area
     const percentLegend = document.getElementById('chartPercentLegend');
-    percentLegend.innerHTML = ''; // we also display top 3 categories with percentages
+    percentLegend.innerHTML = '';
     const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
     const top = sorted.slice(0,3);
     if(top.length){
@@ -352,12 +438,29 @@
     
     setLoadingState(true);
     try {
-      const { data, error, status } = await supabase.from(TABLE).select('*');
-      
+      console.log("Fetching data from Supabase...");
+      const { data, error, status } = await supabase
+        .from(TABLE)
+        .select('*')
+        .limit(1000); // Limitar para evitar timeouts
+
       if(error){
         console.error("Supabase error:", error);
-        throw new Error(`Error ${status}: ${error.message}`);
+        let errorMsg = `Error ${status}: ${error.message}`;
+        
+        // Mensajes más específicos según el tipo de error
+        if (status === 403) {
+          errorMsg += " - Verifica las políticas RLS de la tabla";
+        } else if (status === 404) {
+          errorMsg += " - Tabla no encontrada";
+        } else if (status === 401) {
+          errorMsg += " - Error de autenticación";
+        }
+        
+        throw new Error(errorMsg);
       }
+      
+      console.log("Data received:", data ? data.length : 0, "registros");
       
       if (!data || data.length === 0) {
         console.warn("No se encontraron datos en la tabla");
@@ -377,22 +480,29 @@
     }
   }
 
-  // build indicators dropdown
   function populateIndicators(){
     const sel = document.getElementById('selectIndicator');
     sel.innerHTML = '';
-    INDICATORS.forEach(i=> { const o = document.createElement('option'); o.value = i.value; o.textContent = i.label; sel.appendChild(o); });
+    INDICATORS.forEach(i=> { 
+      const o = document.createElement('option'); 
+      o.value = i.value; 
+      o.textContent = i.label; 
+      sel.appendChild(o); 
+    });
   }
 
-  // build group filter from data
   function populateGroupFilter(data){
     const groups = Array.from(new Set(data.map(d=> normalize(d.grupo)).filter(Boolean)));
     const sel = document.getElementById('filterGrupo');
     sel.innerHTML = '<option value="todos">Grupo: Todos</option>';
-    groups.forEach(g=> { const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o); });
+    groups.forEach(g=> { 
+      const o = document.createElement('option'); 
+      o.value = g; 
+      o.textContent = g; 
+      sel.appendChild(o); 
+    });
   }
 
-  // process indicator - returns { labels, values, isNumeric, numericArray }
   function processIndicator(indKey, rows){
     if (!rows || rows.length === 0) {
       return { labels:[], values:[], isNumeric:false, numeric:[] };
@@ -401,24 +511,23 @@
     const arrRaw = rows.map(r => r[indKey]).filter(v => v!==undefined && v!==null);
     if(!arrRaw.length) return { labels:[], values:[], isNumeric:false, numeric:[] };
 
-    // check if numeric (all values convertible to number)
     const numericCand = arrRaw.map(v=> { 
+      if (typeof v === 'number') return v;
       const n = Number(String(v).replace(/[^0-9\.\-]/g,'')); 
-      return isNaN(n)?null:n; 
+      return isNaN(n) ? null : n; 
     });
     const numericCount = numericCand.filter(n=>n!==null).length;
-    const isNumeric = numericCount / arrRaw.length >= 0.9; // threshold
+    const isNumeric = numericCount / arrRaw.length >= 0.9;
 
     if(isNumeric){
       const numeric = numericCand.filter(n=>n!==null);
-      // Create buckets for display
       const uniqueVals = Array.from(new Set(numeric));
+      
       if(uniqueVals.length <= 8){
-        const labels = uniqueVals.map(v=>String(v));
+        const labels = uniqueVals.sort((a,b)=>a-b).map(v=>String(v));
         const counts = labels.map(l=> numeric.filter(x=> String(x)===String(l)).length);
         return { labels, values:counts, isNumeric:true, numeric };
       } else {
-        // build histogram with 6 bins
         const min = Math.min(...numeric), max = Math.max(...numeric);
         const bins = 6;
         const step = (max - min)/bins || 1;
@@ -435,18 +544,15 @@
       }
     }
 
-    // not numeric: check likert match
     const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
     const matchCount = arrRaw.reduce((s,v) => lower.includes(String(v).toLowerCase()) ? s+1 : s, 0);
     if(matchCount / arrRaw.length >= 0.25){
-      // treat as likert - enforce LIKERT_LEVELS order
       const counts = LIKERT_LEVELS.map(()=>0);
       arrRaw.forEach(v=>{
         const s = String(v).trim();
         const idx = lower.indexOf(s.toLowerCase());
         if(idx !== -1) counts[idx] += 1;
         else {
-          // partial match
           for(let i=0;i<lower.length;i++){
             if(s.toLowerCase().includes(lower[i].split(' ')[0])){ counts[i]++; break;}
           }
@@ -455,7 +561,6 @@
       return { labels: LIKERT_LEVELS.slice(), values: counts, isNumeric:false, numeric:[] };
     }
 
-    // default categorical
     const map = {};
     arrRaw.forEach(v=> {
       const k = normalize(v) || 'No declarado';
@@ -467,13 +572,10 @@
     return { labels, values, isNumeric:false, numeric:[] };
   }
 
-  // update cards and table based on processed indicator & filtered rows
   function updateUIForIndicator(indKey, processed, filteredRows){
-    // total
     const total = filteredRows.length;
     document.getElementById('cardTotal').textContent = total;
 
-    // numeric stats card and variation card
     const numericContainer = document.getElementById('cardNumeric');
     const variationContainer = document.getElementById('cardVariation');
     const numericStatsBlock = document.getElementById('numericStats');
@@ -496,31 +598,43 @@
       const ssum = sum(arr);
       const n = arr.length;
 
-      numericContainer.innerHTML = `<div class="text-lg font-semibold">${avg}</div><div class="small muted">Media (1)</div>
+      numericContainer.innerHTML = `
+        <div class="text-lg font-semibold">${avg}</div>
+        <div class="small muted">Media</div>
         <div class="mt-2">Min: <strong>${mn}</strong> • Max: <strong>${mx}</strong></div>
         <div>Mediana: <strong>${med}</strong> • Moda: <strong>${mod}</strong></div>`;
 
-      variationContainer.innerHTML = `<div>Varianza: <strong>${varr!==null?varr.toFixed(2):'—'}</strong></div>
+      variationContainer.innerHTML = `
+        <div>Varianza: <strong>${varr!==null?varr.toFixed(2):'—'}</strong></div>
         <div>Desv. estándar: <strong>${sd!==null?sd.toFixed(2):'—'}</strong></div>
         <div>Rango: <strong>${rng!==null?rng:'—'}</strong></div>`;
 
-      numericStatsBlock.innerHTML = `<ul class="list-disc pl-5">
-        <li>Min: ${mn}</li><li>Max: ${mx}</li><li>Media: ${avg}</li><li>Mediana: ${med}</li><li>Moda: ${mod}</li>
-        <li>Suma: ${ssum}</li><li>N: ${n}</li></ul>`;
+      numericStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Min: ${mn}</li>
+          <li>Max: ${mx}</li>
+          <li>Media: ${avg}</li>
+          <li>Mediana: ${med}</li>
+          <li>Moda: ${mod}</li>
+          <li>Suma: ${ssum}</li>
+          <li>N: ${n}</li>
+        </ul>`;
 
-      summaryStatsBlock.innerHTML = `<ul class="list-disc pl-5">
-        <li>Varianza: ${varr!==null?varr.toFixed(3):'—'}</li>
-        <li>Desv. est.: ${sd!==null?sd.toFixed(3):'—'}</li>
-        <li>Rango: ${rng!==null?rng:'—'}</li></ul>`;
+      summaryStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Varianza: ${varr!==null?varr.toFixed(3):'—'}</li>
+          <li>Desv. est.: ${sd!==null?sd.toFixed(3):'—'}</li>
+          <li>Rango: ${rng!==null?rng:'—'}</li>
+        </ul>`;
     } else {
-      // no numeric values — show placeholder
-      numericContainer.innerHTML = `<div class="text-lg font-semibold">—</div><div class="small muted">No aplica (no numérico)</div>`;
+      numericContainer.innerHTML = `
+        <div class="text-lg font-semibold">—</div>
+        <div class="small muted">No aplica (no numérico)</div>`;
       variationContainer.innerHTML = `<div class="text-lg font-semibold">—</div>`;
       numericStatsBlock.innerHTML = `<div class="muted">No hay estadísticas numéricas para este indicador.</div>`;
       summaryStatsBlock.innerHTML = `<div class="muted">Resumen no numérico disponible en la tabla de distribución.</div>`;
     }
 
-    // build distribution table
     const distBody = document.getElementById('distBody');
     distBody.innerHTML = '';
     const labels = processed.labels || [];
@@ -543,21 +657,29 @@
       distBody.appendChild(tr);
     }
 
-    // add a summary row (total)
     const trTotal = document.createElement('tr');
     trTotal.innerHTML = `<td><strong>Total</strong></td><td><strong>${totalCounts}</strong></td><td><strong>100%</strong></td>`;
     distBody.appendChild(trTotal);
 
-    // init/refresh Simple-DataTables for distTable
     setTimeout(()=> {
       try{ if(window._distTable) window._distTable.destroy(); } catch(e){}
-      window._distTable = new simpleDatatables.DataTable("#distTable", { searchable: true, perPage: 8 });
+      window._distTable = new simpleDatatables.DataTable("#distTable", { 
+        searchable: true, 
+        perPage: 8,
+        labels: {
+            placeholder: "Buscar...",
+            perPage: "registros por página",
+            noRows: "No se encontraron registros",
+            info: "Mostrando {start} a {end} de {rows} registros"
+        }
+      });
     }, 80);
 
-    // update chart
     document.getElementById('chartTitle').textContent = INDICATORS.find(i=>i.value===indKey)?.label || indKey;
     document.getElementById('chartSubtitle').textContent = `${total} respuestas (filtros aplicados)`;
-    renderChart(document.getElementById('selectChartType').value, labels, values, INDICATORS.find(i=>i.value===indKey)?.label || indKey);
+    
+    const chartType = document.getElementById('selectChartType').value;
+    renderChart(chartType, labels, values, INDICATORS.find(i=>i.value===indKey)?.label || indKey);
   }
 
   /***************************************************************************
@@ -579,7 +701,6 @@
     try {
       const data = await fetchAll();
       if (data.length === 0) {
-        // No data case
         document.getElementById('cardTotal').textContent = '0';
         document.getElementById('noDataMsg').classList.remove('hidden');
         return;
@@ -588,7 +709,6 @@
       populateGroupFilter(data);
       updateCardsInitial(data);
 
-      // re-render indicator with current selections
       const ind = document.getElementById('selectIndicator').value || INDICATORS[0].value;
       const filtered = applyFilters(data);
       const processed = processIndicator(ind, filtered);
@@ -602,7 +722,6 @@
     document.getElementById('cardTotal').textContent = data.length;
   }
 
-  // listeners: indicator, chart type, filters -> update immediately
   document.addEventListener('change', async (e)=>{
     if(['selectIndicator','selectChartType','filterSexo','filterGrupo'].includes(e.target.id)){
       const all = window.__RAW || [];
@@ -615,7 +734,6 @@
     }
   });
 
-  // export CSV: export raw data (full table)
   function exportCSV(){
     const rows = window.__RAW || [];
     if(!rows.length) return alert('No hay datos para exportar.');
@@ -626,19 +744,26 @@
     }).join(','))).join('\n');
     const blob = new Blob([csv], { type:'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `datos_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = `datos_${new Date().toISOString().split('T')[0]}.csv`; 
+    a.click(); 
+    URL.revokeObjectURL(url);
   }
+  
   document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
 
-  // export chart image
   document.getElementById('btnExportChart').addEventListener('click', ()=>{
     if(!chart) return alert('No hay gráfico para exportar.');
     const url = document.getElementById('mainChart').toDataURL('image/png',1);
-    const a = document.createElement('a'); a.href = url; a.download = `grafico_${Date.now()}.png`; a.click();
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = `grafico_${new Date().toISOString().split('T')[0]}.png`; 
+    a.click();
   });
 
   /***************************************************************************
-   * Real-time updates: subscribe to changes on the table and refresh
+   * Real-time updates
    ***************************************************************************/
   function setupRealtime(){
     if (!supabase) {
@@ -649,8 +774,6 @@
     try{
       const channel = supabase.channel('realtime-table-'+TABLE)
         .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => {
-          // whenever change occurs, refetch and update
-          // debounce to avoid too frequent calls
           if(window._rtDebounce) clearTimeout(window._rtDebounce);
           window._rtDebounce = setTimeout(()=> { refreshAll(); }, 700);
         })
@@ -661,7 +784,9 @@
             console.warn('Estado de suscripción realtime:', status);
           }
         });
-    }catch(e){ console.warn('Realtime not available or subscription failed', e); }
+    }catch(e){ 
+      console.warn('Realtime not available or subscription failed', e); 
+    }
   }
 
   /***************************************************************************
@@ -670,7 +795,6 @@
   (async function init(){
     populateIndicators();
     
-    // Mostrar estado de carga inicial
     showConnectionSuccess("Conectando a Supabase...");
     
     try {
@@ -681,9 +805,6 @@
       console.error("Error en inicialización:", error);
       showConnectionError("Error al inicializar la aplicación: " + error.message);
     }
-
-    // automatically re-render every 90s as backup (optional)
-    // setInterval(()=> refreshAll(), 90000);
   })();
 
   </script>
