@@ -15,31 +15,59 @@
     </header>
 
     <main class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <section class="md:col-span-1 card p-4 rounded-lg shadow">
-        <h2 class="font-semibold mb-2">Control</h2>
+      <section class="md:col-span-1 card p-4 rounded-lg shadow space-y-4">
+  <h2 class="font-semibold mb-2 text-lg">Panel de Filtros</h2>
 
-        <label class="block text-xs text-gray-600">Indicador</label>
-        <select id="fieldSelect" class="w-full p-2 border rounded mb-3">
-          <!-- listado de campos comunes para graficar -->
-        </select>
+  <div>
+    <label class="block text-xs text-gray-600">Indicador a visualizar</label>
+    <select id="fieldSelect" class="w-full p-2 border rounded mb-3"></select>
+  </div>
 
-        <label class="block text-xs text-gray-600">Tipo de gráfico</label>
-        <select id="chartType" class="w-full p-2 border rounded mb-3">
-          <option value="pie">Torta (pie)</option>
-          <option value="bar">Barras</option>
-          <option value="doughnut">Dona</option>
-          <option value="line">Línea</option>
-          <option value="polarArea">Polar</option>
-          <option value="radar">Radar</option>
-        </select>
+  <div>
+    <label class="block text-xs text-gray-600">Tipo de gráfico</label>
+    <select id="chartType" class="w-full p-2 border rounded mb-3">
+      <option value="pie">Torta</option>
+      <option value="bar">Barras</option>
+      <option value="line">Línea</option>
+      <option value="doughnut">Dona</option>
+      <option value="polarArea">Polar</option>
+      <option value="radar">Radar</option>
+    </select>
+  </div>
 
-        <div class="text-xs text-gray-600 mb-2">Opciones</div>
-        <label class="flex items-center space-x-2"><input id="showTotals" type="checkbox" checked> <span>Mostrar totales</span></label>
-        <label class="flex items-center space-x-2"><input id="normalize" type="checkbox"> <span>Mostrar porcentajes</span></label>
+  <div>
+    <label class="block text-xs text-gray-600">Filtrar por Sexo</label>
+    <select id="filterSexo" class="w-full p-2 border rounded">
+      <option value="">Todos</option>
+      <option value="Masculino">Masculino</option>
+      <option value="Femenino">Femenino</option>
+      <option value="Otro">Otro</option>
+    </select>
+  </div>
 
-        <div class="mt-4 text-sm text-gray-500">Última actualización: <span id="lastUpdate">—</span></div>
-        <div class="mt-2 text-sm text-gray-500">Registros: <span id="countRecords">0</span></div>
-      </section>
+  <div>
+    <label class="block text-xs text-gray-600">Filtrar por Grupo</label>
+    <input id="filterGrupo" class="w-full p-2 border rounded" placeholder="Ej: A, B, C..." />
+  </div>
+
+  <div>
+    <label class="block text-xs text-gray-600">Filtrar por Subgrupo</label>
+    <input id="filterSubgrupo" class="w-full p-2 border rounded" placeholder="Ej: 1, 2, 3..." />
+  </div>
+
+  <div>
+    <label class="block text-xs text-gray-600">Mostrar Totales / %</label>
+    <div class="flex space-x-2 mt-1">
+      <label class="flex items-center space-x-1 text-sm"><input id="showTotals" type="checkbox" checked> <span>Totales</span></label>
+      <label class="flex items-center space-x-1 text-sm"><input id="normalize" type="checkbox"> <span>Porcentajes</span></label>
+    </div>
+  </div>
+
+  <div class="mt-6 p-3 text-xs text-gray-600 bg-gray-100 rounded-lg">
+    <p>Última actualización: <span id="lastUpdate">—</span></p>
+    <p>Registros filtrados: <span id="countRecords">0</span></p>
+  </div>
+</section>
 
       <section class="md:col-span-3 card p-4 rounded-lg shadow">
         <div class="flex items-center justify-between mb-4">
