@@ -55,7 +55,9 @@
     <div class="grid md:grid-cols-4 gap-4 mb-6">
       <div class="card p-4">
         <label class="block text-sm text-slate-600 mb-2">Indicador</label>
-        <select id="selectIndicator" class="w-full rounded-lg border py-2 px-3"></select>
+        <select id="selectIndicator" class="w-full rounded-lg border py-2 px-3">
+          <option value="">Selecciona un indicador...</option>
+        </select>
         <p class="text-xs muted mt-2">Selecciona el indicador para analizar.</p>
       </div>
 
@@ -131,14 +133,14 @@
     <div class="card p-6 mb-6">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 id="chartTitle" class="text-lg font-semibold">Indicador</h2>
-          <p id="chartSubtitle" class="text-xs muted mt-1"></p>
+          <h2 id="chartTitle" class="text-lg font-semibold">Selecciona un indicador</h2>
+          <p id="chartSubtitle" class="text-xs muted mt-1">El gráfico se actualizará automáticamente al cambiar el indicador</p>
         </div>
         <div id="chartPercentLegend" class="text-right small muted"></div>
       </div>
 
       <div class="chart-container">
-        <canvas id="mainChart" style="max-width:900px; width:100%;"></canvas>
+        <canvas id="mainChart" style="max-width:900px; width:100%; height: 400px;"></canvas>
       </div>
 
       <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
@@ -217,6 +219,13 @@
   const LIKERT_CODES = ['A', 'B', 'C', 'D', 'E'];
 
   /***************************************************************************
+   * Variables globales
+   ***************************************************************************/
+  let chart = null;
+  let currentData = [];
+  let currentIndicator = '';
+
+  /***************************************************************************
    * Manejo de estado de conexión
    ***************************************************************************/
   function showConnectionError(message) {
@@ -281,17 +290,26 @@
   function rangeArr(arr){ if(!arr.length) return null; return Math.max(...arr)-Math.min(...arr); }
 
   /***************************************************************************
-   * Chart handling
+   * Chart handling - MEJORADO para actualización automática
    ***************************************************************************/
-  let chart = null;
-  function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart=null; } }
+  function destroyChart(){ 
+    if(chart){ 
+      try{ 
+        chart.destroy(); 
+      }catch(e){
+        console.warn("Error destroying chart:", e);
+      } 
+      chart=null; 
+    } 
+  }
 
   function renderChart(type, labels, values, title){
     const ctx = document.getElementById('mainChart').getContext('2d');
     destroyChart();
 
     if (!labels.length || !values.length) {
-      console.warn("No data to render chart");
+      console.warn("No data to render chart for:", title);
+      document.getElementById('noDataMsg').classList.remove('hidden');
       return;
     }
 
@@ -301,45 +319,54 @@
     const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
     const bg = palette.slice(0, labels.length);
     
-    chart = new Chart(ctx, {
-      type,
-      data: { 
-        labels, 
-        datasets:[{ 
-          label: title, 
-          data: values, 
-          backgroundColor: bg, 
-          borderColor: '#fff', 
-          borderWidth: 1 
-        }] 
-      },
-      options:{ 
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{ 
-          legend: {
-            position: 'top',
-          },
-          tooltip:{ 
-            callbacks:{ 
-              label(ctx){ 
-                const i = ctx.dataIndex; 
-                const v = values[i]; 
-                const p = total ? Math.round((v/total)*10000)/100 : 0; 
-                return `${v} respuestas (${p}%)`; 
+    try {
+      chart = new Chart(ctx, {
+        type,
+        data: { 
+          labels, 
+          datasets:[{ 
+            label: title, 
+            data: values, 
+            backgroundColor: bg, 
+            borderColor: '#fff', 
+            borderWidth: 1 
+          }] 
+        },
+        options:{ 
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins:{ 
+            legend: {
+              position: 'top',
+            },
+            tooltip:{ 
+              callbacks:{ 
+                label(ctx){ 
+                  const i = ctx.dataIndex; 
+                  const v = values[i]; 
+                  const p = total ? Math.round((v/total)*10000)/100 : 0; 
+                  return `${v} respuestas (${p}%)`; 
+                } 
               } 
             } 
-          } 
+          }
         }
-      }
-    });
+      });
 
-    const percentLegend = document.getElementById('chartPercentLegend');
-    percentLegend.innerHTML = '';
-    const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
-    const top = sorted.slice(0,3);
-    if(top.length){
-      percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+      // Actualizar leyenda de porcentajes
+      const percentLegend = document.getElementById('chartPercentLegend');
+      percentLegend.innerHTML = '';
+      const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
+      const top = sorted.slice(0,3);
+      if(top.length){
+        percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+      }
+
+      document.getElementById('noDataMsg').classList.add('hidden');
+      
+    } catch (error) {
+      console.error("Error rendering chart:", error);
+      document.getElementById('noDataMsg').classList.remove('hidden');
     }
   }
 
@@ -370,7 +397,8 @@
       }
       
       window.__RAW = data || [];
-      return window.__RAW;
+      currentData = data || [];
+      return currentData;
     } catch (error) {
       console.error("Error fetching data:", error);
       showConnectionError("No se pudieron cargar los datos: " + error.message);
@@ -380,7 +408,7 @@
 
   function populateIndicators(){
     const sel = document.getElementById('selectIndicator');
-    sel.innerHTML = '';
+    sel.innerHTML = '<option value="">Selecciona un indicador...</option>';
     INDICATORS.forEach(i=> { 
       const o = document.createElement('option'); 
       o.value = i.value; 
@@ -517,6 +545,28 @@
       
       return { labels, values, isNumeric: false, numeric: [] };
     }
+  }
+
+  /***************************************************************************
+   * FUNCIÓN PRINCIPAL PARA ACTUALIZAR LA VISUALIZACIÓN
+   ***************************************************************************/
+  function updateVisualization() {
+    const indKey = document.getElementById('selectIndicator').value;
+    
+    if (!indKey) {
+      // Si no hay indicador seleccionado, mostrar estado inicial
+      document.getElementById('chartTitle').textContent = 'Selecciona un indicador';
+      document.getElementById('chartSubtitle').textContent = 'El gráfico se actualizará automáticamente al cambiar el indicador';
+      document.getElementById('noDataMsg').classList.add('hidden');
+      destroyChart();
+      return;
+    }
+
+    currentIndicator = indKey;
+    const filtered = applyFilters(currentData);
+    const processed = processIndicator(indKey, filtered);
+    
+    updateUIForIndicator(indKey, processed, filtered);
   }
 
   function updateUIForIndicator(indKey, processed, filteredRows){
@@ -665,47 +715,26 @@
   }
 
   /***************************************************************************
-   * Main rendering flow
+   * Event Listeners - ACTUALIZADO para respuesta inmediata
    ***************************************************************************/
-  async function refreshAll(){
-    try {
-      const data = await fetchAll();
-      if (data.length === 0) {
-        document.getElementById('cardTotal').textContent = '0';
-        document.getElementById('noDataMsg').classList.remove('hidden');
-        return;
-      }
-      
-      populateGroupFilter(data);
-      updateCardsInitial(data);
-
-      const ind = document.getElementById('selectIndicator').value || INDICATORS[0].value;
-      const filtered = applyFilters(data);
-      const processed = processIndicator(ind, filtered);
-      updateUIForIndicator(ind, processed, filtered);
-    } catch (error) {
-      console.error("Error in refreshAll:", error);
-    }
+  function setupEventListeners() {
+    // Actualizar cuando cambia el indicador
+    document.getElementById('selectIndicator').addEventListener('change', updateVisualization);
+    
+    // Actualizar cuando cambia el tipo de gráfico
+    document.getElementById('selectChartType').addEventListener('change', updateVisualization);
+    
+    // Actualizar cuando cambian los filtros
+    document.getElementById('filterSexo').addEventListener('change', updateVisualization);
+    document.getElementById('filterGrupo').addEventListener('change', updateVisualization);
+    
+    // Exportar datos
+    document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+    document.getElementById('btnExportChart').addEventListener('click', exportChart);
   }
-
-  function updateCardsInitial(data){
-    document.getElementById('cardTotal').textContent = data.length;
-  }
-
-  document.addEventListener('change', async (e)=>{
-    if(['selectIndicator','selectChartType','filterSexo','filterGrupo'].includes(e.target.id)){
-      const all = window.__RAW || [];
-      if (all.length === 0) return;
-      
-      const filtered = applyFilters(all);
-      const ind = document.getElementById('selectIndicator').value;
-      const processed = processIndicator(ind, filtered);
-      updateUIForIndicator(ind, processed, filtered);
-    }
-  });
 
   function exportCSV(){
-    const rows = window.__RAW || [];
+    const rows = currentData || [];
     if(!rows.length) return alert('No hay datos para exportar.');
     const cols = Object.keys(rows[0]);
     const csv = [cols.join(',')].concat(rows.map(r=> cols.map(c=>{
@@ -720,33 +749,36 @@
     a.click(); 
     URL.revokeObjectURL(url);
   }
-  
-  document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
 
-  document.getElementById('btnExportChart').addEventListener('click', ()=>{
+  function exportChart(){
     if(!chart) return alert('No hay gráfico para exportar.');
     const url = document.getElementById('mainChart').toDataURL('image/png',1);
     const a = document.createElement('a'); 
     a.href = url; 
-    a.download = `grafico_${new Date().toISOString().split('T')[0]}.png`; 
+    a.download = `grafico_${currentIndicator}_${new Date().toISOString().split('T')[0]}.png`; 
     a.click();
-  });
+  }
 
   /***************************************************************************
    * INIT
    ***************************************************************************/
-  (async function init(){
+  async function init(){
     populateIndicators();
+    setupEventListeners();
     
     showConnectionSuccess("Conectando a Supabase...");
     
     try {
-      await refreshAll();
+      await fetchAll();
+      // No forzar una visualización inicial - esperar a que el usuario seleccione un indicador
     } catch (error) {
       console.error("Error en inicialización:", error);
       showConnectionError("Error al inicializar la aplicación: " + error.message);
     }
-  })();
+  }
+
+  // Inicializar la aplicación cuando se carga la página
+  document.addEventListener('DOMContentLoaded', init);
 
   </script>
 
