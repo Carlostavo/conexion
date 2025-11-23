@@ -26,6 +26,8 @@
     .percent-label { font-weight:600; color:#065f46; }
     .small { font-size:0.85rem; color:#6b7280; }
     table.dataTable thead th { background: transparent; }
+    .loading { opacity: 0.6; pointer-events: none; }
+    .error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 1rem; border-radius: 8px; }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -45,6 +47,9 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Estado de conexión -->
+    <div id="connectionStatus" class="hidden mb-4"></div>
+
     <!-- CONTROLES -->
     <div class="grid md:grid-cols-4 gap-4 mb-6">
       <div class="card p-4">
@@ -182,9 +187,18 @@
    * CONFIG SUPABASE (usa tus credenciales)
    ***************************************************************************/
   const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzYSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzYSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouYgRB9Y4";
   const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  
+  // Inicializar Supabase con manejo de errores
+  let supabase;
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    console.log("Supabase client inicializado");
+  } catch (error) {
+    console.error("Error inicializando Supabase:", error);
+    showConnectionError("Error al inicializar el cliente de Supabase: " + error.message);
+  }
 
   /***************************************************************************
    * INDICATORS (los que nos diste)
@@ -207,6 +221,47 @@
   const LIKERT_LEVELS = [
     "Totalmente en desacuerdo","En desacuerdo","Indiferente","De acuerdo","Totalmente de acuerdo"
   ];
+
+  /***************************************************************************
+   * Manejo de estado de conexión
+   ***************************************************************************/
+  function showConnectionError(message) {
+    const statusEl = document.getElementById('connectionStatus');
+    statusEl.className = 'error';
+    statusEl.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div>
+          <strong>Error de conexión:</strong> ${message}
+        </div>
+        <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded">×</button>
+      </div>
+    `;
+    statusEl.classList.remove('hidden');
+  }
+
+  function showConnectionSuccess(message) {
+    const statusEl = document.getElementById('connectionStatus');
+    statusEl.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+    statusEl.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div>
+          <strong>✓ Conectado:</strong> ${message}
+        </div>
+        <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-sm bg-green-200 hover:bg-green-300 px-2 py-1 rounded">×</button>
+      </div>
+    `;
+    statusEl.classList.remove('hidden');
+    setTimeout(() => statusEl.classList.add('hidden'), 5000);
+  }
+
+  function setLoadingState(loading) {
+    const main = document.querySelector('main');
+    if (loading) {
+      main.classList.add('loading');
+    } else {
+      main.classList.remove('loading');
+    }
+  }
 
   /***************************************************************************
    * UTIL: normalizacion y estadisticas
@@ -291,10 +346,35 @@
    * Data handling: fetch + process
    ***************************************************************************/
   async function fetchAll(){
-    const { data, error } = await supabase.from(TABLE).select('*');
-    if(error){ console.error("Supabase error:", error); return []; }
-    window.__RAW = data || [];
-    return window.__RAW;
+    if (!supabase) {
+      throw new Error("Cliente de Supabase no inicializado");
+    }
+    
+    setLoadingState(true);
+    try {
+      const { data, error, status } = await supabase.from(TABLE).select('*');
+      
+      if(error){
+        console.error("Supabase error:", error);
+        throw new Error(`Error ${status}: ${error.message}`);
+      }
+      
+      if (!data || data.length === 0) {
+        console.warn("No se encontraron datos en la tabla");
+        showConnectionSuccess("Conexión exitosa pero no hay datos en la tabla");
+      } else {
+        showConnectionSuccess(`Cargados ${data.length} registros`);
+      }
+      
+      window.__RAW = data || [];
+      return window.__RAW;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      showConnectionError("No se pudieron cargar los datos: " + error.message);
+      return [];
+    } finally {
+      setLoadingState(false);
+    }
   }
 
   // build indicators dropdown
@@ -314,18 +394,24 @@
 
   // process indicator - returns { labels, values, isNumeric, numericArray }
   function processIndicator(indKey, rows){
+    if (!rows || rows.length === 0) {
+      return { labels:[], values:[], isNumeric:false, numeric:[] };
+    }
+
     const arrRaw = rows.map(r => r[indKey]).filter(v => v!==undefined && v!==null);
     if(!arrRaw.length) return { labels:[], values:[], isNumeric:false, numeric:[] };
 
     // check if numeric (all values convertible to number)
-    const numericCand = arrRaw.map(v=> { const n = Number(String(v).replace(/[^0-9\.\-]/g,'')); return isNaN(n)?null:n; });
+    const numericCand = arrRaw.map(v=> { 
+      const n = Number(String(v).replace(/[^0-9\.\-]/g,'')); 
+      return isNaN(n)?null:n; 
+    });
     const numericCount = numericCand.filter(n=>n!==null).length;
     const isNumeric = numericCount / arrRaw.length >= 0.9; // threshold
 
     if(isNumeric){
       const numeric = numericCand.filter(n=>n!==null);
-      // we will create buckets for display (auto ranges)
-      // Create 5 buckets (quantiles) or use simple unique values if few
+      // Create buckets for display
       const uniqueVals = Array.from(new Set(numeric));
       if(uniqueVals.length <= 8){
         const labels = uniqueVals.map(v=>String(v));
@@ -337,7 +423,12 @@
         const bins = 6;
         const step = (max - min)/bins || 1;
         const edges = [];
-        for(let i=0;i<bins;i++){ edges.push({min: min + i*step, max: (i===bins-1? max: min + (i+1)*step)}); }
+        for(let i=0;i<bins;i++){ 
+          edges.push({
+            min: min + i*step, 
+            max: (i===bins-1? max: min + (i+1)*step)
+          }); 
+        }
         const labels = edges.map((e,i)=> `${Math.round(e.min)}-${Math.round(e.max)}`);
         const counts = edges.map(e=> numeric.filter(n=> n>=e.min && n<=e.max).length);
         return { labels, values:counts, isNumeric:true, numeric };
@@ -485,15 +576,26 @@
    * Main rendering flow
    ***************************************************************************/
   async function refreshAll(){
-    const data = await fetchAll();
-    populateGroupFilter(data);
-    updateCardsInitial(data);
+    try {
+      const data = await fetchAll();
+      if (data.length === 0) {
+        // No data case
+        document.getElementById('cardTotal').textContent = '0';
+        document.getElementById('noDataMsg').classList.remove('hidden');
+        return;
+      }
+      
+      populateGroupFilter(data);
+      updateCardsInitial(data);
 
-    // re-render indicator with current selections
-    const ind = document.getElementById('selectIndicator').value || INDICATORS[0].value;
-    const filtered = applyFilters(data);
-    const processed = processIndicator(ind, filtered);
-    updateUIForIndicator(ind, processed, filtered);
+      // re-render indicator with current selections
+      const ind = document.getElementById('selectIndicator').value || INDICATORS[0].value;
+      const filtered = applyFilters(data);
+      const processed = processIndicator(ind, filtered);
+      updateUIForIndicator(ind, processed, filtered);
+    } catch (error) {
+      console.error("Error in refreshAll:", error);
+    }
   }
 
   function updateCardsInitial(data){
@@ -503,7 +605,9 @@
   // listeners: indicator, chart type, filters -> update immediately
   document.addEventListener('change', async (e)=>{
     if(['selectIndicator','selectChartType','filterSexo','filterGrupo'].includes(e.target.id)){
-      const all = window.__RAW || await fetchAll();
+      const all = window.__RAW || [];
+      if (all.length === 0) return;
+      
       const filtered = applyFilters(all);
       const ind = document.getElementById('selectIndicator').value;
       const processed = processIndicator(ind, filtered);
@@ -537,6 +641,11 @@
    * Real-time updates: subscribe to changes on the table and refresh
    ***************************************************************************/
   function setupRealtime(){
+    if (!supabase) {
+      console.warn("No se puede configurar realtime: Supabase no inicializado");
+      return;
+    }
+    
     try{
       const channel = supabase.channel('realtime-table-'+TABLE)
         .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => {
@@ -545,7 +654,13 @@
           if(window._rtDebounce) clearTimeout(window._rtDebounce);
           window._rtDebounce = setTimeout(()=> { refreshAll(); }, 700);
         })
-        .subscribe();
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('Suscripción realtime activada');
+          } else {
+            console.warn('Estado de suscripción realtime:', status);
+          }
+        });
     }catch(e){ console.warn('Realtime not available or subscription failed', e); }
   }
 
@@ -554,9 +669,18 @@
    ***************************************************************************/
   (async function init(){
     populateIndicators();
-    await fetchAll();
-    await refreshAll();
-    setupRealtime();
+    
+    // Mostrar estado de carga inicial
+    showConnectionSuccess("Conectando a Supabase...");
+    
+    try {
+      await fetchAll();
+      await refreshAll();
+      setupRealtime();
+    } catch (error) {
+      console.error("Error en inicialización:", error);
+      showConnectionError("Error al inicializar la aplicación: " + error.message);
+    }
 
     // automatically re-render every 90s as backup (optional)
     // setInterval(()=> refreshAll(), 90000);
