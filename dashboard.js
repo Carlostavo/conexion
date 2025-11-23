@@ -1,138 +1,474 @@
-// =========================
-// CONFIGURACIÓN SUPABASE
-// =========================
-const SUPABASE_URL = 'https://dutapywxsiuxboqsjqvf.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4';
-    const TABLE = 'cuestionario_comportamiento_proambiental_autosustentabilidad';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Proambiental — Indicadores</title>
 
-    const supabase = supabaseJs.createClient ? supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY) : supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-let chart;
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
-// =========================
-// LISTA DE INDICADORES
-// =========================
-const indicadores = {
-  sexo: "Sexo",
-  educacion_jefe_hogar: "Educación Jefe Hogar",
-  situacion_laboral_jefe_hogar: "Situación Laboral",
-  ingreso_mensual_jefe_hogar: "Ingreso Mensual",
-  conoce_desechos_solidos: "Conocimiento sobre desechos",
-  separar_desechos_por_origen: "Separación por origen",
-  clasificacion_correcta_desechos: "Clasificación correcta",
-  preocupa_exceso_desechos: "Preocupación por contaminación",
-  desechos_contaminan_ambiente: "Desechos contaminan ambiente",
-  beneficios_reutilizar_residuo: "Beneficios de reutilizar",
-  emprendimientos_reutilizacion_aportan_economia: "Emprendimientos ayudan economía",
-};
+  <!-- Simple-DataTables (para tabla profesional) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
 
-const selectIndicador = document.getElementById("indicador");
-Object.entries(indicadores).forEach(([k, v]) => {
-  selectIndicador.innerHTML += `<option value="${k}">${v}</option>`;
-});
+  <style>
+    body { background: linear-gradient(180deg,#f7fafc 0%, #ffffff 100%); }
+    .card { background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,23,42,0.06); }
+    .muted { color: #6b7280; }
+    .accent { color: #065f46; }
+    .control { border: 1px solid #e6e6e6; padding: 0.5rem 0.75rem; border-radius: 8px; }
+    /* responsive chart container */
+    .chart-wrap { max-height: 520px; }
+  </style>
+</head>
+<body class="min-h-screen font-sans antialiased text-slate-800">
 
-// =========================
-// OBTENER DATOS DE SUPABASE
-// =========================
-async function obtenerDatos() {
-  let query = client
-    .from("cuestionario_comportamiento_proambiental_autosustentabilidad")
-    .select("*");
+  <!-- HEADER -->
+  <header class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none"><path d="M12 2l3 6 6 .5-4.5 4 1 6L12 17l-5.5 2.5 1-6L3 8.5 9 8 12 2z" fill="#fff"/></svg>
+        <div>
+          <h1 class="text-xl font-semibold">Dashboard Proambiental</h1>
+          <p class="text-sm muted">Indicadores de comportamiento proambiental y autosustentabilidad</p>
+        </div>
+      </div>
+      <div class="text-sm muted">
+        Tabla: <span class="font-medium text-emerald-100">cuestionario_comportamiento_proambiental_autosustentabilidad</span>
+      </div>
+    </div>
+  </header>
 
-  const fi = document.getElementById("fInicio").value;
-  const ff = document.getElementById("fFin").value;
-  const sexo = document.getElementById("fSexo").value;
-  const grupo = document.getElementById("fGrupo").value;
-  const sub = document.getElementById("fSubgrupo").value;
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- CONTROLES -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-4">
+        <label class="block text-sm text-slate-600 mb-2">Indicador</label>
+        <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
+        <p class="text-xs muted mt-2">Selecciona el indicador para visualizar.</p>
+      </div>
 
-  if (fi) query = query.gte("fecha", fi);
-  if (ff) query = query.lte("fecha", ff);
-  if (sexo) query = query.eq("sexo", sexo);
-  if (grupo) query = query.eq("grupo", grupo);
-  if (sub) query = query.eq("subgrupo", sub);
+      <div class="card p-4">
+        <label class="block text-sm text-slate-600 mb-2">Tipo de gráfico</label>
+        <select id="selectChartType" class="w-full control">
+          <option value="bar">Barras</option>
+          <option value="pie">Pastel</option>
+          <option value="doughnut">Doughnut</option>
+          <option value="line">Línea</option>
+          <option value="radar">Radar</option>
+          <option value="polarArea">Polar Area</option>
+          <option value="scatter">Scatter</option>
+          <option value="bubble">Bubble</option>
+          <option value="mixed">Mixed</option>
+        </select>
+        <p class="text-xs muted mt-2">Cambia el tipo de visualización.</p>
+      </div>
 
-  const { data, error } = await query;
+      <div class="card p-4">
+        <label class="block text-sm text-slate-600 mb-2">Filtros rápidos</label>
+        <div class="flex gap-2">
+          <select id="filterSexo" class="flex-1 control">
+            <option value="todos">Sexo: Todos</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+          </select>
+          <select id="filterGrupo" class="w-40 control">
+            <option value="todos">Grupo: Todos</option>
+          </select>
+        </div>
+        <p class="text-xs muted mt-2">Aplica filtros para segmentar los resultados.</p>
+      </div>
 
-  if (error) console.error(error);
+      <div class="card p-4 flex flex-col justify-between">
+        <div>
+          <label class="block text-sm text-slate-600 mb-2">Acciones</label>
+          <div class="flex gap-2">
+            <button id="btnRefresh" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">Actualizar</button>
+            <button id="btnExportChart" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">Exportar gráfico</button>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button id="btnExportCSV" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border">Exportar tabla (CSV)</button>
+        </div>
+      </div>
+    </div>
 
-  return data || [];
-}
+    <!-- RESUMEN -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-4">
+        <div class="text-sm muted">Total encuestas</div>
+        <div id="totalSurveys" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm muted">Promedio de edad</div>
+        <div id="avgAge" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm muted">Separa residuos (%)</div>
+        <div id="pctSeparate" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm muted">Participaría en talleres (%)</div>
+        <div id="pctWorkshops" class="text-2xl font-semibold mt-1">—</div>
+      </div>
+    </div>
 
-// =========================
-// GRAFICAR
-// =========================
-async function actualizar() {
-  const datos = await obtenerDatos();
-  const indicador = document.getElementById("indicador").value;
-  const tipo = document.getElementById("tipoGrafico").value;
+    <!-- GRAFICO -->
+    <div class="card p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 id="chartTitle" class="text-lg font-semibold">Indicador</h2>
+          <p id="chartSubtitle" class="text-xs muted mt-1">Selecciona indicador y tipo de gráfico, luego presiona <strong>Actualizar</strong>.</p>
+        </div>
+        <div class="text-sm muted">Datos en vivo desde Supabase</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="mainChart"></canvas>
+      </div>
+      <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
+    </div>
 
-  const valores = {};
-  datos.forEach(d => {
-    const v = d[indicador] || "Sin dato";
-    valores[v] = (valores[v] || 0) + 1;
-  });
+    <!-- TABLA -->
+    <div class="card p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-semibold">Tabla de registros</h3>
+          <p class="text-xs muted mt-1">Visualiza todos los registros de la tabla. Usa el buscador/ordenación/paginación abajo.</p>
+        </div>
+        <div class="text-sm muted">Live table</div>
+      </div>
 
-  const labels = Object.keys(valores);
-  const cantidad = Object.values(valores);
+      <div class="overflow-x-auto">
+        <table id="dataTable" class="w-full">
+          <thead>
+            <tr id="tableHeaderRow"></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
 
-  const ctx = document.getElementById("grafico").getContext("2d");
+    <footer class="text-center text-sm muted mb-8">© 2025 Proyecto Proambiental — Supabase & Chart.js</footer>
+  </main>
 
-  if (chart) chart.destroy();
+  <script>
+    /**************************************************************************
+     * Supabase config (usa las credenciales que me diste)
+     **************************************************************************/
+    const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+    const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  chart = new Chart(ctx, {
-    type: tipo,
-    data: {
-      labels,
-      datasets: [{
-        label: "Frecuencia",
-        data: cantidad,
-      }]
+    /**************************************************************************
+     * Indicadores solicitados (tu lista exacta)
+     **************************************************************************/
+    const INDICATORS = [
+      { value: 'sexo', label: 'Sexo' },
+      { value: 'estado_civil', label: 'Estado civil' },
+      { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
+      { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
+      { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
+      { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
+      { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
+      { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
+      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
+      { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
+      { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
+      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
+    ];
+
+    /**************************************************************************
+     * Likert defaults (para las preguntas tipo Likert)
+     **************************************************************************/
+    const LIKERT_LEVELS = [
+      "Totalmente en desacuerdo",
+      "En desacuerdo",
+      "Indiferente",
+      "De acuerdo",
+      "Totalmente de acuerdo"
+    ];
+
+    function normalize(v) {
+      if (v === null || v === undefined) return null;
+      return String(v).trim();
     }
-  });
 
-  pintarTabla(datos);
-  pintarResumen(datos);
-}
+    function countCategorical(arr) {
+      const counts = {};
+      arr.forEach(v => {
+        const k = normalize(v) || "No declarado";
+        counts[k] = (counts[k] || 0) + 1;
+      });
+      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
+      return { labels: entries.map(e=>e[0]), values: entries.map(e=>e[1]) };
+    }
 
-// =========================
-// TABLA
-// =========================
-function pintarTabla(datos) {
-  const head = document.querySelector("#tabla thead");
-  const body = document.querySelector("#tabla tbody");
+    function countLikert(arr) {
+      const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
+      const counts = LIKERT_LEVELS.map(()=>0);
+      arr.forEach(v => {
+        const s = normalize(v);
+        if (!s) return;
+        const idx = lower.indexOf(s.toLowerCase());
+        if (idx !== -1) counts[idx] += 1;
+        else {
+          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
+          for (let i=0;i<lower.length;i++){
+            if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
+          }
+        }
+      });
+      return { labels: LIKERT_LEVELS.slice(), values: counts };
+    }
 
-  if (datos.length === 0) {
-    head.innerHTML = "<tr><th>No hay datos</th></tr>";
-    body.innerHTML = "";
-    return;
-  }
+    /**************************************************************************
+     * Chart handling
+     **************************************************************************/
+    let chartInstance = null;
+    function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
 
-  const columnas = Object.keys(datos[0]);
+    function renderChart(type, labels, values, title) {
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      destroyChart();
 
-  head.innerHTML = "<tr>" + columnas.map(c => `<th class="p-2">${c}</th>`).join("") + "</tr>";
-  body.innerHTML = datos.map(row =>
-    `<tr>${columnas.map(c => `<td class="p-2 border">${row[c] ?? ""}</td>`).join("")}</tr>`
-  ).join("");
-}
+      // Special handling for scatter/bubble/mixed
+      if (type === 'scatter') {
+        const dataPoints = values.map((v,i) => ({ x: i+1, y: v }));
+        chartInstance = new Chart(ctx, { type: 'scatter', data: { datasets: [{ label: title, data: dataPoints, backgroundColor: '#2a9d8f' }] }, options: { scales:{ x:{ title:{display:true,text:'Índice'} }, y:{ beginAtZero:true } } } });
+        return;
+      }
+      if (type === 'bubble') {
+        const max = Math.max(...values,1);
+        const dataPoints = values.map((v,i) => ({ x: i+1, y: v, r: Math.max(4, (v/max)*18) }));
+        chartInstance = new Chart(ctx, { type: 'bubble', data: { datasets: [{ label: title, data: dataPoints, backgroundColor: '#2a9d8f' }] }, options: { scales:{ x:{ title:{display:true,text:'Índice'} }, y:{ beginAtZero:true } } } });
+        return;
+      }
+      if (type === 'mixed') {
+        // barras + linea
+        chartInstance = new Chart(ctx, {
+          data: {
+            labels,
+            datasets: [
+              { type:'bar', label:'Conteo', data: values, backgroundColor:'#2a9d8f' },
+              { type:'line', label:'Tendencia', data: values.map((v,i)=> i>0? (values[i]+values[i-1])/2 : values[i]), borderColor:'#e76f51', tension:0.3, fill:false }
+            ]
+          },
+          options: { responsive:true, scales:{ y:{ beginAtZero:true } } }
+        });
+        return;
+      }
 
-// =========================
-// RESUMEN
-// =========================
-function pintarResumen(datos) {
-  const c = datos.length;
-  document.getElementById("resumen").innerHTML = `
-    <div class="bg-white p-4 shadow rounded text-center">Registros: <b>${c}</b></div>
-    <div class="bg-white p-4 shadow rounded text-center">Hombres: <b>${datos.filter(d => d.sexo === "Masculino").length}</b></div>
-    <div class="bg-white p-4 shadow rounded text-center">Mujeres: <b>${datos.filter(d => d.sexo === "Femenino").length}</b></div>
-    <div class="bg-white p-4 shadow rounded text-center">Otros: <b>${datos.filter(d => d.sexo !== "Masculino" && d.sexo !== "Femenino").length}</b></div>
-  `;
-}
+      // default chart types
+      const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
+      const bg = palette.slice(0, labels.length);
+      chartInstance = new Chart(ctx, {
+        type,
+        data: { labels, datasets: [{ label: title, data: values, backgroundColor: bg, borderColor:'#fff', borderWidth:0.6 }] },
+        options: { responsive:true, scales: type === 'bar' ? { y:{ beginAtZero:true } } : {} }
+      });
+    }
 
-// =========================
-// EVENTOS
-// =========================
-["fInicio", "fFin", "fSexo", "fGrupo", "fSubgrupo", "indicador", "tipoGrafico"]
-  .forEach(id => document.getElementById(id).addEventListener("change", actualizar));
+    /**************************************************************************
+     * Table handling (Simple-DataTables)
+     **************************************************************************/
+    let dataTable = null;
+    function buildTableHeaders(columns) {
+      const headerRow = document.getElementById('tableHeaderRow');
+      headerRow.innerHTML = '';
+      columns.forEach(c => {
+        const th = document.createElement('th');
+        th.innerText = c;
+        headerRow.appendChild(th);
+      });
+    }
+    function buildTableBody(rows, columns) {
+      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        columns.forEach(col => {
+          const td = document.createElement('td');
+          td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      // init or reinit datatable after DOM updated
+      setTimeout(() => {
+        try { if (dataTable) dataTable.destroy(); } catch(e){}
+        dataTable = new simpleDatatables.DataTable("#dataTable", { searchable: true, fixedHeight: true, perPage: 10 });
+      }, 60);
+    }
 
-actualizar();
+    /**************************************************************************
+     * Fetch data from Supabase and render all (chart + table + summaries)
+     **************************************************************************/
+    async function fetchAllAndRender() {
+      // fetch
+      const { data, error } = await supabase.from(TABLE).select("*");
+      if (error) { console.error("Supabase error:", error); alert("Error cargando datos desde Supabase. Revisar consola."); return; }
+      // store raw
+      window.__RAW_DATA = data || [];
+
+      // populate group filter
+      const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
+      const filterGrupo = document.getElementById('filterGrupo');
+      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
+      groups.forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.textContent = g; filterGrupo.appendChild(opt); });
+
+      // populate indicator selector (once)
+      const sel = document.getElementById('selectIndicator');
+      if (!sel.options.length) {
+        INDICATORS.forEach(i => {
+          const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; sel.appendChild(opt);
+        });
+      }
+
+      // build table headers & body
+      const columns = Object.keys(data[0] || { id: 'id' });
+      buildTableHeaders(columns);
+      buildTableBody(data, columns);
+
+      // update summaries
+      updateSummaries(data);
+
+      // initial render: first indicator
+      const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
+      const chartType = document.getElementById('selectChartType').value || 'bar';
+      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
+    }
+
+    function updateSummaries(rows) {
+      document.getElementById('totalSurveys').innerText = rows.length;
+      const ages = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
+      const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
+      document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg} años`;
+
+      const separaArr = rows.map(r => normalize(r.practica_separacion_reciclaje_ingreso)).filter(Boolean);
+      const separaPos = separaArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
+      document.getElementById('pctSeparate').innerText = separaArr.length ? `${Math.round((separaPos/separaArr.length)*100)}%` : '—';
+
+      const talleresArr = rows.map(r => normalize(r.participaria_talleres_buenas_practicas)).filter(Boolean);
+      const talleresPos = talleresArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
+      document.getElementById('pctWorkshops').innerText = talleresArr.length ? `${Math.round((talleresPos/talleresArr.length)*100)}%` : '—';
+    }
+
+    /**************************************************************************
+     * Render indicator with filters
+     **************************************************************************/
+    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
+      const data = window.__RAW_DATA || [];
+      let filtered = data.slice();
+      if (filters.sexo && filters.sexo !== 'todos') filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
+      if (filters.grupo && filters.grupo !== 'todos') filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
+
+      updateSummaries(filtered);
+
+      // find label
+      const indObj = INDICATORS.find(i=> i.value === indicatorKey);
+      const title = indObj ? indObj.label : indicatorKey;
+
+      // prepare labels/values
+      let labels = [], values = [];
+      // numeric special: treat 'sexo' and others as categorical; only 'edad' was numeric but it's not in INDICATORS list.
+      // Determine if field likely Likert: check if many values match Likert list
+      const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
+
+      // if arr empty -> show no data
+      if (!arr.length) {
+        document.getElementById('noDataMsg').classList.remove('hidden');
+        destroyChart();
+        return;
+      } else {
+        document.getElementById('noDataMsg').classList.add('hidden');
+      }
+
+      // decide processing: if many arr elements match likert options => likert
+      const lowerLikert = LIKERT_LEVELS.map(l => l.toLowerCase());
+      const matchCount = arr.reduce((acc, v) => lowerLikert.includes(String(v).toLowerCase()) ? acc+1 : acc, 0);
+      const isLikert = (matchCount / arr.length) >= 0.25; // threshold 25%
+
+      if (isLikert) {
+        const res = countLikert(arr);
+        labels = res.labels; values = res.values;
+      } else {
+        // categorical
+        const res = countCategorical(arr);
+        labels = res.labels; values = res.values;
+      }
+
+      document.getElementById('chartTitle').innerText = title;
+      document.getElementById('chartSubtitle').innerText = `Tipo: ${chartType} — ${filtered.length} respuestas (filtros aplicados)`;
+      renderChart(chartType, labels, values, title);
+    }
+
+    /**************************************************************************
+     * Export table as CSV
+     **************************************************************************/
+    function exportTableCSV() {
+      const data = window.__RAW_DATA || [];
+      if (!data.length) return alert("No hay datos para exportar.");
+      const cols = Object.keys(data[0]);
+      const csvRows = [cols.join(",")];
+      data.forEach(row => {
+        const vals = cols.map(c => {
+          let v = row[c];
+          if (v === null || v === undefined) return "";
+          // escape quotes
+          v = String(v).replace(/"/g, '""');
+          if (v.includes(",") || v.includes("\n")) return `"${v}"`;
+          return v;
+        });
+        csvRows.push(vals.join(","));
+      });
+      const csv = csvRows.join("\n");
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `tabla_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+    }
+
+    /**************************************************************************
+     * Export chart image
+     **************************************************************************/
+    function exportChartImage() {
+      if (!chartInstance) return alert("No hay gráfico para exportar.");
+      const url = document.getElementById('mainChart').toDataURL('image/png', 1);
+      const a = document.createElement('a'); a.href = url; a.download = `grafico_${Date.now()}.png`; a.click();
+    }
+
+    /**************************************************************************
+     * Init UI & events
+     **************************************************************************/
+    document.getElementById('btnRefresh').addEventListener('click', async () => {
+      const indicator = document.getElementById('selectIndicator').value;
+      const chartType = document.getElementById('selectChartType').value;
+      const sexo = document.getElementById('filterSexo').value;
+      const grupo = document.getElementById('filterGrupo').value;
+      await renderIndicator(indicator, chartType, { sexo, grupo });
+    });
+
+    document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
+    document.getElementById('btnExportChart').addEventListener('click', exportChartImage);
+
+    // initial load
+    (async function init(){
+      // populate indicator dropdown quickly (in case fetch slow)
+      const sel = document.getElementById('selectIndicator');
+      INDICATORS.forEach(i => { const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; sel.appendChild(opt); });
+
+      await fetchAllAndRender();
+
+      // optional: auto-refresh every 60s (uncomment if desired)
+      // setInterval(async ()=> { await fetchAllAndRender(); }, 60000);
+    })();
+  </script>
+</body>
+</html>
