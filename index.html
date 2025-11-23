@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Encuesta Ambiental</title>
+
+  <!-- TAILWIND -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CHART.JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- FILTROS SUPERIORES -->
+  <div class="w-full bg-white shadow p-4 flex flex-wrap gap-4 justify-between">
+
+    <div>
+      <label class="text-sm">Fecha Inicio</label>
+      <input type="date" id="fInicio" class="border p-2 rounded w-40">
+    </div>
+
+    <div>
+      <label class="text-sm">Fecha Fin</label>
+      <input type="date" id="fFin" class="border p-2 rounded w-40">
+    </div>
+
+    <div>
+      <label class="text-sm">Sexo</label>
+      <select id="fSexo" class="border p-2 rounded w-40">
+        <option value="">Todos</option>
+        <option>Masculino</option>
+        <option>Femenino</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-sm">Grupo</label>
+      <input id="fGrupo" class="border p-2 rounded w-40" placeholder="Ej: A">
+    </div>
+
+    <div>
+      <label class="text-sm">Subgrupo</label>
+      <input id="fSubgrupo" class="border p-2 rounded w-40" placeholder="Ej: 1">
+    </div>
+
+    <div>
+      <label class="text-sm">Indicador</label>
+      <select id="indicador" class="border p-2 rounded w-60"></select>
+    </div>
+
+    <div>
+      <label class="text-sm">Tipo de gráfico</label>
+      <select id="tipoGrafico" class="border p-2 rounded w-40">
+        <option value="bar">Barras</option>
+        <option value="pie">Torta</option>
+        <option value="doughnut">Dona</option>
+        <option value="line">Línea</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="container mx-auto p-4">
+
+    <!-- RESUMEN -->
+    <div id="resumen" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"></div>
+
+    <!-- GRAFICO -->
+    <div class="bg-white p-4 shadow rounded mt-6">
+      <canvas id="grafico"></canvas>
+    </div>
+
+    <!-- TABLA -->
+    <div class="bg-white p-4 shadow rounded mt-6 overflow-x-auto">
+      <table id="tabla" class="min-w-full text-sm">
+        <thead class="bg-gray-200"></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
