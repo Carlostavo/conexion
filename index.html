@@ -288,20 +288,24 @@
       // Event listeners para actualización automática
       document.getElementById('selectIndicator').addEventListener('change', () => {
         this.currentIndicator = document.getElementById('selectIndicator').value;
+        console.log("Indicador cambiado a:", this.currentIndicator);
         this.updateVisualization();
       });
       
       document.getElementById('selectChartType').addEventListener('change', () => {
+        console.log("Tipo de gráfico cambiado");
         this.updateVisualization();
       });
       
       document.getElementById('filterSexo').addEventListener('change', (e) => {
         this.currentFilters.sexo = e.target.value;
+        console.log("Filtro sexo cambiado:", this.currentFilters.sexo);
         this.updateVisualization();
       });
       
       document.getElementById('filterGrupo').addEventListener('change', (e) => {
         this.currentFilters.grupo = e.target.value;
+        console.log("Filtro grupo cambiado:", this.currentFilters.grupo);
         this.updateVisualization();
       });
 
@@ -468,27 +472,38 @@
         filtered = filtered.filter(r => this.normalize(r.grupo) === grupo);
       }
       
+      console.log(`Filtros aplicados: ${filtered.length} registros de ${this.data.length} totales`);
       return filtered;
     }
 
     /***************************************************************************
-     * Process indicator data
+     * Process indicator data - CORREGIDO
      ***************************************************************************/
     processIndicator(indKey, rows){
       if (!rows || rows.length === 0) {
+        console.log("No hay filas para procesar");
         return { labels: [], values: [], isNumeric: false, numeric: [] };
       }
 
       const indicator = INDICATORS.find(i => i.value === indKey);
       if (!indicator) {
+        console.log(`Indicador no encontrado: ${indKey}`);
         return { labels: [], values: [], isNumeric: false, numeric: [] };
       }
 
+      console.log(`Procesando indicador: ${indicator.label} (${indicator.type})`);
+
       const arrRaw = rows.map(r => r[indKey]).filter(v => v !== undefined && v !== null);
-      if(!arrRaw.length) return { labels: [], values: [], isNumeric: false, numeric: [] };
+      console.log(`Datos crudos para ${indKey}:`, arrRaw);
+      
+      if(!arrRaw.length) {
+        console.log(`No hay datos válidos para ${indKey}`);
+        return { labels: [], values: [], isNumeric: false, numeric: [] };
+      }
 
       // Procesar según el tipo de indicador
       if (indicator.type === 'numeric') {
+        console.log("Procesando como numérico");
         const numeric = arrRaw.map(v => {
           const num = Number(v);
           return isNaN(num) ? null : num;
@@ -507,6 +522,7 @@
           const uniqueVals = Array.from(new Set(numeric)).sort((a, b) => a - b);
           const labels = uniqueVals.map(v => String(v));
           const values = uniqueVals.map(val => numeric.filter(v => v === val).length);
+          console.log("Datos numéricos procesados:", { labels, values });
           return { labels, values, isNumeric: true, numeric };
         } else {
           // Muchos valores, crear bins
@@ -526,10 +542,12 @@
             values[binIndex]++;
           });
           
+          console.log("Datos numéricos con bins:", { labels, values });
           return { labels, values, isNumeric: true, numeric };
         }
       }
       else if (indicator.type === 'likert') {
+        console.log("Procesando como Likert");
         // Procesar respuestas Likert (A, B, C, D, E)
         const values = new Array(5).fill(0);
         
@@ -549,6 +567,7 @@
           }
         });
         
+        console.log("Datos Likert procesados:", { labels: LIKERT_LEVELS, values });
         return { 
           labels: LIKERT_LEVELS, 
           values: values, 
@@ -557,6 +576,7 @@
         };
       }
       else if (indicator.type === 'categorical' && indicator.options) {
+        console.log("Procesando como categórico con opciones definidas");
         // Procesar respuestas categóricas con opciones definidas
         const values = {};
         Object.keys(indicator.options).forEach(key => {
@@ -583,9 +603,11 @@
           valueCounts.push(otrosCount);
         }
         
+        console.log("Datos categóricos procesados:", { labels, values: valueCounts });
         return { labels, values: valueCounts, isNumeric: false, numeric: [] };
       }
       else {
+        console.log("Procesando como categórico genérico");
         // Procesamiento genérico para datos categóricos
         const counts = {};
         arrRaw.forEach(v => {
@@ -597,12 +619,13 @@
         const labels = entries.map(e => e[0]);
         const values = entries.map(e => e[1]);
         
+        console.log("Datos categóricos genéricos procesados:", { labels, values });
         return { labels, values, isNumeric: false, numeric: [] };
       }
     }
 
     /***************************************************************************
-     * Chart handling
+     * Chart handling - CORREGIDO
      ***************************************************************************/
     destroyChart(){ 
       if(this.chart){ 
@@ -616,11 +639,14 @@
     }
 
     renderChart(type, labels, values, title){
+      console.log(`Renderizando gráfico: ${type} para ${title}`);
+      console.log("Datos:", { labels, values });
+      
       const ctx = document.getElementById('mainChart').getContext('2d');
       this.destroyChart();
 
       if (!labels.length || !values.length) {
-        console.warn("No data to render chart");
+        console.warn("No hay datos para renderizar el gráfico");
         document.getElementById('noDataMsg').classList.remove('hidden');
         return;
       }
@@ -631,54 +657,62 @@
       const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
       const bg = palette.slice(0, labels.length);
       
-      this.chart = new Chart(ctx, {
-        type,
-        data: { 
-          labels, 
-          datasets:[{ 
-            label: title, 
-            data: values, 
-            backgroundColor: bg, 
-            borderColor: '#fff', 
-            borderWidth: 1 
-          }] 
-        },
-        options:{ 
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins:{ 
-            legend: {
-              position: 'top',
-            },
-            tooltip:{ 
-              callbacks:{ 
-                label(ctx){ 
-                  const i = ctx.dataIndex; 
-                  const v = values[i]; 
-                  const p = total ? Math.round((v/total)*10000)/100 : 0; 
-                  return `${v} respuestas (${p}%)`; 
+      try {
+        this.chart = new Chart(ctx, {
+          type,
+          data: { 
+            labels, 
+            datasets:[{ 
+              label: title, 
+              data: values, 
+              backgroundColor: bg, 
+              borderColor: '#fff', 
+              borderWidth: 1 
+            }] 
+          },
+          options:{ 
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins:{ 
+              legend: {
+                position: 'top',
+              },
+              tooltip:{ 
+                callbacks:{ 
+                  label(ctx){ 
+                    const i = ctx.dataIndex; 
+                    const v = values[i]; 
+                    const p = total ? Math.round((v/total)*10000)/100 : 0; 
+                    return `${v} respuestas (${p}%)`; 
+                  } 
                 } 
               } 
-            } 
+            }
           }
-        }
-      });
+        });
 
-      const percentLegend = document.getElementById('chartPercentLegend');
-      percentLegend.innerHTML = '';
-      const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
-      const top = sorted.slice(0,3);
-      if(top.length){
-        percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+        const percentLegend = document.getElementById('chartPercentLegend');
+        percentLegend.innerHTML = '';
+        const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
+        const top = sorted.slice(0,3);
+        if(top.length){
+          percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+        }
+        
+        document.getElementById('noDataMsg').classList.add('hidden');
+        console.log("Gráfico renderizado exitosamente");
+      } catch (error) {
+        console.error("Error al renderizar el gráfico:", error);
+        document.getElementById('noDataMsg').classList.remove('hidden');
       }
-      
-      document.getElementById('noDataMsg').classList.add('hidden');
     }
 
     /***************************************************************************
-     * UI Updates
+     * UI Updates - CORREGIDO
      ***************************************************************************/
     updateUIForIndicator(indKey, processed, filteredRows){
+      console.log("Actualizando UI para indicador:", indKey);
+      
       const total = filteredRows.length;
       document.getElementById('cardTotal').textContent = total;
 
@@ -770,6 +804,7 @@
       const totalCounts = values.reduce((a,b)=>a+b,0) || 0;
 
       if(!labels.length){
+        console.log("No hay datos para mostrar en la tabla");
         document.getElementById('noDataMsg').classList.remove('hidden');
         return;
       } else {
@@ -814,14 +849,18 @@
       document.getElementById('chartSubtitle').textContent = `${total} encuestas (${totalCounts} respuestas válidas)`;
       
       const chartType = document.getElementById('selectChartType').value;
+      console.log(`Llamando a renderChart con tipo: ${chartType}`);
       this.renderChart(chartType, labels, values, indicator ? indicator.label : indKey);
     }
 
     /***************************************************************************
-     * Main rendering flow
+     * Main rendering flow - CORREGIDO
      ***************************************************************************/
     updateVisualization() {
+      console.log("=== ACTUALIZANDO VISUALIZACIÓN ===");
+      
       if (this.data.length === 0) {
+        console.log("No hay datos disponibles");
         document.getElementById('cardTotal').textContent = '0';
         document.getElementById('noDataMsg').classList.remove('hidden');
         return;
@@ -829,7 +868,11 @@
       
       const filtered = this.applyFilters();
       const ind = this.currentIndicator || document.getElementById('selectIndicator').value;
+      console.log(`Indicador actual: ${ind}`);
+      
       const processed = this.processIndicator(ind, filtered);
+      console.log("Datos procesados:", processed);
+      
       this.updateUIForIndicator(ind, processed, filtered);
     }
 
