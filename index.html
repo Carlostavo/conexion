@@ -68,11 +68,8 @@
           <option value="line">Línea</option>
           <option value="radar">Radar</option>
           <option value="polarArea">Polar Area</option>
-          <option value="scatter">Scatter</option>
-          <option value="bubble">Bubble</option>
-          <option value="mixed">Mixed</option>
         </select>
-        <p class="text-xs muted mt-2">Cambia la visualización; los porcentajes se muestran cuando aplica.</p>
+        <p class="text-xs muted mt-2">Cambia la visualización.</p>
       </div>
 
       <div class="card p-4">
@@ -80,8 +77,8 @@
         <div class="flex gap-2">
           <select id="filterSexo" class="flex-1 rounded-lg border py-2 px-3">
             <option value="todos">Sexo: Todos</option>
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
+            <option value="A">Masculino</option>
+            <option value="B">Femenino</option>
           </select>
           <select id="filterGrupo" class="w-40 rounded-lg border py-2 px-3">
             <option value="todos">Grupo: Todos</option>
@@ -114,11 +111,11 @@
       </div>
 
       <div class="card p-5">
-        <div class="text-sm muted">Principales estadísticas numéricas</div>
+        <div class="text-sm muted">Principales estadísticas</div>
         <div id="cardNumeric" class="mt-2 space-y-1">
           <!-- se llenará dinamicamente -->
         </div>
-        <div class="small mt-1 muted">Min / Max / Media / Mediana / Moda</div>
+        <div class="small mt-1 muted">Distribución de categorías</div>
       </div>
 
       <div class="card p-5">
@@ -126,7 +123,7 @@
         <div id="cardVariation" class="mt-2 space-y-1">
           <!-- varianza y desviación -->
         </div>
-        <div class="small mt-1 muted">Varianza, desviación estándar, rango</div>
+        <div class="small mt-1 muted">Diversidad de respuestas</div>
       </div>
     </div>
 
@@ -171,7 +168,7 @@
 
       <div class="grid md:grid-cols-2 gap-4">
         <div class="p-4 border rounded">
-          <h4 class="font-semibold">Estadísticas numéricas (cuando aplican)</h4>
+          <h4 class="font-semibold">Estadísticas descriptivas</h4>
           <div id="numericStats" class="mt-2 small muted"></div>
         </div>
         <div class="p-4 border rounded">
@@ -185,36 +182,39 @@
 
   <script>
   /***************************************************************************
-   * CONFIG SUPABASE - USANDO EXACTAMENTE LAS MISMAS CREDENCIALES DEL CÓDIGO QUE FUNCIONA
+   * CONFIG SUPABASE
    ***************************************************************************/
   const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
   const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
   
-  // Inicializar Supabase - versión simple como en el código que funciona
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   /***************************************************************************
-   * INDICATORS
+   * INDICATORS - Actualizado según la estructura real de la encuesta
    ***************************************************************************/
   const INDICATORS = [
-    { value: 'sexo', label: 'Sexo' },
-    { value: 'estado_civil', label: 'Estado civil' },
-    { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
-    { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
-    { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
-    { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
-    { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
-    { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
-    { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
-    { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
-    { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
-    { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
+    { value: 'sexo', label: 'Sexo', type: 'categorical', options: { 'A': 'Masculino', 'B': 'Femenino' } },
+    { value: 'estado_civil', label: 'Estado civil', type: 'categorical', options: { 'A': 'Soltero', 'B': 'Casado', 'C': 'Unión libre', 'D': 'Divorciado' } },
+    { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar', type: 'categorical', options: { 'A': 'Primaria', 'B': 'Secundaria', 'C': 'Universidad', 'D': 'Postgrado' } },
+    { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral', type: 'categorical', options: { 'A': 'Desempleado', 'B': 'Temporal', 'C': 'Empleado' } },
+    { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual', type: 'categorical', options: { 'A': 'Menor al sueldo básico', 'B': 'Sueldo básico', 'C': 'Mayor al sueldo básico' } },
+    { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos', type: 'likert' },
+    { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta', type: 'likert' },
+    { value: 'separar_desechos_por_origen', label: 'Separa desechos', type: 'likert' },
+    { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar', type: 'likert' },
+    { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar', type: 'likert' },
+    { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres', type: 'likert' },
+    { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado', type: 'likert' },
+    { value: 'edad', label: 'Edad', type: 'numeric' },
+    { value: 'num_integrantes_familia', label: 'Número de integrantes familia', type: 'numeric' }
   ];
 
   const LIKERT_LEVELS = [
-    "Totalmente en desacuerdo","En desacuerdo","Indiferente","De acuerdo","Totalmente de acuerdo"
+    "Totalmente en desacuerdo", "En desacuerdo", "Indiferente", "De acuerdo", "Totalmente de acuerdo"
   ];
+
+  const LIKERT_CODES = ['A', 'B', 'C', 'D', 'E'];
 
   /***************************************************************************
    * Manejo de estado de conexión
@@ -251,7 +251,10 @@
   /***************************************************************************
    * UTIL: normalizacion y estadisticas
    ***************************************************************************/
-  function normalize(v) { if (v===null || v===undefined) return null; return String(v).trim(); }
+  function normalize(v) { 
+    if (v === null || v === undefined) return null; 
+    return String(v).trim(); 
+  }
 
   function mean(arr){ if(!arr.length) return null; return arr.reduce((a,b)=>a+b,0)/arr.length; }
   function median(arr){
@@ -295,71 +298,6 @@
     const total = values.reduce((a,b)=>a+b,0);
     const percentData = values.map(v=> total? Math.round((v/total)*10000)/100 : 0);
 
-    if(type==='mixed'){
-      chart = new Chart(ctx, {
-        data: { 
-          labels, 
-          datasets: [{ 
-            type:'bar', 
-            label:'Conteo', 
-            data: values, 
-            backgroundColor:'#2a9d8f' 
-          }, { 
-            type:'line', 
-            label:'% (tendencia)', 
-            data: percentData, 
-            borderColor:'#e76f51', 
-            yAxisID:'percent', 
-            tension:0.25, 
-            fill:false 
-          }] 
-        },
-        options:{ 
-          scales:{ 
-            y:{ beginAtZero:true }, 
-            percent:{ display:false } 
-          }, 
-          plugins:{ 
-            tooltip:{ 
-              callbacks:{ 
-                label(ctx){ 
-                  const i=ctx.dataIndex; 
-                  const v=values[i]; 
-                  const p = percentData[i]; 
-                  return `${v} (${p}%)`; 
-                } 
-              } 
-            } 
-          } 
-        }
-      });
-      return;
-    }
-
-    if(type==='scatter' || type==='bubble'){
-      const ds = type==='scatter' ? 
-        values.map((v,i)=>({x:i+1,y:v})) : 
-        values.map((v,i)=>({x:i+1,y:v,r: Math.max(4, (v/Math.max(...values,1))*18)}));
-      
-      chart = new Chart(ctx, { 
-        type, 
-        data: { 
-          datasets:[{ 
-            label:title, 
-            data:ds, 
-            backgroundColor:'#2a9d8f' 
-          }] 
-        }, 
-        options:{ 
-          scales:{ 
-            x:{ title:{ display:true, text:'Índice' }}, 
-            y:{ beginAtZero:true } 
-          } 
-        } 
-      });
-      return;
-    }
-
     const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
     const bg = palette.slice(0, labels.length);
     
@@ -368,28 +306,31 @@
       data: { 
         labels, 
         datasets:[{ 
-          label:title, 
+          label: title, 
           data: values, 
           backgroundColor: bg, 
-          borderColor:'#fff', 
-          borderWidth:0.6 
+          borderColor: '#fff', 
+          borderWidth: 1 
         }] 
       },
       options:{ 
-        responsive:true, 
+        responsive: true,
+        maintainAspectRatio: false,
         plugins:{ 
+          legend: {
+            position: 'top',
+          },
           tooltip:{ 
             callbacks:{ 
               label(ctx){ 
-                const i=ctx.dataIndex; 
-                const v=values[i]; 
-                const p = total?Math.round((v/total)*10000)/100:0; 
-                return `${v} (${p}%)`; 
+                const i = ctx.dataIndex; 
+                const v = values[i]; 
+                const p = total ? Math.round((v/total)*10000)/100 : 0; 
+                return `${v} respuestas (${p}%)`; 
               } 
             } 
           } 
-        }, 
-        scales: type==='bar' ? { y:{ beginAtZero:true } } : {} 
+        }
       }
     });
 
@@ -416,15 +357,6 @@
       if(error){
         console.error("Supabase error:", error);
         let errorMsg = `Error ${status}: ${error.message}`;
-        
-        if (status === 403) {
-          errorMsg += " - Verifica las políticas RLS de la tabla";
-        } else if (status === 404) {
-          errorMsg += " - Tabla no encontrada";
-        } else if (status === 401) {
-          errorMsg += " - Error de autenticación - Verifica la API key";
-        }
-        
         throw new Error(errorMsg);
       }
       
@@ -464,78 +396,127 @@
     groups.forEach(g=> { 
       const o = document.createElement('option'); 
       o.value = g; 
-      o.textContent = g; 
+      o.textContent = `Grupo: ${g}`; 
       sel.appendChild(o); 
     });
   }
 
   function processIndicator(indKey, rows){
     if (!rows || rows.length === 0) {
-      return { labels:[], values:[], isNumeric:false, numeric:[] };
+      return { labels: [], values: [], isNumeric: false, numeric: [] };
     }
 
-    const arrRaw = rows.map(r => r[indKey]).filter(v => v!==undefined && v!==null);
-    if(!arrRaw.length) return { labels:[], values:[], isNumeric:false, numeric:[] };
+    const indicator = INDICATORS.find(i => i.value === indKey);
+    if (!indicator) {
+      return { labels: [], values: [], isNumeric: false, numeric: [] };
+    }
 
-    const numericCand = arrRaw.map(v=> { 
-      if (typeof v === 'number') return v;
-      const n = Number(String(v).replace(/[^0-9\.\-]/g,'')); 
-      return isNaN(n) ? null : n; 
-    });
-    const numericCount = numericCand.filter(n=>n!==null).length;
-    const isNumeric = numericCount / arrRaw.length >= 0.9;
+    const arrRaw = rows.map(r => r[indKey]).filter(v => v !== undefined && v !== null);
+    if(!arrRaw.length) return { labels: [], values: [], isNumeric: false, numeric: [] };
 
-    if(isNumeric){
-      const numeric = numericCand.filter(n=>n!==null);
-      const uniqueVals = Array.from(new Set(numeric));
+    // Procesar según el tipo de indicador
+    if (indicator.type === 'numeric') {
+      const numeric = arrRaw.map(v => {
+        const num = Number(v);
+        return isNaN(num) ? null : num;
+      }).filter(n => n !== null);
       
-      if(uniqueVals.length <= 8){
-        const labels = uniqueVals.sort((a,b)=>a-b).map(v=>String(v));
-        const counts = labels.map(l=> numeric.filter(x=> String(x)===String(l)).length);
-        return { labels, values:counts, isNumeric:true, numeric };
+      if (numeric.length === 0) {
+        return { labels: [], values: [], isNumeric: true, numeric: [] };
+      }
+
+      // Para datos numéricos, crear bins
+      const min = Math.min(...numeric);
+      const max = Math.max(...numeric);
+      
+      if (max - min <= 10) {
+        // Pocos valores únicos, mostrar todos
+        const uniqueVals = Array.from(new Set(numeric)).sort((a, b) => a - b);
+        const labels = uniqueVals.map(v => String(v));
+        const values = uniqueVals.map(val => numeric.filter(v => v === val).length);
+        return { labels, values, isNumeric: true, numeric };
       } else {
-        const min = Math.min(...numeric), max = Math.max(...numeric);
-        const bins = 6;
-        const step = (max - min)/bins || 1;
-        const edges = [];
-        for(let i=0;i<bins;i++){ 
-          edges.push({
-            min: min + i*step, 
-            max: (i===bins-1? max: min + (i+1)*step)
-          }); 
+        // Muchos valores, crear bins
+        const binCount = Math.min(6, Math.ceil((max - min) / 5));
+        const binSize = (max - min) / binCount;
+        const labels = [];
+        const values = new Array(binCount).fill(0);
+        
+        for (let i = 0; i < binCount; i++) {
+          const binStart = min + i * binSize;
+          const binEnd = min + (i + 1) * binSize;
+          labels.push(`${Math.round(binStart)}-${Math.round(binEnd)}`);
         }
-        const labels = edges.map((e,i)=> `${Math.round(e.min)}-${Math.round(e.max)}`);
-        const counts = edges.map(e=> numeric.filter(n=> n>=e.min && n<=e.max).length);
-        return { labels, values:counts, isNumeric:true, numeric };
+        
+        numeric.forEach(value => {
+          const binIndex = Math.min(binCount - 1, Math.floor((value - min) / binSize));
+          values[binIndex]++;
+        });
+        
+        return { labels, values, isNumeric: true, numeric };
       }
     }
-
-    const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
-    const matchCount = arrRaw.reduce((s,v) => lower.includes(String(v).toLowerCase()) ? s+1 : s, 0);
-    if(matchCount / arrRaw.length >= 0.25){
-      const counts = LIKERT_LEVELS.map(()=>0);
-      arrRaw.forEach(v=>{
-        const s = String(v).trim();
-        const idx = lower.indexOf(s.toLowerCase());
-        if(idx !== -1) counts[idx] += 1;
-        else {
-          for(let i=0;i<lower.length;i++){
-            if(s.toLowerCase().includes(lower[i].split(' ')[0])){ counts[i]++; break;}
-          }
+    else if (indicator.type === 'likert') {
+      // Procesar respuestas Likert (A, B, C, D, E)
+      const values = new Array(5).fill(0);
+      
+      arrRaw.forEach(v => {
+        const strVal = String(v).trim().toUpperCase();
+        const index = LIKERT_CODES.indexOf(strVal);
+        if (index !== -1) {
+          values[index]++;
         }
       });
-      return { labels: LIKERT_LEVELS.slice(), values: counts, isNumeric:false, numeric:[] };
+      
+      return { 
+        labels: LIKERT_LEVELS, 
+        values: values, 
+        isNumeric: false, 
+        numeric: [] 
+      };
     }
-
-    const map = {};
-    arrRaw.forEach(v=> {
-      const k = normalize(v) || 'No declarado';
-      map[k] = (map[k]||0)+1;
-    });
-    const entries = Object.entries(map).sort((a,b)=> b[1]-a[1]);
-    const labels = entries.map(e=>e[0]);
-    const values = entries.map(e=>e[1]);
-    return { labels, values, isNumeric:false, numeric:[] };
+    else if (indicator.type === 'categorical' && indicator.options) {
+      // Procesar respuestas categóricas con opciones definidas
+      const values = {};
+      Object.keys(indicator.options).forEach(key => {
+        values[key] = 0;
+      });
+      values['Otros'] = 0;
+      
+      arrRaw.forEach(v => {
+        const strVal = String(v).trim().toUpperCase();
+        if (values.hasOwnProperty(strVal)) {
+          values[strVal]++;
+        } else {
+          values['Otros']++;
+        }
+      });
+      
+      const labels = Object.keys(indicator.options).map(key => indicator.options[key]);
+      const valueCounts = Object.keys(indicator.options).map(key => values[key]);
+      
+      // Agregar "Otros" si hay valores
+      if (values['Otros'] > 0) {
+        labels.push('Otros');
+        valueCounts.push(values['Otros']);
+      }
+      
+      return { labels, values: valueCounts, isNumeric: false, numeric: [] };
+    }
+    else {
+      // Procesamiento genérico para datos categóricos
+      const counts = {};
+      arrRaw.forEach(v => {
+        const key = normalize(v) || 'No especificado';
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const labels = entries.map(e => e[0]);
+      const values = entries.map(e => e[1]);
+      
+      return { labels, values, isNumeric: false, numeric: [] };
+    }
   }
 
   function updateUIForIndicator(indKey, processed, filteredRows){
@@ -554,51 +535,73 @@
 
     if(processed.isNumeric && processed.numeric.length){
       const arr = processed.numeric;
-      const mn = Math.min(...arr), mx = Math.max(...arr);
-      const avg = mean(arr).toFixed(2);
-      const med = median(arr);
+      const mn = Math.min(...arr);
+      const mx = Math.max(...arr);
+      const avg = mean(arr).toFixed(1);
+      const med = median(arr).toFixed(1);
       const mod = mode(arr);
       const varr = variance(arr);
       const sd = stdev(arr);
       const rng = rangeArr(arr);
-      const ssum = sum(arr);
-      const n = arr.length;
 
       numericContainer.innerHTML = `
         <div class="text-lg font-semibold">${avg}</div>
-        <div class="small muted">Media</div>
-        <div class="mt-2">Min: <strong>${mn}</strong> • Max: <strong>${mx}</strong></div>
-        <div>Mediana: <strong>${med}</strong> • Moda: <strong>${mod}</strong></div>`;
+        <div class="small muted">Promedio</div>
+        <div class="mt-2">Mín: <strong>${mn}</strong> • Máx: <strong>${mx}</strong></div>
+        <div>Mediana: <strong>${med}</strong></div>`;
 
       variationContainer.innerHTML = `
-        <div>Varianza: <strong>${varr!==null?varr.toFixed(2):'—'}</strong></div>
         <div>Desv. estándar: <strong>${sd!==null?sd.toFixed(2):'—'}</strong></div>
-        <div>Rango: <strong>${rng!==null?rng:'—'}</strong></div>`;
+        <div>Rango: <strong>${rng!==null?rng:'—'}</strong></div>
+        <div>Moda: <strong>${mod}</strong></div>`;
 
       numericStatsBlock.innerHTML = `
         <ul class="list-disc pl-5">
-          <li>Min: ${mn}</li>
-          <li>Max: ${mx}</li>
-          <li>Media: ${avg}</li>
+          <li>Mínimo: ${mn}</li>
+          <li>Máximo: ${mx}</li>
+          <li>Promedio: ${avg}</li>
           <li>Mediana: ${med}</li>
           <li>Moda: ${mod}</li>
-          <li>Suma: ${ssum}</li>
-          <li>N: ${n}</li>
+          <li>Total muestras: ${arr.length}</li>
         </ul>`;
 
       summaryStatsBlock.innerHTML = `
         <ul class="list-disc pl-5">
+          <li>Desviación estándar: ${sd!==null?sd.toFixed(3):'—'}</li>
           <li>Varianza: ${varr!==null?varr.toFixed(3):'—'}</li>
-          <li>Desv. est.: ${sd!==null?sd.toFixed(3):'—'}</li>
           <li>Rango: ${rng!==null?rng:'—'}</li>
         </ul>`;
     } else {
+      // Para datos categóricos
+      const totalResponses = processed.values.reduce((a, b) => a + b, 0);
+      const uniqueCategories = processed.labels.length;
+      const maxValue = Math.max(...processed.values);
+      const maxCategory = processed.labels[processed.values.indexOf(maxValue)];
+
       numericContainer.innerHTML = `
-        <div class="text-lg font-semibold">—</div>
-        <div class="small muted">No aplica (no numérico)</div>`;
-      variationContainer.innerHTML = `<div class="text-lg font-semibold">—</div>`;
-      numericStatsBlock.innerHTML = `<div class="muted">No hay estadísticas numéricas para este indicador.</div>`;
-      summaryStatsBlock.innerHTML = `<div class="muted">Resumen no numérico disponible en la tabla de distribución.</div>`;
+        <div class="text-lg font-semibold">${uniqueCategories}</div>
+        <div class="small muted">Categorías únicas</div>
+        <div class="mt-2">Total respuestas: <strong>${totalResponses}</strong></div>
+        <div>Moda: <strong>${maxCategory}</strong></div>`;
+
+      variationContainer.innerHTML = `
+        <div>Frecuencia máxima: <strong>${maxValue}</strong></div>
+        <div>Diversidad: <strong>${uniqueCategories}</strong> categorías</div>`;
+
+      numericStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Total respuestas: ${totalResponses}</li>
+          <li>Categorías únicas: ${uniqueCategories}</li>
+          <li>Moda: "${maxCategory}" (${maxValue} respuestas)</li>
+          <li>Porcentaje moda: ${totalResponses ? Math.round((maxValue/totalResponses)*100) : 0}%</li>
+        </ul>`;
+
+      summaryStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Distribución categórica</li>
+          <li>Índice de diversidad: ${uniqueCategories}</li>
+          <li>Concentración: ${totalResponses ? Math.round((maxValue/totalResponses)*100) : 0}% en la categoría principal</li>
+        </ul>`;
     }
 
     const distBody = document.getElementById('distBody');
@@ -641,11 +644,12 @@
       });
     }, 80);
 
-    document.getElementById('chartTitle').textContent = INDICATORS.find(i=>i.value===indKey)?.label || indKey;
-    document.getElementById('chartSubtitle').textContent = `${total} respuestas (filtros aplicados)`;
+    const indicator = INDICATORS.find(i=>i.value===indKey);
+    document.getElementById('chartTitle').textContent = indicator ? indicator.label : indKey;
+    document.getElementById('chartSubtitle').textContent = `${total} encuestas (${totalCounts} respuestas válidas)`;
     
     const chartType = document.getElementById('selectChartType').value;
-    renderChart(chartType, labels, values, INDICATORS.find(i=>i.value===indKey)?.label || indKey);
+    renderChart(chartType, labels, values, indicator ? indicator.label : indKey);
   }
 
   /***************************************************************************
@@ -655,8 +659,8 @@
     const sexo = document.getElementById('filterSexo').value;
     const grupo = document.getElementById('filterGrupo').value;
     let filtered = rows.slice();
-    if(sexo && sexo!=='todos') filtered = filtered.filter(r=> (r.sexo||'').toLowerCase() === sexo.toLowerCase());
-    if(grupo && grupo!=='todos') filtered = filtered.filter(r=> (r.grupo||'').toLowerCase() === grupo.toLowerCase());
+    if(sexo && sexo!=='todos') filtered = filtered.filter(r => normalize(r.sexo) === sexo);
+    if(grupo && grupo!=='todos') filtered = filtered.filter(r => normalize(r.grupo) === grupo);
     return filtered;
   }
 
