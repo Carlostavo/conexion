@@ -185,21 +185,14 @@
 
   <script>
   /***************************************************************************
-   * CONFIG SUPABASE
+   * CONFIG SUPABASE - USANDO EXACTAMENTE LAS MISMAS CREDENCIALES DEL CÓDIGO QUE FUNCIONA
    ***************************************************************************/
   const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzYSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
   const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
   
-  // Inicializar Supabase con manejo de errores
-  let supabase;
-  try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    console.log("Supabase client inicializado");
-  } catch (error) {
-    console.error("Error inicializando Supabase:", error);
-    showConnectionError("Error al inicializar el cliente de Supabase: " + error.message);
-  }
+  // Inicializar Supabase - versión simple como en el código que funciona
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   /***************************************************************************
    * INDICATORS
@@ -253,15 +246,6 @@
     `;
     statusEl.classList.remove('hidden');
     setTimeout(() => statusEl.classList.add('hidden'), 5000);
-  }
-
-  function setLoadingState(loading) {
-    const main = document.querySelector('main');
-    if (loading) {
-      main.classList.add('loading');
-    } else {
-      main.classList.remove('loading');
-    }
   }
 
   /***************************************************************************
@@ -370,16 +354,6 @@
           scales:{ 
             x:{ title:{ display:true, text:'Índice' }}, 
             y:{ beginAtZero:true } 
-          }, 
-          plugins:{ 
-            tooltip:{ 
-              callbacks:{ 
-                label(tp){ 
-                  if(tp.raw.r) return `x:${tp.raw.x} y:${tp.raw.y} (r:${tp.raw.r})`; 
-                  return `x:${tp.raw.x} y:${tp.raw.y}`; 
-                } 
-              } 
-            } 
           } 
         } 
       });
@@ -432,29 +406,23 @@
    * Data handling: fetch + process
    ***************************************************************************/
   async function fetchAll(){
-    if (!supabase) {
-      throw new Error("Cliente de Supabase no inicializado");
-    }
-    
-    setLoadingState(true);
     try {
       console.log("Fetching data from Supabase...");
       const { data, error, status } = await supabase
         .from(TABLE)
         .select('*')
-        .limit(1000); // Limitar para evitar timeouts
+        .limit(1000);
 
       if(error){
         console.error("Supabase error:", error);
         let errorMsg = `Error ${status}: ${error.message}`;
         
-        // Mensajes más específicos según el tipo de error
         if (status === 403) {
           errorMsg += " - Verifica las políticas RLS de la tabla";
         } else if (status === 404) {
           errorMsg += " - Tabla no encontrada";
         } else if (status === 401) {
-          errorMsg += " - Error de autenticación";
+          errorMsg += " - Error de autenticación - Verifica la API key";
         }
         
         throw new Error(errorMsg);
@@ -475,8 +443,6 @@
       console.error("Error fetching data:", error);
       showConnectionError("No se pudieron cargar los datos: " + error.message);
       return [];
-    } finally {
-      setLoadingState(false);
     }
   }
 
@@ -763,33 +729,6 @@
   });
 
   /***************************************************************************
-   * Real-time updates
-   ***************************************************************************/
-  function setupRealtime(){
-    if (!supabase) {
-      console.warn("No se puede configurar realtime: Supabase no inicializado");
-      return;
-    }
-    
-    try{
-      const channel = supabase.channel('realtime-table-'+TABLE)
-        .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => {
-          if(window._rtDebounce) clearTimeout(window._rtDebounce);
-          window._rtDebounce = setTimeout(()=> { refreshAll(); }, 700);
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            console.log('Suscripción realtime activada');
-          } else {
-            console.warn('Estado de suscripción realtime:', status);
-          }
-        });
-    }catch(e){ 
-      console.warn('Realtime not available or subscription failed', e); 
-    }
-  }
-
-  /***************************************************************************
    * INIT
    ***************************************************************************/
   (async function init(){
@@ -798,9 +737,7 @@
     showConnectionSuccess("Conectando a Supabase...");
     
     try {
-      await fetchAll();
       await refreshAll();
-      setupRealtime();
     } catch (error) {
       console.error("Error en inicialización:", error);
       showConnectionError("Error al inicializar la aplicación: " + error.message);
