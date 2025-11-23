@@ -66,6 +66,8 @@
           <option value="pie">Pastel</option>
           <option value="doughnut">Doughnut</option>
           <option value="line">Línea</option>
+          <option value="radar">Radar</option>
+          <option value="polarArea">Polar Area</option>
         </select>
         <p class="text-xs muted mt-2">Cambia la visualización.</p>
       </div>
@@ -465,12 +467,12 @@
           values[index]++;
         } else {
           // Si no encuentra el código, buscar por texto
-          const textMatch = LIKERT_LEVELS.findIndex(level => 
-            level.toLowerCase().includes(strVal.toLowerCase())
-          );
-          if (textMatch !== -1) {
-            values[textMatch]++;
-          }
+          const lowerVal = strVal.toLowerCase();
+          if (lowerVal.includes('totalmente') && lowerVal.includes('desacuerdo')) values[0]++;
+          else if (lowerVal.includes('desacuerdo')) values[1]++;
+          else if (lowerVal.includes('indiferente')) values[2]++;
+          else if (lowerVal.includes('acuerdo') && !lowerVal.includes('totalmente')) values[3]++;
+          else if (lowerVal.includes('totalmente') && lowerVal.includes('acuerdo')) values[4]++;
         }
       });
       
@@ -483,36 +485,35 @@
     }
     else if (indicator.type === 'categorical' && indicator.options) {
       // Procesar respuestas categóricas con opciones definidas
-      const counts = {};
-      
-      // Inicializar contadores para todas las opciones definidas
+      const values = {};
       Object.keys(indicator.options).forEach(key => {
-        counts[key] = 0;
+        values[key] = 0;
       });
       
-      // Contar ocurrencias
+      let otrosCount = 0;
+      
       arrRaw.forEach(v => {
         const strVal = String(v).trim().toUpperCase();
-        if (counts.hasOwnProperty(strVal)) {
-          counts[strVal]++;
+        if (values.hasOwnProperty(strVal)) {
+          values[strVal]++;
+        } else {
+          otrosCount++;
         }
       });
       
-      // Crear arrays para labels y values, excluyendo categorías con 0 respuestas
-      const labels = [];
-      const values = [];
+      const labels = Object.keys(indicator.options).map(key => indicator.options[key]);
+      const valueCounts = Object.keys(indicator.options).map(key => values[key]);
       
-      Object.keys(indicator.options).forEach(key => {
-        if (counts[key] > 0) {
-          labels.push(indicator.options[key]);
-          values.push(counts[key]);
-        }
-      });
+      // Solo agregar "Otros" si hay valores
+      if (otrosCount > 0) {
+        labels.push('Otros');
+        valueCounts.push(otrosCount);
+      }
       
-      return { labels, values, isNumeric: false, numeric: [] };
+      return { labels, values: valueCounts, isNumeric: false, numeric: [] };
     }
     else {
-      // Procesamiento genérico para datos categóricos sin opciones definidas
+      // Procesamiento genérico para datos categóricos
       const counts = {};
       arrRaw.forEach(v => {
         const key = normalize(v) || 'No especificado';
@@ -673,7 +674,7 @@
   }
 
   /***************************************************************************
-   * Main rendering flow
+   * Main rendering flow - ACTUALIZACIÓN AUTOMÁTICA
    ***************************************************************************/
   async function refreshAll(){
     try {
@@ -700,16 +701,28 @@
     document.getElementById('cardTotal').textContent = data.length;
   }
 
-  document.addEventListener('change', async (e)=>{
-    if(['selectIndicator','selectChartType','filterSexo','filterGrupo'].includes(e.target.id)){
-      const all = window.__RAW || [];
-      if (all.length === 0) return;
-      
-      const filtered = applyFilters(all);
-      const ind = document.getElementById('selectIndicator').value;
-      const processed = processIndicator(ind, filtered);
-      updateUIForIndicator(ind, processed, filtered);
-    }
+  // Función para actualizar la visualización
+  function updateVisualization() {
+    const all = window.__RAW || [];
+    if (all.length === 0) return;
+    
+    const filtered = applyFilters(all);
+    const ind = document.getElementById('selectIndicator').value;
+    const processed = processIndicator(ind, filtered);
+    updateUIForIndicator(ind, processed, filtered);
+  }
+
+  // Event listeners para actualización automática
+  document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar cuando cambia el indicador
+    document.getElementById('selectIndicator').addEventListener('change', updateVisualization);
+    
+    // Actualizar cuando cambia el tipo de gráfico
+    document.getElementById('selectChartType').addEventListener('change', updateVisualization);
+    
+    // Actualizar cuando cambian los filtros
+    document.getElementById('filterSexo').addEventListener('change', updateVisualization);
+    document.getElementById('filterGrupo').addEventListener('change', updateVisualization);
   });
 
   function exportCSV(){
