@@ -29,10 +29,6 @@
     .loading { opacity: 0.6; pointer-events: none; }
     .error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 1rem; border-radius: 8px; }
     .success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 1rem; border-radius: 8px; }
-    .fade-in { animation: fadeIn 0.5s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .pulse { animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -142,7 +138,7 @@
       </div>
 
       <div class="chart-container">
-        <canvas id="mainChart" style="max-width:900px; width:100%; height: 400px;"></canvas>
+        <canvas id="mainChart" style="max-width:900px; width:100%;"></canvas>
       </div>
 
       <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
@@ -198,52 +194,20 @@
    * INDICATORS - Actualizado según la estructura real de la encuesta
    ***************************************************************************/
   const INDICATORS = [
-    // Información demográfica
     { value: 'sexo', label: 'Sexo', type: 'categorical', options: { 'A': 'Masculino', 'B': 'Femenino' } },
-    { value: 'edad', label: 'Edad', type: 'numeric' },
     { value: 'estado_civil', label: 'Estado civil', type: 'categorical', options: { 'A': 'Soltero', 'B': 'Casado', 'C': 'Unión libre', 'D': 'Divorciado' } },
-    { value: 'grupo', label: 'Grupo', type: 'categorical' },
-    { value: 'subgrupo', label: 'Subgrupo', type: 'categorical' },
-    { value: 'num_integrantes_familia', label: 'Número de integrantes en la familia', type: 'numeric' },
-    { value: 'rango_0_10', label: 'Integrantes 0-10 años', type: 'numeric' },
-    { value: 'rango_11_25', label: 'Integrantes 11-25 años', type: 'numeric' },
-    { value: 'rango_51_90', label: 'Integrantes 51-90 años', type: 'numeric' },
     { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar', type: 'categorical', options: { 'A': 'Primaria', 'B': 'Secundaria', 'C': 'Universidad', 'D': 'Postgrado' } },
-    { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral del jefe del hogar', type: 'categorical', options: { 'A': 'Desempleado', 'B': 'Temporal', 'C': 'Empleado' } },
-    { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual del jefe del hogar', type: 'categorical', options: { 'A': 'Menor al sueldo básico', 'B': 'Sueldo básico', 'C': 'Mayor al sueldo básico' } },
-    
-    // Preguntas de conocimiento y actitud (todas tipo Likert)
-    { value: 'conoce_desechos_solidos', label: '¿Conoce usted qué son los desechos sólidos domiciliarios?', type: 'likert' },
-    { value: 'comportamiento_adecuado_residuos', label: '¿Cree usted que existe un comportamiento adecuado frente a los residuos?', type: 'likert' },
-    { value: 'separar_desechos_origen', label: '¿Se debe separar los desechos sólidos según su origen?', type: 'likert' },
-    { value: 'clasificacion_correcta_desechos', label: '¿Es importante la correcta clasificación de los desechos sólidos orgánicos e inorgánicos en el hogar?', type: 'likert' },
-    { value: 'comunidad_influye_acumulacion_desechos', label: '¿Cree que el comportamiento de la comunidad influye en la acumulación de desechos?', type: 'likert' },
-    { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: '¿Dedica tiempo para reducir, reutilizar o reciclar?', type: 'likert' },
-    { value: 'desechos_problema_comunidad', label: '¿Los desechos sólidos son un gran problema para su comunidad?', type: 'likert' },
-    { value: 'preocupa_exceso_desechos', label: '¿Le preocupa el exceso de desechos sólidos domiciliarios?', type: 'likert' },
-    { value: 'desechos_contaminan_ambiente', label: '¿Considera que los desechos contaminan el ambiente?', type: 'likert' },
-    { value: 'afecta_emocionalmente_noticias_contaminacion', label: '¿Le afecta emocionalmente cuando escucha noticias sobre la contaminación?', type: 'likert' },
-    { value: 'frustracion_falta_acciones_ambientales', label: '¿Siente frustración debido a la falta de acciones ambientales?', type: 'likert' },
-    { value: 'importante_pensar_futuras_generaciones', label: '¿Considera importante pensar en el tipo de planeta que dejamos a futuras generaciones?', type: 'likert' },
-    { value: 'consciente_impacto_desechos_salud_ambiente', label: '¿Es consciente del impacto de los desechos sólidos en la salud y el ambiente?', type: 'likert' },
-    { value: 'investiga_temas_medioambientales', label: '¿Investiga frecuentemente acerca de temas medio ambientales?', type: 'likert' },
-    { value: 'conoce_consecuencias_acumulacion_desechos', label: '¿Conoce las consecuencias de la acumulación de los desechos sólidos domiciliarios?', type: 'likert' },
-    { value: 'conoce_beneficios_reutilizar_residuo', label: '¿Conoce los beneficios de reutilizar un residuo domiciliario?', type: 'likert' },
-    { value: 'falta_informacion_obstaculo_gestion', label: '¿La falta de información es un obstáculo para la correcta gestión de los residuos sólidos domiciliarios?', type: 'likert' },
-    { value: 'desechos_organicos_otra_funcionalidad', label: '¿Los desechos orgánicos generados en el hogar pueden tener otra funcionalidad?', type: 'likert' },
-    { value: 'acumulacion_desechos_afecta_salud', label: '¿La acumulación de desechos afectan a la salud de la población?', type: 'likert' },
-    { value: 'reduccion_reciclaje_reutilizacion_cuidan_ambiente', label: '¿La reducción, reciclaje y la reutilización de los desechos sólidos puede cuidar al medio ambiente y a la vida silvestre?', type: 'likert' },
-    { value: 'transformacion_desechos_nuevos_productos', label: '¿Cree que la transformación de desechos sólidos en nuevos productos puede contribuir significativamente a la reducción de la generación de desechos?', type: 'likert' },
-    { value: 'necesita_informacion_educacion_ambiental', label: '¿Necesita más información acerca de educación ambiental?', type: 'likert' },
-    { value: 'practica_separacion_desechos_reciclaje_ingreso', label: '¿En su hogar practica la separación de los desechos para el reciclaje y le representa algún ingreso?', type: 'likert' },
-    { value: 'desechos_reutilizados_nueva_funcion', label: '¿Los desechos sólidos generados en el hogar pueden ser reutilizados para una nueva función o creación de un producto?', type: 'likert' },
-    { value: 'manejo_adecuado_desechos_desarrollo_economico', label: '¿Cree que el manejo adecuado de los desechos sólidos domiciliarios podría aportar al desarrollo económico comunitario?', type: 'likert' },
-    { value: 'emprendimientos_reutilizacion_aportan_economia', label: '¿Los emprendimientos en base a la reutilización de los desechos aporta a su economía?', type: 'likert' },
-    { value: 'manejo_adecuado_desechos_oportunidades_emprendimiento', label: '¿El manejo adecuado de los desechos sólidos domiciliarios ofrece oportunidades para el emprendimiento?', type: 'likert' },
-    { value: 'reducir_residuos_eventos_concientizacion', label: '¿Es posible reducir la generación de residuos sólidos domiciliarios por medio de eventos de concientización?', type: 'likert' },
-    { value: 'participaria_talleres_buenas_practicas', label: '¿Participaría en talleres de buenas prácticas y capacitaciones para el correcto manejo de los desechos sólidos domiciliarios?', type: 'likert' },
-    { value: 'dispuesto_participar_emprendimiento_desechos', label: '¿Está dispuesto a participar en un emprendimiento en base al uso de los desechos sólidos?', type: 'likert' },
-    { value: 'participaria_feria_emprendimientos_comunitarios', label: '¿Participaría a una feria de emprendimientos comunitarios en base a desechos domiciliarios reutilizados?', type: 'likert' }
+    { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral', type: 'categorical', options: { 'A': 'Desempleado', 'B': 'Temporal', 'C': 'Empleado' } },
+    { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual', type: 'categorical', options: { 'A': 'Menor al sueldo básico', 'B': 'Sueldo básico', 'C': 'Mayor al sueldo básico' } },
+    { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos', type: 'likert' },
+    { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta', type: 'likert' },
+    { value: 'separar_desechos_por_origen', label: 'Separa desechos', type: 'likert' },
+    { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar', type: 'likert' },
+    { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar', type: 'likert' },
+    { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres', type: 'likert' },
+    { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado', type: 'likert' },
+    { value: 'edad', label: 'Edad', type: 'numeric' },
+    { value: 'num_integrantes_familia', label: 'Número de integrantes familia', type: 'numeric' }
   ];
 
   const LIKERT_LEVELS = [
@@ -253,666 +217,580 @@
   const LIKERT_CODES = ['A', 'B', 'C', 'D', 'E'];
 
   /***************************************************************************
-   * Clase principal para manejar el dashboard
+   * Manejo de estado de conexión
    ***************************************************************************/
-  class Dashboard {
-    constructor() {
-      this.data = [];
-      this.chart = null;
-      this.dataTable = null;
-      this.isLoading = false;
-      this.currentIndicator = null;
-      this.currentFilters = {
-        sexo: 'todos',
-        grupo: 'todos'
-      };
-      
-      this.init();
-    }
-
-    async init() {
-      this.setupEventListeners();
-      this.populateIndicators();
-      
-      try {
-        await this.fetchData();
-        this.populateGroupFilter();
-        this.updateVisualization();
-      } catch (error) {
-        console.error("Error en inicialización:", error);
-        this.showConnectionError("Error al inicializar la aplicación: " + error.message);
-      }
-    }
-
-    setupEventListeners() {
-      // Event listeners para actualización automática
-      document.getElementById('selectIndicator').addEventListener('change', () => {
-        this.currentIndicator = document.getElementById('selectIndicator').value;
-        console.log("Indicador cambiado a:", this.currentIndicator);
-        this.updateVisualization();
-      });
-      
-      document.getElementById('selectChartType').addEventListener('change', () => {
-        console.log("Tipo de gráfico cambiado");
-        this.updateVisualization();
-      });
-      
-      document.getElementById('filterSexo').addEventListener('change', (e) => {
-        this.currentFilters.sexo = e.target.value;
-        console.log("Filtro sexo cambiado:", this.currentFilters.sexo);
-        this.updateVisualization();
-      });
-      
-      document.getElementById('filterGrupo').addEventListener('change', (e) => {
-        this.currentFilters.grupo = e.target.value;
-        console.log("Filtro grupo cambiado:", this.currentFilters.grupo);
-        this.updateVisualization();
-      });
-
-      // Export buttons
-      document.getElementById('btnExportCSV').addEventListener('click', () => this.exportCSV());
-      document.getElementById('btnExportChart').addEventListener('click', () => this.exportChart());
-    }
-
-    /***************************************************************************
-     * Manejo de estado de conexión
-     ***************************************************************************/
-    showConnectionError(message) {
-      const statusEl = document.getElementById('connectionStatus');
-      statusEl.className = 'error fade-in';
-      statusEl.innerHTML = `
-        <div class="flex items-center justify-between">
-          <div>
-            <strong>Error de conexión:</strong> ${message}
-          </div>
-          <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded">×</button>
+  function showConnectionError(message) {
+    const statusEl = document.getElementById('connectionStatus');
+    statusEl.className = 'error';
+    statusEl.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div>
+          <strong>Error de conexión:</strong> ${message}
         </div>
-      `;
-      statusEl.classList.remove('hidden');
-    }
+        <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded">×</button>
+      </div>
+    `;
+    statusEl.classList.remove('hidden');
+  }
 
-    showConnectionSuccess(message) {
-      const statusEl = document.getElementById('connectionStatus');
-      statusEl.className = 'success fade-in';
-      statusEl.innerHTML = `
-        <div class="flex items-center justify-between">
-          <div>
-            <strong>✓ Conectado:</strong> ${message}
-          </div>
-          <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-sm bg-green-200 hover:bg-green-300 px-2 py-1 rounded">×</button>
+  function showConnectionSuccess(message) {
+    const statusEl = document.getElementById('connectionStatus');
+    statusEl.className = 'success';
+    statusEl.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div>
+          <strong>✓ Conectado:</strong> ${message}
         </div>
-      `;
-      statusEl.classList.remove('hidden');
-      setTimeout(() => statusEl.classList.add('hidden'), 5000);
+        <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-sm bg-green-200 hover:bg-green-300 px-2 py-1 rounded">×</button>
+      </div>
+    `;
+    statusEl.classList.remove('hidden');
+    setTimeout(() => statusEl.classList.add('hidden'), 5000);
+  }
+
+  /***************************************************************************
+   * UTIL: normalizacion y estadisticas
+   ***************************************************************************/
+  function normalize(v) { 
+    if (v === null || v === undefined) return null; 
+    return String(v).trim(); 
+  }
+
+  function mean(arr){ if(!arr.length) return null; return arr.reduce((a,b)=>a+b,0)/arr.length; }
+  function median(arr){
+    if(!arr.length) return null;
+    const s = arr.slice().sort((a,b)=>a-b);
+    const m = Math.floor(s.length/2);
+    return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+  }
+  function mode(arr){
+    if(!arr.length) return null;
+    const counts = {};
+    arr.forEach(v=> counts[v] = (counts[v]||0)+1);
+    let max=0, mod=null;
+    Object.entries(counts).forEach(([k,c])=> { if(c>max){ max=c; mod=k; }});
+    return mod;
+  }
+  function variance(arr){
+    if(!arr.length) return null;
+    const m = mean(arr);
+    return arr.reduce((s,x)=> s+Math.pow(x-m,2),0)/arr.length;
+  }
+  function stdev(arr){ const v = variance(arr); return v===null ? null : Math.sqrt(v); }
+  function sum(arr){ return arr.reduce((a,b)=>a+b,0); }
+  function rangeArr(arr){ if(!arr.length) return null; return Math.max(...arr)-Math.min(...arr); }
+
+  /***************************************************************************
+   * Chart handling
+   ***************************************************************************/
+  let chart = null;
+  function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart=null; } }
+
+  function renderChart(type, labels, values, title){
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    destroyChart();
+
+    if (!labels.length || !values.length) {
+      console.warn("No data to render chart");
+      return;
     }
 
-    /***************************************************************************
-     * Data handling: fetch + process
-     ***************************************************************************/
-    async fetchData() {
-      try {
-        this.showLoadingState(true);
-        this.showConnectionSuccess("Conectando a Supabase...");
-        
-        console.log("Fetching data from Supabase...");
-        const { data, error, status } = await supabase
-          .from(TABLE)
-          .select('*')
-          .limit(1000);
+    const total = values.reduce((a,b)=>a+b,0);
+    const percentData = values.map(v=> total? Math.round((v/total)*10000)/100 : 0);
 
-        if(error){
-          console.error("Supabase error:", error);
-          let errorMsg = `Error ${status}: ${error.message}`;
-          throw new Error(errorMsg);
-        }
-        
-        console.log("Data received:", data ? data.length : 0, "registros");
-        
-        if (!data || data.length === 0) {
-          console.warn("No se encontraron datos en la tabla");
-          this.showConnectionSuccess("Conexión exitosa pero no hay datos en la tabla");
-        } else {
-          this.showConnectionSuccess(`Cargados ${data.length} registros`);
-        }
-        
-        this.data = data || [];
-        return this.data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        this.showConnectionError("No se pudieron cargar los datos: " + error.message);
-        return [];
-      } finally {
-        this.showLoadingState(false);
-      }
-    }
-
-    showLoadingState(show) {
-      this.isLoading = show;
-      const main = document.querySelector('main');
-      if (show) {
-        main.classList.add('loading');
-      } else {
-        main.classList.remove('loading');
-      }
-    }
-
-    populateIndicators(){
-      const sel = document.getElementById('selectIndicator');
-      sel.innerHTML = '';
-      INDICATORS.forEach(i=> { 
-        const o = document.createElement('option'); 
-        o.value = i.value; 
-        o.textContent = i.label; 
-        sel.appendChild(o); 
-      });
-      
-      // Establecer el primer indicador como seleccionado
-      if (INDICATORS.length > 0) {
-        this.currentIndicator = INDICATORS[0].value;
-        sel.value = this.currentIndicator;
-      }
-    }
-
-    populateGroupFilter(){
-      const groups = Array.from(new Set(this.data.map(d=> this.normalize(d.grupo)).filter(Boolean)));
-      const sel = document.getElementById('filterGrupo');
-      sel.innerHTML = '<option value="todos">Grupo: Todos</option>';
-      groups.forEach(g=> { 
-        const o = document.createElement('option'); 
-        o.value = g; 
-        o.textContent = `Grupo: ${g}`; 
-        sel.appendChild(o); 
-      });
-    }
-
-    /***************************************************************************
-     * UTIL: normalizacion y estadisticas
-     ***************************************************************************/
-    normalize(v) { 
-      if (v === null || v === undefined) return null; 
-      return String(v).trim(); 
-    }
-
-    mean(arr){ if(!arr.length) return null; return arr.reduce((a,b)=>a+b,0)/arr.length; }
-    median(arr){
-      if(!arr.length) return null;
-      const s = arr.slice().sort((a,b)=>a-b);
-      const m = Math.floor(s.length/2);
-      return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
-    }
-    mode(arr){
-      if(!arr.length) return null;
-      const counts = {};
-      arr.forEach(v=> counts[v] = (counts[v]||0)+1);
-      let max=0, mod=null;
-      Object.entries(counts).forEach(([k,c])=> { if(c>max){ max=c; mod=k; }});
-      return mod;
-    }
-    variance(arr){
-      if(!arr.length) return null;
-      const m = this.mean(arr);
-      return arr.reduce((s,x)=> s+Math.pow(x-m,2),0)/arr.length;
-    }
-    stdev(arr){ const v = this.variance(arr); return v===null ? null : Math.sqrt(v); }
-    sum(arr){ return arr.reduce((a,b)=>a+b,0); }
-    rangeArr(arr){ if(!arr.length) return null; return Math.max(...arr)-Math.min(...arr); }
-
-    /***************************************************************************
-     * Filtering helper
-     ***************************************************************************/
-    applyFilters(){
-      const { sexo, grupo } = this.currentFilters;
-      let filtered = this.data.slice();
-      
-      if(sexo && sexo !== 'todos') {
-        filtered = filtered.filter(r => this.normalize(r.sexo) === sexo);
-      }
-      
-      if(grupo && grupo !== 'todos') {
-        filtered = filtered.filter(r => this.normalize(r.grupo) === grupo);
-      }
-      
-      console.log(`Filtros aplicados: ${filtered.length} registros de ${this.data.length} totales`);
-      return filtered;
-    }
-
-    /***************************************************************************
-     * Process indicator data - CORREGIDO
-     ***************************************************************************/
-    processIndicator(indKey, rows){
-      if (!rows || rows.length === 0) {
-        console.log("No hay filas para procesar");
-        return { labels: [], values: [], isNumeric: false, numeric: [] };
-      }
-
-      const indicator = INDICATORS.find(i => i.value === indKey);
-      if (!indicator) {
-        console.log(`Indicador no encontrado: ${indKey}`);
-        return { labels: [], values: [], isNumeric: false, numeric: [] };
-      }
-
-      console.log(`Procesando indicador: ${indicator.label} (${indicator.type})`);
-
-      const arrRaw = rows.map(r => r[indKey]).filter(v => v !== undefined && v !== null);
-      console.log(`Datos crudos para ${indKey}:`, arrRaw);
-      
-      if(!arrRaw.length) {
-        console.log(`No hay datos válidos para ${indKey}`);
-        return { labels: [], values: [], isNumeric: false, numeric: [] };
-      }
-
-      // Procesar según el tipo de indicador
-      if (indicator.type === 'numeric') {
-        console.log("Procesando como numérico");
-        const numeric = arrRaw.map(v => {
-          const num = Number(v);
-          return isNaN(num) ? null : num;
-        }).filter(n => n !== null);
-        
-        if (numeric.length === 0) {
-          return { labels: [], values: [], isNumeric: true, numeric: [] };
-        }
-
-        // Para datos numéricos, crear bins
-        const min = Math.min(...numeric);
-        const max = Math.max(...numeric);
-        
-        if (max - min <= 10) {
-          // Pocos valores únicos, mostrar todos
-          const uniqueVals = Array.from(new Set(numeric)).sort((a, b) => a - b);
-          const labels = uniqueVals.map(v => String(v));
-          const values = uniqueVals.map(val => numeric.filter(v => v === val).length);
-          console.log("Datos numéricos procesados:", { labels, values });
-          return { labels, values, isNumeric: true, numeric };
-        } else {
-          // Muchos valores, crear bins
-          const binCount = Math.min(6, Math.ceil((max - min) / 5));
-          const binSize = (max - min) / binCount;
-          const labels = [];
-          const values = new Array(binCount).fill(0);
-          
-          for (let i = 0; i < binCount; i++) {
-            const binStart = min + i * binSize;
-            const binEnd = min + (i + 1) * binSize;
-            labels.push(`${Math.round(binStart)}-${Math.round(binEnd)}`);
-          }
-          
-          numeric.forEach(value => {
-            const binIndex = Math.min(binCount - 1, Math.floor((value - min) / binSize));
-            values[binIndex]++;
-          });
-          
-          console.log("Datos numéricos con bins:", { labels, values });
-          return { labels, values, isNumeric: true, numeric };
-        }
-      }
-      else if (indicator.type === 'likert') {
-        console.log("Procesando como Likert");
-        // Procesar respuestas Likert (A, B, C, D, E)
-        const values = new Array(5).fill(0);
-        
-        arrRaw.forEach(v => {
-          const strVal = String(v).trim().toUpperCase();
-          const index = LIKERT_CODES.indexOf(strVal);
-          if (index !== -1) {
-            values[index]++;
-          } else {
-            // Si no encuentra el código, buscar por texto
-            const lowerVal = strVal.toLowerCase();
-            if (lowerVal.includes('totalmente') && lowerVal.includes('desacuerdo')) values[0]++;
-            else if (lowerVal.includes('desacuerdo')) values[1]++;
-            else if (lowerVal.includes('indiferente')) values[2]++;
-            else if (lowerVal.includes('acuerdo') && !lowerVal.includes('totalmente')) values[3]++;
-            else if (lowerVal.includes('totalmente') && lowerVal.includes('acuerdo')) values[4]++;
-          }
-        });
-        
-        console.log("Datos Likert procesados:", { labels: LIKERT_LEVELS, values });
-        return { 
-          labels: LIKERT_LEVELS, 
-          values: values, 
-          isNumeric: false, 
-          numeric: [] 
-        };
-      }
-      else if (indicator.type === 'categorical' && indicator.options) {
-        console.log("Procesando como categórico con opciones definidas");
-        // Procesar respuestas categóricas con opciones definidas
-        const values = {};
-        Object.keys(indicator.options).forEach(key => {
-          values[key] = 0;
-        });
-        
-        let otrosCount = 0;
-        
-        arrRaw.forEach(v => {
-          const strVal = String(v).trim().toUpperCase();
-          if (values.hasOwnProperty(strVal)) {
-            values[strVal]++;
-          } else {
-            otrosCount++;
-          }
-        });
-        
-        const labels = Object.keys(indicator.options).map(key => indicator.options[key]);
-        const valueCounts = Object.keys(indicator.options).map(key => values[key]);
-        
-        // Solo agregar "Otros" si hay valores
-        if (otrosCount > 0) {
-          labels.push('Otros');
-          valueCounts.push(otrosCount);
-        }
-        
-        console.log("Datos categóricos procesados:", { labels, values: valueCounts });
-        return { labels, values: valueCounts, isNumeric: false, numeric: [] };
-      }
-      else {
-        console.log("Procesando como categórico genérico");
-        // Procesamiento genérico para datos categóricos
-        const counts = {};
-        arrRaw.forEach(v => {
-          const key = this.normalize(v) || 'No especificado';
-          counts[key] = (counts[key] || 0) + 1;
-        });
-        
-        const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-        const labels = entries.map(e => e[0]);
-        const values = entries.map(e => e[1]);
-        
-        console.log("Datos categóricos genéricos procesados:", { labels, values });
-        return { labels, values, isNumeric: false, numeric: [] };
-      }
-    }
-
-    /***************************************************************************
-     * Chart handling - CORREGIDO
-     ***************************************************************************/
-    destroyChart(){ 
-      if(this.chart){ 
-        try{ 
-          this.chart.destroy(); 
-        } catch(e) {
-          console.warn("Error destroying chart:", e);
-        } 
-        this.chart = null; 
-      } 
-    }
-
-    renderChart(type, labels, values, title){
-      console.log(`Renderizando gráfico: ${type} para ${title}`);
-      console.log("Datos:", { labels, values });
-      
-      const ctx = document.getElementById('mainChart').getContext('2d');
-      this.destroyChart();
-
-      if (!labels.length || !values.length) {
-        console.warn("No hay datos para renderizar el gráfico");
-        document.getElementById('noDataMsg').classList.remove('hidden');
-        return;
-      }
-
-      const total = values.reduce((a,b)=>a+b,0);
-      const percentData = values.map(v=> total? Math.round((v/total)*10000)/100 : 0);
-
-      const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
-      const bg = palette.slice(0, labels.length);
-      
-      try {
-        this.chart = new Chart(ctx, {
-          type,
-          data: { 
-            labels, 
-            datasets:[{ 
-              label: title, 
-              data: values, 
-              backgroundColor: bg, 
-              borderColor: '#fff', 
-              borderWidth: 1 
-            }] 
+    const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
+    const bg = palette.slice(0, labels.length);
+    
+    chart = new Chart(ctx, {
+      type,
+      data: { 
+        labels, 
+        datasets:[{ 
+          label: title, 
+          data: values, 
+          backgroundColor: bg, 
+          borderColor: '#fff', 
+          borderWidth: 1 
+        }] 
+      },
+      options:{ 
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{ 
+          legend: {
+            position: 'top',
           },
-          options:{ 
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins:{ 
-              legend: {
-                position: 'top',
-              },
-              tooltip:{ 
-                callbacks:{ 
-                  label(ctx){ 
-                    const i = ctx.dataIndex; 
-                    const v = values[i]; 
-                    const p = total ? Math.round((v/total)*10000)/100 : 0; 
-                    return `${v} respuestas (${p}%)`; 
-                  } 
-                } 
+          tooltip:{ 
+            callbacks:{ 
+              label(ctx){ 
+                const i = ctx.dataIndex; 
+                const v = values[i]; 
+                const p = total ? Math.round((v/total)*10000)/100 : 0; 
+                return `${v} respuestas (${p}%)`; 
               } 
-            }
-          }
-        });
-
-        const percentLegend = document.getElementById('chartPercentLegend');
-        percentLegend.innerHTML = '';
-        const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
-        const top = sorted.slice(0,3);
-        if(top.length){
-          percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+            } 
+          } 
         }
-        
-        document.getElementById('noDataMsg').classList.add('hidden');
-        console.log("Gráfico renderizado exitosamente");
-      } catch (error) {
-        console.error("Error al renderizar el gráfico:", error);
-        document.getElementById('noDataMsg').classList.remove('hidden');
       }
+    });
+
+    const percentLegend = document.getElementById('chartPercentLegend');
+    percentLegend.innerHTML = '';
+    const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
+    const top = sorted.slice(0,3);
+    if(top.length){
+      percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+    }
+  }
+
+  /***************************************************************************
+   * Data handling: fetch + process
+   ***************************************************************************/
+  async function fetchAll(){
+    try {
+      console.log("Fetching data from Supabase...");
+      const { data, error, status } = await supabase
+        .from(TABLE)
+        .select('*')
+        .limit(1000);
+
+      if(error){
+        console.error("Supabase error:", error);
+        let errorMsg = `Error ${status}: ${error.message}`;
+        throw new Error(errorMsg);
+      }
+      
+      console.log("Data received:", data ? data.length : 0, "registros");
+      
+      if (!data || data.length === 0) {
+        console.warn("No se encontraron datos en la tabla");
+        showConnectionSuccess("Conexión exitosa pero no hay datos en la tabla");
+      } else {
+        showConnectionSuccess(`Cargados ${data.length} registros`);
+      }
+      
+      window.__RAW = data || [];
+      return window.__RAW;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      showConnectionError("No se pudieron cargar los datos: " + error.message);
+      return [];
+    }
+  }
+
+  function populateIndicators(){
+    const sel = document.getElementById('selectIndicator');
+    sel.innerHTML = '';
+    INDICATORS.forEach(i=> { 
+      const o = document.createElement('option'); 
+      o.value = i.value; 
+      o.textContent = i.label; 
+      sel.appendChild(o); 
+    });
+  }
+
+  function populateGroupFilter(data){
+    const groups = Array.from(new Set(data.map(d=> normalize(d.grupo)).filter(Boolean)));
+    const sel = document.getElementById('filterGrupo');
+    sel.innerHTML = '<option value="todos">Grupo: Todos</option>';
+    groups.forEach(g=> { 
+      const o = document.createElement('option'); 
+      o.value = g; 
+      o.textContent = `Grupo: ${g}`; 
+      sel.appendChild(o); 
+    });
+  }
+
+  function processIndicator(indKey, rows){
+    if (!rows || rows.length === 0) {
+      return { labels: [], values: [], isNumeric: false, numeric: [] };
     }
 
-    /***************************************************************************
-     * UI Updates - CORREGIDO
-     ***************************************************************************/
-    updateUIForIndicator(indKey, processed, filteredRows){
-      console.log("Actualizando UI para indicador:", indKey);
-      
-      const total = filteredRows.length;
-      document.getElementById('cardTotal').textContent = total;
-
-      const numericContainer = document.getElementById('cardNumeric');
-      const variationContainer = document.getElementById('cardVariation');
-      const numericStatsBlock = document.getElementById('numericStats');
-      const summaryStatsBlock = document.getElementById('summaryStats');
-
-      numericContainer.innerHTML = '';
-      variationContainer.innerHTML = '';
-      numericStatsBlock.innerHTML = '';
-      summaryStatsBlock.innerHTML = '';
-
-      if(processed.isNumeric && processed.numeric.length){
-        const arr = processed.numeric;
-        const mn = Math.min(...arr);
-        const mx = Math.max(...arr);
-        const avg = this.mean(arr).toFixed(1);
-        const med = this.median(arr).toFixed(1);
-        const mod = this.mode(arr);
-        const varr = this.variance(arr);
-        const sd = this.stdev(arr);
-        const rng = this.rangeArr(arr);
-
-        numericContainer.innerHTML = `
-          <div class="text-lg font-semibold">${avg}</div>
-          <div class="small muted">Promedio</div>
-          <div class="mt-2">Mín: <strong>${mn}</strong> • Máx: <strong>${mx}</strong></div>
-          <div>Mediana: <strong>${med}</strong></div>`;
-
-        variationContainer.innerHTML = `
-          <div>Desv. estándar: <strong>${sd!==null?sd.toFixed(2):'—'}</strong></div>
-          <div>Rango: <strong>${rng!==null?rng:'—'}</strong></div>
-          <div>Moda: <strong>${mod}</strong></div>`;
-
-        numericStatsBlock.innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>Mínimo: ${mn}</li>
-            <li>Máximo: ${mx}</li>
-            <li>Promedio: ${avg}</li>
-            <li>Mediana: ${med}</li>
-            <li>Moda: ${mod}</li>
-            <li>Total muestras: ${arr.length}</li>
-          </ul>`;
-
-        summaryStatsBlock.innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>Desviación estándar: ${sd!==null?sd.toFixed(3):'—'}</li>
-            <li>Varianza: ${varr!==null?varr.toFixed(3):'—'}</li>
-            <li>Rango: ${rng!==null?rng:'—'}</li>
-          </ul>`;
-      } else {
-        // Para datos categóricos
-        const totalResponses = processed.values.reduce((a, b) => a + b, 0);
-        const uniqueCategories = processed.labels.length;
-        const maxValue = Math.max(...processed.values);
-        const maxCategory = processed.labels[processed.values.indexOf(maxValue)];
-
-        numericContainer.innerHTML = `
-          <div class="text-lg font-semibold">${uniqueCategories}</div>
-          <div class="small muted">Categorías únicas</div>
-          <div class="mt-2">Total respuestas: <strong>${totalResponses}</strong></div>
-          <div>Moda: <strong>${maxCategory}</strong></div>`;
-
-        variationContainer.innerHTML = `
-          <div>Frecuencia máxima: <strong>${maxValue}</strong></div>
-          <div>Diversidad: <strong>${uniqueCategories}</strong> categorías</div>`;
-
-        numericStatsBlock.innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>Total respuestas: ${totalResponses}</li>
-            <li>Categorías únicas: ${uniqueCategories}</li>
-            <li>Moda: "${maxCategory}" (${maxValue} respuestas)</li>
-            <li>Porcentaje moda: ${totalResponses ? Math.round((maxValue/totalResponses)*100) : 0}%</li>
-          </ul>`;
-
-        summaryStatsBlock.innerHTML = `
-          <ul class="list-disc pl-5">
-            <li>Distribución categórica</li>
-            <li>Índice de diversidad: ${uniqueCategories}</li>
-            <li>Concentración: ${totalResponses ? Math.round((maxValue/totalResponses)*100) : 0}% en la categoría principal</li>
-          </ul>`;
-      }
-
-      const distBody = document.getElementById('distBody');
-      distBody.innerHTML = '';
-      const labels = processed.labels || [];
-      const values = processed.values || [];
-      const totalCounts = values.reduce((a,b)=>a+b,0) || 0;
-
-      if(!labels.length){
-        console.log("No hay datos para mostrar en la tabla");
-        document.getElementById('noDataMsg').classList.remove('hidden');
-        return;
-      } else {
-        document.getElementById('noDataMsg').classList.add('hidden');
-      }
-
-      for(let i=0;i<labels.length;i++){
-        const lab = labels[i];
-        const cnt = values[i] || 0;
-        const pct = totalCounts ? Math.round((cnt/totalCounts)*10000)/100 : 0;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${lab}</td><td>${cnt}</td><td>${pct}%</td>`;
-        distBody.appendChild(tr);
-      }
-
-      const trTotal = document.createElement('tr');
-      trTotal.innerHTML = `<td><strong>Total</strong></td><td><strong>${totalCounts}</strong></td><td><strong>100%</strong></td>`;
-      distBody.appendChild(trTotal);
-
-      // Actualizar tabla de datos
-      setTimeout(()=> {
-        try{ 
-          if(this.dataTable) this.dataTable.destroy(); 
-        } catch(e){
-          console.warn("Error destroying data table:", e);
-        }
-        
-        this.dataTable = new simpleDatatables.DataTable("#distTable", { 
-          searchable: true, 
-          perPage: 8,
-          labels: {
-              placeholder: "Buscar...",
-              perPage: "registros por página",
-              noRows: "No se encontraron registros",
-              info: "Mostrando {start} a {end} de {rows} registros"
-          }
-        });
-      }, 80);
-
-      const indicator = INDICATORS.find(i=>i.value===indKey);
-      document.getElementById('chartTitle').textContent = indicator ? indicator.label : indKey;
-      document.getElementById('chartSubtitle').textContent = `${total} encuestas (${totalCounts} respuestas válidas)`;
-      
-      const chartType = document.getElementById('selectChartType').value;
-      console.log(`Llamando a renderChart con tipo: ${chartType}`);
-      this.renderChart(chartType, labels, values, indicator ? indicator.label : indKey);
+    const indicator = INDICATORS.find(i => i.value === indKey);
+    if (!indicator) {
+      return { labels: [], values: [], isNumeric: false, numeric: [] };
     }
 
-    /***************************************************************************
-     * Main rendering flow - CORREGIDO
-     ***************************************************************************/
-    updateVisualization() {
-      console.log("=== ACTUALIZANDO VISUALIZACIÓN ===");
+    const arrRaw = rows.map(r => r[indKey]).filter(v => v !== undefined && v !== null);
+    if(!arrRaw.length) return { labels: [], values: [], isNumeric: false, numeric: [] };
+
+    // Procesar según el tipo de indicador
+    if (indicator.type === 'numeric') {
+      const numeric = arrRaw.map(v => {
+        const num = Number(v);
+        return isNaN(num) ? null : num;
+      }).filter(n => n !== null);
       
-      if (this.data.length === 0) {
-        console.log("No hay datos disponibles");
+      if (numeric.length === 0) {
+        return { labels: [], values: [], isNumeric: true, numeric: [] };
+      }
+
+      // Para datos numéricos, crear bins
+      const min = Math.min(...numeric);
+      const max = Math.max(...numeric);
+      
+      if (max - min <= 10) {
+        // Pocos valores únicos, mostrar todos
+        const uniqueVals = Array.from(new Set(numeric)).sort((a, b) => a - b);
+        const labels = uniqueVals.map(v => String(v));
+        const values = uniqueVals.map(val => numeric.filter(v => v === val).length);
+        return { labels, values, isNumeric: true, numeric };
+      } else {
+        // Muchos valores, crear bins
+        const binCount = Math.min(6, Math.ceil((max - min) / 5));
+        const binSize = (max - min) / binCount;
+        const labels = [];
+        const values = new Array(binCount).fill(0);
+        
+        for (let i = 0; i < binCount; i++) {
+          const binStart = min + i * binSize;
+          const binEnd = min + (i + 1) * binSize;
+          labels.push(`${Math.round(binStart)}-${Math.round(binEnd)}`);
+        }
+        
+        numeric.forEach(value => {
+          const binIndex = Math.min(binCount - 1, Math.floor((value - min) / binSize));
+          values[binIndex]++;
+        });
+        
+        return { labels, values, isNumeric: true, numeric };
+      }
+    }
+    else if (indicator.type === 'likert') {
+      // Procesar respuestas Likert (A, B, C, D, E)
+      const values = new Array(5).fill(0);
+      
+      arrRaw.forEach(v => {
+        const strVal = String(v).trim().toUpperCase();
+        const index = LIKERT_CODES.indexOf(strVal);
+        if (index !== -1) {
+          values[index]++;
+        } else {
+          // Si no encuentra el código, buscar por texto
+          const lowerVal = strVal.toLowerCase();
+          if (lowerVal.includes('totalmente') && lowerVal.includes('desacuerdo')) values[0]++;
+          else if (lowerVal.includes('desacuerdo')) values[1]++;
+          else if (lowerVal.includes('indiferente')) values[2]++;
+          else if (lowerVal.includes('acuerdo') && !lowerVal.includes('totalmente')) values[3]++;
+          else if (lowerVal.includes('totalmente') && lowerVal.includes('acuerdo')) values[4]++;
+        }
+      });
+      
+      return { 
+        labels: LIKERT_LEVELS, 
+        values: values, 
+        isNumeric: false, 
+        numeric: [] 
+      };
+    }
+    else if (indicator.type === 'categorical' && indicator.options) {
+      // Procesar respuestas categóricas con opciones definidas - SIN "Otros"
+      const values = {};
+      Object.keys(indicator.options).forEach(key => {
+        values[key] = 0;
+      });
+      
+      arrRaw.forEach(v => {
+        const strVal = String(v).trim().toUpperCase();
+        if (values.hasOwnProperty(strVal)) {
+          values[strVal]++;
+        }
+        // NO agregamos la categoría "Otros" - solo contamos las opciones definidas
+      });
+      
+      const labels = Object.keys(indicator.options).map(key => indicator.options[key]);
+      const valueCounts = Object.keys(indicator.options).map(key => values[key]);
+      
+      return { labels, values: valueCounts, isNumeric: false, numeric: [] };
+    }
+    else {
+      // Procesamiento genérico para datos categóricos sin opciones predefinidas
+      const counts = {};
+      arrRaw.forEach(v => {
+        const key = normalize(v) || 'No especificado';
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const labels = entries.map(e => e[0]);
+      const values = entries.map(e => e[1]);
+      
+      return { labels, values, isNumeric: false, numeric: [] };
+    }
+  }
+
+  function updateUIForIndicator(indKey, processed, filteredRows){
+    const total = filteredRows.length;
+    document.getElementById('cardTotal').textContent = total;
+
+    const numericContainer = document.getElementById('cardNumeric');
+    const variationContainer = document.getElementById('cardVariation');
+    const numericStatsBlock = document.getElementById('numericStats');
+    const summaryStatsBlock = document.getElementById('summaryStats');
+
+    numericContainer.innerHTML = '';
+    variationContainer.innerHTML = '';
+    numericStatsBlock.innerHTML = '';
+    summaryStatsBlock.innerHTML = '';
+
+    if(processed.isNumeric && processed.numeric.length){
+      const arr = processed.numeric;
+      const mn = Math.min(...arr);
+      const mx = Math.max(...arr);
+      const avg = mean(arr).toFixed(1);
+      const med = median(arr).toFixed(1);
+      const mod = mode(arr);
+      const varr = variance(arr);
+      const sd = stdev(arr);
+      const rng = rangeArr(arr);
+
+      numericContainer.innerHTML = `
+        <div class="text-lg font-semibold">${avg}</div>
+        <div class="small muted">Promedio</div>
+        <div class="mt-2">Mín: <strong>${mn}</strong> • Máx: <strong>${mx}</strong></div>
+        <div>Mediana: <strong>${med}</strong></div>`;
+
+      variationContainer.innerHTML = `
+        <div>Desv. estándar: <strong>${sd!==null?sd.toFixed(2):'—'}</strong></div>
+        <div>Rango: <strong>${rng!==null?rng:'—'}</strong></div>
+        <div>Moda: <strong>${mod}</strong></div>`;
+
+      numericStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Mínimo: ${mn}</li>
+          <li>Máximo: ${mx}</li>
+          <li>Promedio: ${avg}</li>
+          <li>Mediana: ${med}</li>
+          <li>Moda: ${mod}</li>
+          <li>Total muestras: ${arr.length}</li>
+        </ul>`;
+
+      summaryStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Desviación estándar: ${sd!==null?sd.toFixed(3):'—'}</li>
+          <li>Varianza: ${varr!==null?varr.toFixed(3):'—'}</li>
+          <li>Rango: ${rng!==null?rng:'—'}</li>
+        </ul>`;
+    } else {
+      // Para datos categóricos
+      const totalResponses = processed.values.reduce((a, b) => a + b, 0);
+      const uniqueCategories = processed.labels.length;
+      const maxValue = Math.max(...processed.values);
+      const maxIndex = processed.values.indexOf(maxValue);
+      const maxCategory = processed.labels[maxIndex];
+
+      numericContainer.innerHTML = `
+        <div class="text-lg font-semibold">${uniqueCategories}</div>
+        <div class="small muted">Categorías únicas</div>
+        <div class="mt-2">Total respuestas: <strong>${totalResponses}</strong></div>
+        <div>Moda: <strong>${maxCategory}</strong></div>`;
+
+      variationContainer.innerHTML = `
+        <div>Frecuencia máxima: <strong>${maxValue}</strong></div>
+        <div>Diversidad: <strong>${uniqueCategories}</strong> categorías</div>`;
+
+      numericStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Total respuestas: ${totalResponses}</li>
+          <li>Categorías únicas: ${uniqueCategories}</li>
+          <li>Moda: "${maxCategory}" (${maxValue} respuestas)</li>
+          <li>Porcentaje moda: ${totalResponses ? Math.round((maxValue/totalResponses)*100) : 0}%</li>
+        </ul>`;
+
+      summaryStatsBlock.innerHTML = `
+        <ul class="list-disc pl-5">
+          <li>Distribución categórica</li>
+          <li>Índice de diversidad: ${uniqueCategories}</li>
+          <li>Concentración: ${totalResponses ? Math.round((maxValue/totalResponses)*100) : 0}% en la categoría principal</li>
+        </ul>`;
+    }
+
+    const distBody = document.getElementById('distBody');
+    distBody.innerHTML = '';
+    const labels = processed.labels || [];
+    const values = processed.values || [];
+    const totalCounts = values.reduce((a,b)=>a+b,0) || 0;
+
+    if(!labels.length){
+      document.getElementById('noDataMsg').classList.remove('hidden');
+      return;
+    } else {
+      document.getElementById('noDataMsg').classList.add('hidden');
+    }
+
+    for(let i=0;i<labels.length;i++){
+      const lab = labels[i];
+      const cnt = values[i] || 0;
+      const pct = totalCounts ? Math.round((cnt/totalCounts)*10000)/100 : 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${lab}</td><td>${cnt}</td><td>${pct}%</td>`;
+      distBody.appendChild(tr);
+    }
+
+    const trTotal = document.createElement('tr');
+    trTotal.innerHTML = `<td><strong>Total</strong></td><td><strong>${totalCounts}</strong></td><td><strong>100%</strong></td>`;
+    distBody.appendChild(trTotal);
+
+    setTimeout(()=> {
+      try{ if(window._distTable) window._distTable.destroy(); } catch(e){}
+      window._distTable = new simpleDatatables.DataTable("#distTable", { 
+        searchable: true, 
+        perPage: 8,
+        labels: {
+            placeholder: "Buscar...",
+            perPage: "registros por página",
+            noRows: "No se encontraron registros",
+            info: "Mostrando {start} a {end} de {rows} registros"
+        }
+      });
+    }, 80);
+
+    const indicator = INDICATORS.find(i=>i.value===indKey);
+    document.getElementById('chartTitle').textContent = indicator ? indicator.label : indKey;
+    document.getElementById('chartSubtitle').textContent = `${total} encuestas (${totalCounts} respuestas válidas)`;
+    
+    const chartType = document.getElementById('selectChartType').value;
+    renderChart(chartType, labels, values, indicator ? indicator.label : indKey);
+  }
+
+  /***************************************************************************
+   * Filtering helper
+   ***************************************************************************/
+  function applyFilters(rows){
+    const sexo = document.getElementById('filterSexo').value;
+    const grupo = document.getElementById('filterGrupo').value;
+    let filtered = rows.slice();
+    if(sexo && sexo!=='todos') filtered = filtered.filter(r => normalize(r.sexo) === sexo);
+    if(grupo && grupo!=='todos') filtered = filtered.filter(r => normalize(r.grupo) === grupo);
+    return filtered;
+  }
+
+  /***************************************************************************
+   * Main rendering flow - ACTUALIZACIÓN AUTOMÁTICA
+   ***************************************************************************/
+  async function refreshAll(){
+    try {
+      const data = await fetchAll();
+      if (data.length === 0) {
         document.getElementById('cardTotal').textContent = '0';
         document.getElementById('noDataMsg').classList.remove('hidden');
         return;
       }
       
-      const filtered = this.applyFilters();
-      const ind = this.currentIndicator || document.getElementById('selectIndicator').value;
-      console.log(`Indicador actual: ${ind}`);
-      
-      const processed = this.processIndicator(ind, filtered);
-      console.log("Datos procesados:", processed);
-      
-      this.updateUIForIndicator(ind, processed, filtered);
-    }
+      populateGroupFilter(data);
+      updateCardsInitial(data);
 
-    /***************************************************************************
-     * Export functions
-     ***************************************************************************/
-    exportCSV(){
-      const rows = this.data || [];
-      if(!rows.length) return alert('No hay datos para exportar.');
-      const cols = Object.keys(rows[0]);
-      const csv = [cols.join(',')].concat(rows.map(r=> cols.map(c=>{
-        const v = r[c]===null||r[c]===undefined ? '' : String(r[c]).replace(/"/g,'""');
-        return v.includes(',')||v.includes('\n') ? `"${v}"` : v;
-      }).join(','))).join('\n');
-      const blob = new Blob([csv], { type:'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `datos_${new Date().toISOString().split('T')[0]}.csv`; 
-      a.click(); 
-      URL.revokeObjectURL(url);
+      const ind = document.getElementById('selectIndicator').value || INDICATORS[0].value;
+      const filtered = applyFilters(data);
+      const processed = processIndicator(ind, filtered);
+      updateUIForIndicator(ind, processed, filtered);
+    } catch (error) {
+      console.error("Error in refreshAll:", error);
     }
+  }
 
-    exportChart(){
-      if(!this.chart) return alert('No hay gráfico para exportar.');
-      const url = document.getElementById('mainChart').toDataURL('image/png',1);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `grafico_${new Date().toISOString().split('T')[0]}.png`; 
-      a.click();
-    }
+  function updateCardsInitial(data){
+    document.getElementById('cardTotal').textContent = data.length;
+  }
+
+  // Función para actualizar automáticamente cuando cambia cualquier control
+  function updateDashboard() {
+    const all = window.__RAW || [];
+    if (all.length === 0) return;
+    
+    const filtered = applyFilters(all);
+    const ind = document.getElementById('selectIndicator').value;
+    const processed = processIndicator(ind, filtered);
+    updateUIForIndicator(ind, processed, filtered);
+  }
+
+  /***************************************************************************
+   * Event Listeners para actualización automática
+   ***************************************************************************/
+  document.addEventListener('DOMContentLoaded', function() {
+    // Listeners para todos los controles que deben actualizar el dashboard
+    document.getElementById('selectIndicator').addEventListener('change', updateDashboard);
+    document.getElementById('selectChartType').addEventListener('change', updateDashboard);
+    document.getElementById('filterSexo').addEventListener('change', updateDashboard);
+    document.getElementById('filterGrupo').addEventListener('change', updateDashboard);
+    
+    // Listeners para exportación
+    document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+    document.getElementById('btnExportChart').addEventListener('click', exportChart);
+  });
+
+  function exportCSV(){
+    const rows = window.__RAW || [];
+    if(!rows.length) return alert('No hay datos para exportar.');
+    const cols = Object.keys(rows[0]);
+    const csv = [cols.join(',')].concat(rows.map(r=> cols.map(c=>{
+      const v = r[c]===null||r[c]===undefined ? '' : String(r[c]).replace(/"/g,'""');
+      return v.includes(',')||v.includes('\n') ? `"${v}"` : v;
+    }).join(','))).join('\n');
+    const blob = new Blob([csv], { type:'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = `datos_${new Date().toISOString().split('T')[0]}.csv`; 
+    a.click(); 
+    URL.revokeObjectURL(url);
+  }
+
+  function exportChart(){
+    if(!chart) return alert('No hay gráfico para exportar.');
+    const url = document.getElementById('mainChart').toDataURL('image/png',1);
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = `grafico_${new Date().toISOString().split('T')[0]}.png`; 
+    a.click();
   }
 
   /***************************************************************************
    * INIT
    ***************************************************************************/
-  let dashboard;
-  document.addEventListener('DOMContentLoaded', function() {
-    dashboard = new Dashboard();
-  });
+  (async function init(){
+    populateIndicators();
+    
+    showConnectionSuccess("Conectando a Supabase...");
+    
+    try {
+      await refreshAll();
+      
+      // Configurar actualizaciones en tiempo real
+      setupRealtime();
+    } catch (error) {
+      console.error("Error en inicialización:", error);
+      showConnectionError("Error al inicializar la aplicación: " + error.message);
+    }
+  })();
+
+  /***************************************************************************
+   * Actualizaciones en tiempo real con Supabase
+   ***************************************************************************/
+  function setupRealtime() {
+    try {
+      const channel = supabase
+        .channel('table-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: TABLE
+          },
+          (payload) => {
+            console.log('Cambio detectado en la tabla:', payload);
+            showConnectionSuccess('Datos actualizados en tiempo real');
+            refreshAll();
+          }
+        )
+        .subscribe();
+
+      console.log('Suscripción a cambios en tiempo real configurada');
+    } catch (error) {
+      console.warn('No se pudo configurar la suscripción en tiempo real:', error);
+    }
+  }
 
   </script>
 
