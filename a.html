@@ -3,190 +3,300 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard de Indicadores - Encuesta Proambiental</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>html,body,#app{height:100%} .card{background:rgba(255,255,255,0.9);backdrop-filter:blur(6px)}</style>
-</head>
-<body class="bg-gradient-to-r from-green-100 to-green-50 p-6 font-sans">
-  <div id="app" class="max-w-7xl mx-auto">
-    <header class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">Dashboard de indicadores (Encuesta Proambiental)</h1>
-      <p class="text-sm text-gray-600">Conexión en tiempo real a Supabase — despliegue en Vercel listo.</p>
-    </header>
+  <title>Dashboard - Encuesta Proambiental</title>
 
-    <main class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <section class="md:col-span-1 card p-4 rounded-lg shadow space-y-4">
-  <h2 class="font-semibold mb-2 text-lg">Panel de Filtros</h2>
+  <!-- Tailwind CDN (prod-friendly) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <div>
-    <label class="block text-xs text-gray-600">Indicador a visualizar</label>
-    <select id="fieldSelect" class="w-full p-2 border rounded mb-3"></select>
-  </div>
+  <!-- Shadcn-like utility: using Tailwind + small custom styles -->
+  <style>
+    html,body,#app{height:100%}
+    .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(6px); }
+    .table-fixed thead th { position: sticky; top: 0; background: rgba(255,255,255,0.95); z-index: 10; }
+    .chip { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 999px; background: rgba(0,0,0,0.06); }
+  </style>
 
-  <div>
-    <label class="block text-xs text-gray-600">Tipo de gráfico</label>
-    <select id="chartType" class="w-full p-2 border rounded mb-3">
-      <option value="pie">Torta</option>
-      <option value="bar">Barras</option>
-      <option value="line">Línea</option>
-      <option value="doughnut">Dona</option>
-      <option value="polarArea">Polar</option>
-      <option value="radar">Radar</option>
-    </select>
-  </div>
-
-  <div>
-    <label class="block text-xs text-gray-600">Filtrar por Sexo</label>
-    <select id="filterSexo" class="w-full p-2 border rounded">
-      <option value="">Todos</option>
-      <option value="Masculino">Masculino</option>
-      <option value="Femenino">Femenino</option>
-      <option value="Otro">Otro</option>
-    </select>
-  </div>
-
-  <div>
-    <label class="block text-xs text-gray-600">Filtrar por Grupo</label>
-    <input id="filterGrupo" class="w-full p-2 border rounded" placeholder="Ej: A, B, C..." />
-  </div>
-
-  <div>
-    <label class="block text-xs text-gray-600">Filtrar por Subgrupo</label>
-    <input id="filterSubgrupo" class="w-full p-2 border rounded" placeholder="Ej: 1, 2, 3..." />
-  </div>
-
-  <div>
-    <label class="block text-xs text-gray-600">Mostrar Totales / %</label>
-    <div class="flex space-x-2 mt-1">
-      <label class="flex items-center space-x-1 text-sm"><input id="showTotals" type="checkbox" checked> <span>Totales</span></label>
-      <label class="flex items-center space-x-1 text-sm"><input id="normalize" type="checkbox"> <span>Porcentajes</span></label>
-    </div>
-  </div>
-
-  <div class="mt-6 p-3 text-xs text-gray-600 bg-gray-100 rounded-lg">
-    <p>Última actualización: <span id="lastUpdate">—</span></p>
-    <p>Registros filtrados: <span id="countRecords">0</span></p>
-  </div>
-</section>
-
-      <section class="md:col-span-3 card p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold">Visualización</h2>
-          <div class="text-sm text-gray-600">Cambio de gráfico se actualiza automáticamente</div>
-        </div>
-
-        <canvas id="mainChart" height="220"></canvas>
-
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-3 bg-white rounded shadow-sm">
-            <h3 class="text-sm font-medium">Edad - distribución familia</h3>
-            <div id="ageSummary" class="text-sm text-gray-700 mt-2">Cargando...</div>
-          </div>
-          <div class="p-3 bg-white rounded shadow-sm">
-            <h3 class="text-sm font-medium">Género</h3>
-            <div id="genderSummary" class="text-sm text-gray-700 mt-2">Cargando...</div>
-          </div>
-          <div class="p-3 bg-white rounded shadow-sm">
-            <h3 class="text-sm font-medium">Separación de residuos</h3>
-            <div id="separationSummary" class="text-sm text-gray-700 mt-2">Cargando...</div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="mt-8 text-xs text-gray-500">Hecho para despliegue en Vercel • Usa tu NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY</footer>
-  </div>
-
-  <!-- dependencias -->
+  <!-- Supabase & Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div id="app" class="max-w-7xl mx-auto p-6">
+
+    <!-- HEADER -->
+    <header class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-semibold text-gray-800">Dashboard: Encuesta Proambiental y Autosustentabilidad</h1>
+      <p class="text-sm text-gray-500">Conexión en tiempo real a Supabase — despliegue en Vercel</p>
+    </header>
+
+    <!-- BARRA DE FILTROS (arriba) -->
+    <div class="glass p-4 rounded-lg shadow-sm mb-6">
+      <div class="flex flex-col md:flex-row gap-3 items-center">
+        <!-- Sexo -->
+        <div class="w-full md:w-40">
+          <label class="block text-xs text-gray-600">Sexo</label>
+          <select id="filterSexo" class="mt-1 w-full p-2 border rounded">
+            <option value="">Todos</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Sin dato">Sin dato</option>
+          </select>
+        </div>
+
+        <!-- Grupo -->
+        <div class="w-full md:w-40">
+          <label class="block text-xs text-gray-600">Grupo</label>
+          <input id="filterGrupo" placeholder="Ej: A" class="mt-1 w-full p-2 border rounded" />
+        </div>
+
+        <!-- Subgrupo -->
+        <div class="w-full md:w-40">
+          <label class="block text-xs text-gray-600">Subgrupo</label>
+          <input id="filterSubgrupo" placeholder="Ej: 1" class="mt-1 w-full p-2 border rounded" />
+        </div>
+
+        <!-- Rango edad -->
+        <div class="w-full md:w-48">
+          <label class="block text-xs text-gray-600">Rango de edad (familia)</label>
+          <select id="filterAgeRange" class="mt-1 w-full p-2 border rounded">
+            <option value="">Todos</option>
+            <option value="0-10">0 - 10 años</option>
+            <option value="11-25">11 - 25 años</option>
+            <option value="26-50">26 - 50 años</option>
+            <option value="51-90">51 - 90 años</option>
+            <option value="con_integrantes">Registros con 'num_integrantes_familia' &gt; 0</option>
+          </select>
+        </div>
+
+        <!-- Indicador -->
+        <div class="w-full md:w-56">
+          <label class="block text-xs text-gray-600">Indicador</label>
+          <select id="fieldSelect" class="mt-1 w-full p-2 border rounded">
+            <!-- Se carga dinámicamente -->
+          </select>
+        </div>
+
+        <!-- Tipo gráfico y acciones -->
+        <div class="flex items-end gap-2">
+          <div>
+            <label class="block text-xs text-gray-600">Tipo de gráfico</label>
+            <select id="chartType" class="mt-1 p-2 border rounded w-36">
+              <option value="bar">Barras</option>
+              <option value="pie">Torta</option>
+              <option value="doughnut">Dona</option>
+              <option value="line">Línea</option>
+              <option value="polarArea">Polar</option>
+              <option value="radar">Radar</option>
+            </select>
+          </div>
+
+          <div class="ml-2">
+            <label class="block text-xs text-gray-600">Mostrar</label>
+            <div class="flex gap-2 mt-1">
+              <label class="flex items-center gap-2"><input id="showTotals" type="checkbox" checked> Totales</label>
+              <label class="flex items-center gap-2"><input id="normalize" type="checkbox"> %</label>
+            </div>
+          </div>
+
+          <div class="ml-3">
+            <button id="exportCsv" class="mt-2 px-3 py-2 bg-sky-600 text-white rounded shadow-sm text-sm">Exportar CSV</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INDICADORES (cards) -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="p-4 bg-white rounded shadow-sm">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs text-gray-500">Registros totales</div>
+            <div id="totalRecords" class="text-xl font-semibold">0</div>
+          </div>
+          <div class="chip" id="lastUpdate">—</div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white rounded shadow-sm">
+        <div class="text-xs text-gray-500">Sexo (mayoría)</div>
+        <div id="topSexo" class="text-lg font-medium">—</div>
+      </div>
+
+      <div class="p-4 bg-white rounded shadow-sm">
+        <div class="text-xs text-gray-500">Separa desechos</div>
+        <div id="topSepara" class="text-lg font-medium">—</div>
+      </div>
+
+      <div class="p-4 bg-white rounded shadow-sm">
+        <div class="text-xs text-gray-500">Participaría en talleres</div>
+        <div id="topTaller" class="text-lg font-medium">—</div>
+      </div>
+    </section>
+
+    <!-- GRÁFICO PRINCIPAL -->
+    <section class="bg-white p-4 rounded shadow-sm mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-medium">Visualización</h2>
+        <div class="text-xs text-gray-500">Cambio y nuevos registros se actualizan automáticamente</div>
+      </div>
+      <canvas id="mainChart" height="120"></canvas>
+    </section>
+
+    <!-- TABLA -->
+    <section class="bg-white p-4 rounded shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-md font-medium">Tabla de registros (filtrados)</h3>
+        <div class="text-sm text-gray-500">Exporta los datos filtrados con el botón CSV</div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table id="dataTable" class="min-w-full table-fixed border-collapse">
+          <thead>
+            <tr class="text-left">
+              <!-- cabezera dinámica -->
+            </tr>
+          </thead>
+          <tbody>
+            <!-- filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="noDataMsg" class="text-sm text-gray-500 mt-4 hidden">No hay datos para mostrar con los filtros actuales.</div>
+    </section>
+
+    <footer class="mt-6 text-xs text-gray-400">Hecho para despliegue en Vercel • Usa tu NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY</footer>
+  </div>
 
   <script>
-    // --- CONFIGURA AQUÍ (ya los proporcionaste, se usan tal cual) ---
+    /***** CONFIG - reemplaza si quieres con variables de entorno en Vercel *****/
     const SUPABASE_URL = 'https://dutapywxsiuxboqsjqvf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4';
-
-    // tabla
     const TABLE = 'cuestionario_comportamiento_proambiental_autosustentabilidad';
 
-    const supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = supabaseJs.createClient ? supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY) : supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // campos que queremos ofrecer como indicadores (puedes añadir más si quieres)
+    /***** Indicadores importantes (basado en tu formulario) *****/
     const INDICATORS = [
-      {value: 'sexo', label: 'Sexo'},
-      {value: 'edad_0_10', label: 'Rango edad 0-10 (conteo por registro)'},
-      {value: 'edad_11_25', label: 'Rango edad 11-25 (conteo por registro)'},
-      {value: 'edad_26_50', label: 'Rango edad 26-50 (conteo por registro)'},
-      {value: 'edad_51_90', label: 'Rango edad 51-90 (conteo por registro)'},
-      {value: 'educacion_jefe_hogar', label: 'Educación jefe de hogar'},
-      {value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos'},
-      {value: 'separar_desechos_por_origen', label: 'Separa desechos por origen'},
-      {value: 'practica_separacion_reciclaje_ingreso', label: 'Practica separación (ingreso)'},
-      {value: 'desechos_hogar_reutilizados', label: 'Desechos del hogar reutilizados'}
+      { value: 'sexo', label: 'Sexo' },
+      { value: 'estado_civil', label: 'Estado civil' },
+      { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
+      { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
+      { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
+      { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
+      { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
+      { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
+      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
+      { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
+      { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
+      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
     ];
 
     // UI refs
     const fieldSelect = document.getElementById('fieldSelect');
     const chartTypeSelect = document.getElementById('chartType');
+    const filterSexo = document.getElementById('filterSexo');
+    const filterGrupo = document.getElementById('filterGrupo');
+    const filterSubgrupo = document.getElementById('filterSubgrupo');
+    const filterAgeRange = document.getElementById('filterAgeRange');
+    const normalizeCheckbox = document.getElementById('normalize');
+    const showTotalsCheckbox = document.getElementById('showTotals');
+    const exportCsvBtn = document.getElementById('exportCsv');
+
+    const totalRecordsEl = document.getElementById('totalRecords');
     const lastUpdateEl = document.getElementById('lastUpdate');
-    const countRecordsEl = document.getElementById('countRecords');
-    const ageSummary = document.getElementById('ageSummary');
-    const genderSummary = document.getElementById('genderSummary');
-    const separationSummary = document.getElementById('separationSummary');
+    const topSexo = document.getElementById('topSexo');
+    const topSepara = document.getElementById('topSepara');
+    const topTaller = document.getElementById('topTaller');
 
-    // rellenar select de indicadores
+    const dataTable = document.getElementById('dataTable');
+    const noDataMsg = document.getElementById('noDataMsg');
+
+    // inicializa select indicadores
     INDICATORS.forEach(i => {
-      const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; fieldSelect.appendChild(opt);
+      const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label;
+      fieldSelect.appendChild(opt);
     });
+    fieldSelect.value = INDICATORS[0].value;
 
-    // Chart.js instance
+    // Chart.js
     let chart = null;
+    function createEmptyChart() {
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: chartTypeSelect.value || 'bar',
+        data: { labels: ['No hay datos'], datasets: [{ label: 'Indicador', data: [0] }] },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+    }
+    createEmptyChart();
 
-    async function fetchAllData() {
-      const { data, error } = await supabase.from(TABLE).select('*');
-      if (error) {
-        console.error('Error leyendo datos:', error);
-        return [];
+    // Construir query con filtros
+    function buildQueryWithFilters() {
+      let query = supabase.from(TABLE).select('*');
+      const sexo = filterSexo.value.trim();
+      const grupo = filterGrupo.value.trim();
+      const subgrupo = filterSubgrupo.value.trim();
+      const ageRange = filterAgeRange.value;
+
+      if (sexo) query = query.eq('sexo', sexo);
+      if (grupo) query = query.eq('grupo', grupo);
+      if (subgrupo) query = query.eq('subgrupo', subgrupo);
+
+      // edad ranges map to the four fields in your table
+      if (ageRange && ['0-10','11-25','26-50','51-90'].includes(ageRange)) {
+        const map = { '0-10':'edad_0_10', '11-25':'edad_11_25', '26-50':'edad_26_50', '51-90':'edad_51_90' };
+        const field = map[ageRange];
+        // filtrar registros que tengan > 0 en ese rango (o null/0 se excluye)
+        query = query.gt(field, 0);
+      } else if (ageRange === 'con_integrantes') {
+        query = query.gt('num_integrantes_familia', 0);
       }
-      return data || [];
+
+      return query;
     }
 
-    function buildCategoryCounts(records, field) {
-      // campos numéricos de rangos especiales
-      if (['edad_0_10','edad_11_25','edad_26_50','edad_51_90'].includes(field)) {
-        // sumar todos los registros para ese campo
-        let total = 0; let counts = {};
-        records.forEach(r => {
-          const val = Number(r[field]) || 0;
-          counts[field] = (counts[field] || 0) + val;
-          total += val;
-        });
-        // si total es 0 pero existen registros con num_integrantes, intentamos distribuir
-        if (total === 0) {
-          let sumIntegrantes = 0;
-          records.forEach(r => sumIntegrantes += Number(r.num_integrantes_familia) || 0);
-          // distribución uniforme como fallback
-          const ranges = ['edad_0_10','edad_11_25','edad_26_50','edad_51_90'];
-          const perRange = Math.floor(sumIntegrantes / ranges.length) || 0;
-          const remainder = sumIntegrantes - perRange * ranges.length;
-          const result = {}; ranges.forEach((rg,idx)=> result[rg]=perRange + (idx===0? remainder:0));
-          return {labels: ['0-10','11-25','26-50','51-90'], values: [result.edad_0_10, result.edad_11_25, result.edad_26_50, result.edad_51_90] };
+    // Obtener datos
+    async function fetchAllData() {
+      try {
+        const query = buildQueryWithFilters();
+        const { data, error } = await query.order('fecha_registro', { ascending: false });
+
+        if (error) {
+          console.error('Error Supabase:', error);
+          return { records: [], error };
         }
-
-        return { labels: [field], values: [counts[field] || 0] };
+        return { records: data || [] };
+      } catch (err) {
+        console.error(err);
+        return { records: [], error: err };
       }
+    }
 
-      // si el campo es numérico almacenado como conteo por registro, sumar
-      const numeric = records.every(r => r[field] === null || !isNaN(Number(r[field])));
-      if (numeric) {
-        let sum = 0; records.forEach(r => sum += Number(r[field]) || 0);
+    // Construir conteos por categoría para indicador
+    function buildCategoryCounts(records, field) {
+      // si es uno de los cuatro campos de edad, agregamos sumas por rango (para el resumen lateral)
+      if (['edad_0_10','edad_11_25','edad_26_50','edad_51_90'].includes(field)) {
+        let sum = 0;
+        records.forEach(r => sum += Number(r[field]) || 0);
         return { labels: [field], values: [sum] };
       }
 
-      // para campos categóricos, agrupar por valor
+      // si el campo es claramente numérico (conteos por registro)
+      const numeric = records.every(r => r[field] === null || r[field] === undefined || !isNaN(Number(r[field])));
+      if (numeric && records.length > 0) {
+        let s = 0; records.forEach(r => s += Number(r[field]) || 0);
+        return { labels: [field], values: [s] };
+      }
+
+      // categóricos: agrupar por valor
       const map = new Map();
       records.forEach(r => {
-        const v = (r[field] === null || r[field] === undefined || r[field] === '') ? 'Sin dato' : String(r[field]);
+        let v = r[field];
+        if (v === null || v === undefined || v === '') v = 'Sin dato';
+        v = String(v);
         map.set(v, (map.get(v) || 0) + 1);
       });
       const labels = Array.from(map.keys());
@@ -194,46 +304,31 @@
       return { labels, values };
     }
 
-    function aggregateAgeRanges(records) {
-      const sums = { '0-10':0, '11-25':0, '26-50':0, '51-90':0 };
-      records.forEach(r => {
-        sums['0-10'] += Number(r.edad_0_10) || 0;
-        sums['11-25'] += Number(r.edad_11_25) || 0;
-        sums['26-50'] += Number(r.edad_26_50) || 0;
-        sums['51-90'] += Number(r.edad_51_90) || 0;
-        // si todas las edades vienen en 0 y hay num_integrantes, distribuir por defecto
-        const sumRanges = (Number(r.edad_0_10)||0)+(Number(r.edad_11_25)||0)+(Number(r.edad_26_50)||0)+(Number(r.edad_51_90)||0);
-        if (sumRanges === 0 && Number(r.num_integrantes_familia)) {
-          const n = Number(r.num_integrantes_familia);
-          // heurística simple: si tiene adultos, la mayor parte en 26-50
-          const a = Math.floor(n*0.15); // 0-10
-          const b = Math.floor(n*0.25); // 11-25
-          const c = Math.floor(n*0.45); // 26-50
-          const d = n - (a+b+c);
-          sums['0-10'] += a; sums['11-25'] += b; sums['26-50'] += c; sums['51-90'] += d;
-        }
-      });
-      return sums;
-    }
+    // Actualizar tarjetas resumen
+    function updateCards(records) {
+      totalRecordsEl.textContent = records.length;
+      lastUpdateEl.textContent = new Date().toLocaleString();
 
-    function updateSummaries(records) {
-      const ages = aggregateAgeRanges(records);
-      ageSummary.innerHTML = `0-10: ${ages['0-10']} <br> 11-25: ${ages['11-25']} <br> 26-50: ${ages['26-50']} <br> 51-90: ${ages['51-90']}`;
+      // Sexo top
+      const sexMap = {};
+      records.forEach(r => { const s = r.sexo || 'Sin dato'; sexMap[s] = (sexMap[s]||0)+1; });
+      const topS = Object.entries(sexMap).sort((a,b)=>b[1]-a[1])[0];
+      topSexo.textContent = topS ? `${topS[0]} (${topS[1]})` : '—';
 
-      // gender
-      const genderMap = {};
-      records.forEach(r => { const g = r.sexo || 'Sin dato'; genderMap[g] = (genderMap[g]||0)+1; });
-      genderSummary.innerHTML = Object.entries(genderMap).map(([k,v])=>`${k}: ${v}`).join('<br>');
-
-      // separation
+      // Separa desechos top
       const sepMap = {};
       records.forEach(r => { const s = r.separar_desechos_por_origen || 'Sin dato'; sepMap[s] = (sepMap[s]||0)+1; });
-      separationSummary.innerHTML = Object.entries(sepMap).map(([k,v])=>`${k}: ${v}`).join('<br>');
+      const topSep = Object.entries(sepMap).sort((a,b)=>b[1]-a[1])[0];
+      topSepara.textContent = topSep ? `${topSep[0]} (${topSep[1]})` : '—';
 
-      countRecordsEl.textContent = records.length;
-      lastUpdateEl.textContent = new Date().toLocaleString();
+      // Talleres top
+      const tMap = {};
+      records.forEach(r => { const s = r.participaria_talleres_buenas_practicas || 'Sin dato'; tMap[s] = (tMap[s]||0)+1; });
+      const topT = Object.entries(tMap).sort((a,b)=>b[1]-a[1])[0];
+      topTaller.textContent = topT ? `${topT[0]} (${topT[1]})` : '—';
     }
 
+    // Render Chart
     function renderChart({labels, values}, chartType, normalize=false) {
       const ctx = document.getElementById('mainChart').getContext('2d');
       if (chart) chart.destroy();
@@ -241,63 +336,169 @@
       let dataValues = values.slice();
       if (normalize) {
         const s = dataValues.reduce((a,b)=>a+b,0) || 1;
-        dataValues = dataValues.map(v => ((v/s)*100).toFixed(2));
+        dataValues = dataValues.map(v => Number(((v/s)*100).toFixed(2)));
       }
 
+      // If no meaningful data -> create placeholder
+      if (dataValues.length === 0 || dataValues.every(v => v === 0)) {
+        createEmptyChart();
+        return;
+      }
+
+      // Build dataset
       chart = new Chart(ctx, {
         type: chartType,
         data: {
           labels: labels,
           datasets: [{
-            label: 'Indicador',
+            label: showTotalsCheckbox.checked ? 'Totales' : 'Indicador',
             data: dataValues,
-            // Chart.js picks defaults
+            // default styling (browser picks)
           }]
         },
         options: {
           responsive: true,
           plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index' } },
-          animation: { duration: 300 }
+          animation: { duration: 350 }
         }
       });
     }
 
-    async function refreshAndRender() {
-      const records = await fetchAllData();
-      updateSummaries(records);
+    // Rellenar tabla con registros filtrados
+    function renderTable(records) {
+      const thead = dataTable.querySelector('thead tr');
+      const tbody = dataTable.querySelector('tbody');
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
 
-      const field = fieldSelect.value;
-      const { labels, values } = buildCategoryCounts(records, field);
-      const chartType = chartTypeSelect.value;
-      const normalize = document.getElementById('normalize').checked;
-      renderChart({labels, values}, chartType, normalize);
+      if (!records || records.length === 0) {
+        noDataMsg.classList.remove('hidden');
+        return;
+      }
+      noDataMsg.classList.add('hidden');
+
+      // columns: elegir un conjunto de campos representativos y luego el resto
+      const sample = records[0];
+      const cols = Object.keys(sample);
+
+      // Cabecera
+      cols.forEach(c => {
+        const th = document.createElement('th');
+        th.textContent = c;
+        th.className = 'p-2 text-xs text-gray-600';
+        thead.appendChild(th);
+      });
+
+      // Filas (limitamos a 200 por cliente para performance)
+      const maxRows = 200;
+      const slice = records.slice(0, maxRows);
+      slice.forEach(r => {
+        const tr = document.createElement('tr');
+        cols.forEach(c => {
+          const td = document.createElement('td');
+          td.className = 'p-2 text-sm text-gray-700 align-top border-b';
+          let v = r[c];
+          if (v === null || v === undefined) v = '';
+          td.innerHTML = String(v);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      // Si hay más registros, indicarlo
+      if (records.length > maxRows) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = cols.length;
+        td.className = 'p-2 text-xs text-gray-500';
+        td.textContent = `Mostrando ${maxRows} de ${records.length} registros. Filtra para ver menos o exporta CSV para todo.`;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
     }
 
-    // iniciar
-    (async function init(){
-      // seleccionar indicador por defecto
-      fieldSelect.value = INDICATORS[0].value;
+    // Export CSV
+    function exportToCsv(records) {
+      if (!records || records.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+      }
+      const cols = Object.keys(records[0]);
+      const rows = records.map(r => cols.map(c => {
+        let v = r[c];
+        if (v === null || v === undefined) return '';
+        // escape quotes
+        return String(v).replaceAll('"', '""');
+      }));
 
-      // cargar datos iniciales y render
+      const csv = [cols.join(','), ...rows.map(r => '"' + r.join('","') + '"')].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `encuesta_filtrada_${new Date().toISOString().slice(0,19)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Refrescar y renderizar todo: tabla, tarjetas, grafico
+    async function refreshAndRender() {
+      try {
+        const { records, error } = await fetchAllData();
+        if (error) {
+          console.error('Error al obtener datos:', error);
+          // mostrar mensaje en UI
+          totalRecordsEl.textContent = 'Error';
+          createEmptyChart();
+          return;
+        }
+
+        // Actualizaciones
+        updateCards(records);
+        renderTable(records);
+
+        // calcular conteos para indicador seleccionado
+        const field = fieldSelect.value;
+        const { labels, values } = buildCategoryCounts(records, field);
+        renderChart({ labels, values }, chartTypeSelect.value, normalizeCheckbox.checked);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Listeners UI para actualizar automáticamente
+    [filterSexo, filterGrupo, filterSubgrupo, filterAgeRange, fieldSelect, chartTypeSelect, normalizeCheckbox, showTotalsCheckbox].forEach(el => {
+      el.addEventListener('change', () => refreshAndRender());
+      el.addEventListener('input', () => refreshAndRender());
+    });
+
+    exportCsvBtn.addEventListener('click', async () => {
+      const { records } = await fetchAllData();
+      exportToCsv(records);
+    });
+
+    // Suscripción realtime (INSERT/UPDATE/DELETE)
+    (async () => {
+      // Inicial render
       await refreshAndRender();
 
-      // listeners UI
-      fieldSelect.addEventListener('change', refreshAndRender);
-      chartTypeSelect.addEventListener('change', refreshAndRender);
-      document.getElementById('normalize').addEventListener('change', refreshAndRender);
+      // Subscribirse al canal de cambios de la tabla
+      try {
+        const channel = supabase.channel('tabla-encuesta-cambios')
+          .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, (payload) => {
+            // payload contiene new/old
+            // refrescar datos al detectar cambios
+            refreshAndRender();
+          })
+          .subscribe();
 
-      // suscripción en tiempo real a INSERT/UPDATE/DELETE
-      const channel = supabase.channel('public:table-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => {
-          // console.log('Realtime payload', payload);
-          refreshAndRender();
-        })
-        .subscribe();
-
-      // seguridad: reconectar si la suscripción falla
-      channel.on('subscription_state', (status) => console.log('Subscription state', status));
+        channel.on('subscription_state', (status) => {
+          console.log('Realtime subscription state:', status);
+        });
+      } catch (err) {
+        console.warn('No fue posible subscribirse a realtime (verifica key/URL):', err);
+      }
     })();
-
   </script>
 </body>
 </html>
