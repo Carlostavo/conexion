@@ -49,7 +49,7 @@
   <!-- MAIN -->
   <main class="max-w-7xl mx-auto px-6 py-8">
     <!-- CONTROLES -->
-    <div class="grid md:grid-cols-4 gap-4 mb-6">
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
       <div class="card p-4">
         <label class="block text-sm text-slate-600 mb-2">Indicador</label>
         <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
@@ -86,19 +86,6 @@
         </div>
         <p class="text-xs muted mt-2">Aplica filtros para segmentar los resultados.</p>
       </div>
-
-      <div class="card p-4 flex flex-col justify-between">
-        <div>
-          <label class="block text-sm text-slate-600 mb-2">Acciones</label>
-          <div class="flex gap-2">
-            <button id="btnRefresh" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">Actualizar</button>
-            <button id="btnExportChart" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">Exportar gráfico</button>
-          </div>
-        </div>
-        <div class="mt-3">
-          <button id="btnExportCSV" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border">Exportar tabla (CSV)</button>
-        </div>
-      </div>
     </div>
 
     <!-- RESUMEN -->
@@ -126,7 +113,7 @@
       <div class="flex items-center justify-between mb-4">
         <div>
           <h2 id="chartTitle" class="text-lg font-semibold">Indicador</h2>
-          <p id="chartSubtitle" class="text-xs muted mt-1">Selecciona indicador y tipo de gráfico, luego presiona <strong>Actualizar</strong>.</p>
+          <p id="chartSubtitle" class="text-xs muted mt-1">Selecciona indicador y tipo de gráfico.</p>
         </div>
         <div class="text-sm muted">Datos en vivo desde Supabase</div>
       </div>
@@ -136,23 +123,36 @@
       <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
     </div>
 
-    <!-- TABLA -->
-    <div class="card p-6 mb-8">
-      <div class="flex items-center justify-between mb-4">
+    <!-- ACCIONES Y TABLA -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="card p-4 flex flex-col justify-between">
         <div>
-          <h3 class="text-lg font-semibold">Tabla de registros</h3>
-          <p class="text-xs muted mt-1">Visualiza todos los registros de la tabla. Usa el buscador/ordenación/paginación abajo.</p>
+          <label class="block text-sm text-slate-600 mb-2">Acciones</label>
+          <div class="flex gap-2">
+            <button id="btnExportChart" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">Exportar gráfico</button>
+          </div>
         </div>
-        <div class="text-sm muted">Live table</div>
+        <div class="mt-3">
+          <button id="btnExportCSV" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border">Exportar tabla (CSV)</button>
+        </div>
       </div>
+      <div class="md:col-span-3 card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-semibold">Tabla de registros</h3>
+            <p class="text-xs muted mt-1">Visualiza todos los registros de la tabla. Usa el buscador/ordenación/paginación abajo.</p>
+          </div>
+          <div class="text-sm muted">Live table</div>
+        </div>
 
-      <div class="overflow-x-auto">
-        <table id="dataTable" class="w-full">
-          <thead>
-            <tr id="tableHeaderRow"></tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+        <div class="overflow-x-auto">
+          <table id="dataTable" class="w-full">
+            <thead>
+              <tr id="tableHeaderRow"></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -243,13 +243,51 @@
       // Special handling for scatter/bubble/mixed
       if (type === 'scatter') {
         const dataPoints = values.map((v,i) => ({ x: i+1, y: v }));
-        chartInstance = new Chart(ctx, { type: 'scatter', data: { datasets: [{ label: title, data: dataPoints, backgroundColor: '#2a9d8f' }] }, options: { scales:{ x:{ title:{display:true,text:'Índice'} }, y:{ beginAtZero:true } } } });
+        chartInstance = new Chart(ctx, { 
+          type: 'scatter', 
+          data: { 
+            datasets: [{ 
+              label: title, 
+              data: dataPoints, 
+              backgroundColor: '#2a9d8f' 
+            }] 
+          }, 
+          options: { 
+            scales:{ 
+              x:{ 
+                title:{display:true,text:'Índice'} 
+              }, 
+              y:{ 
+                beginAtZero:true 
+              } 
+            } 
+          } 
+        });
         return;
       }
       if (type === 'bubble') {
         const max = Math.max(...values,1);
         const dataPoints = values.map((v,i) => ({ x: i+1, y: v, r: Math.max(4, (v/max)*18) }));
-        chartInstance = new Chart(ctx, { type: 'bubble', data: { datasets: [{ label: title, data: dataPoints, backgroundColor: '#2a9d8f' }] }, options: { scales:{ x:{ title:{display:true,text:'Índice'} }, y:{ beginAtZero:true } } } });
+        chartInstance = new Chart(ctx, { 
+          type: 'bubble', 
+          data: { 
+            datasets: [{ 
+              label: title, 
+              data: dataPoints, 
+              backgroundColor: '#2a9d8f' 
+            }] 
+          }, 
+          options: { 
+            scales:{ 
+              x:{ 
+                title:{display:true,text:'Índice'} 
+              }, 
+              y:{ 
+                beginAtZero:true 
+              } 
+            } 
+          } 
+        });
         return;
       }
       if (type === 'mixed') {
@@ -272,8 +310,20 @@
       const bg = palette.slice(0, labels.length);
       chartInstance = new Chart(ctx, {
         type,
-        data: { labels, datasets: [{ label: title, data: values, backgroundColor: bg, borderColor:'#fff', borderWidth:0.6 }] },
-        options: { responsive:true, scales: type === 'bar' ? { y:{ beginAtZero:true } } : {} }
+        data: { 
+          labels, 
+          datasets: [{ 
+            label: title, 
+            data: values, 
+            backgroundColor: bg, 
+            borderColor:'#fff', 
+            borderWidth:0.6 
+          }] 
+        },
+        options: { 
+          responsive:true, 
+          scales: type === 'bar' ? { y:{ beginAtZero:true } } : {} 
+        }
       });
     }
 
@@ -314,7 +364,11 @@
     async function fetchAllAndRender() {
       // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
-      if (error) { console.error("Supabase error:", error); alert("Error cargando datos desde Supabase. Revisar consola."); return; }
+      if (error) { 
+        console.error("Supabase error:", error); 
+        alert("Error cargando datos desde Supabase. Revisar consola."); 
+        return; 
+      }
       // store raw
       window.__RAW_DATA = data || [];
 
@@ -322,13 +376,21 @@
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
       filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
-      groups.forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.textContent = g; filterGrupo.appendChild(opt); });
+      groups.forEach(g => { 
+        const opt = document.createElement('option'); 
+        opt.value = g; 
+        opt.textContent = g; 
+        filterGrupo.appendChild(opt); 
+      });
 
       // populate indicator selector (once)
       const sel = document.getElementById('selectIndicator');
       if (!sel.options.length) {
         INDICATORS.forEach(i => {
-          const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; sel.appendChild(opt);
+          const opt = document.createElement('option'); 
+          opt.value = i.value; 
+          opt.textContent = i.label; 
+          sel.appendChild(opt);
         });
       }
 
@@ -367,8 +429,12 @@
     async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
       const data = window.__RAW_DATA || [];
       let filtered = data.slice();
-      if (filters.sexo && filters.sexo !== 'todos') filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
-      if (filters.grupo && filters.grupo !== 'todos') filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
+      if (filters.sexo && filters.sexo !== 'todos') {
+        filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
+      }
+      if (filters.grupo && filters.grupo !== 'todos') {
+        filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
+      }
 
       updateSummaries(filtered);
 
@@ -378,8 +444,8 @@
 
       // prepare labels/values
       let labels = [], values = [];
-      // numeric special: treat 'sexo' and others as categorical; only 'edad' was numeric but it's not in INDICATORS list.
-      // Determine if field likely Likert: check if many values match Likert list
+      
+      // Get the data for the selected indicator
       const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
 
       // if arr empty -> show no data
@@ -398,11 +464,13 @@
 
       if (isLikert) {
         const res = countLikert(arr);
-        labels = res.labels; values = res.values;
+        labels = res.labels; 
+        values = res.values;
       } else {
         // categorical
         const res = countCategorical(arr);
-        labels = res.labels; values = res.values;
+        labels = res.labels; 
+        values = res.values;
       }
 
       document.getElementById('chartTitle').innerText = title;
@@ -432,7 +500,11 @@
       const csv = csvRows.join("\n");
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `tabla_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+      const a = document.createElement('a'); 
+      a.href = url; 
+      a.download = `tabla_${Date.now()}.csv`; 
+      a.click(); 
+      URL.revokeObjectURL(url);
     }
 
     /**************************************************************************
@@ -441,28 +513,45 @@
     function exportChartImage() {
       if (!chartInstance) return alert("No hay gráfico para exportar.");
       const url = document.getElementById('mainChart').toDataURL('image/png', 1);
-      const a = document.createElement('a'); a.href = url; a.download = `grafico_${Date.now()}.png`; a.click();
+      const a = document.createElement('a'); 
+      a.href = url; 
+      a.download = `grafico_${Date.now()}.png`; 
+      a.click();
+    }
+
+    /**************************************************************************
+     * Auto-refresh function
+     **************************************************************************/
+    function autoRefreshChart() {
+      const indicator = document.getElementById('selectIndicator').value;
+      const chartType = document.getElementById('selectChartType').value;
+      const sexo = document.getElementById('filterSexo').value;
+      const grupo = document.getElementById('filterGrupo').value;
+      renderIndicator(indicator, chartType, { sexo, grupo });
     }
 
     /**************************************************************************
      * Init UI & events
      **************************************************************************/
-    document.getElementById('btnRefresh').addEventListener('click', async () => {
-      const indicator = document.getElementById('selectIndicator').value;
-      const chartType = document.getElementById('selectChartType').value;
-      const sexo = document.getElementById('filterSexo').value;
-      const grupo = document.getElementById('filterGrupo').value;
-      await renderIndicator(indicator, chartType, { sexo, grupo });
-    });
-
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
     document.getElementById('btnExportChart').addEventListener('click', exportChartImage);
+
+    // Add event listeners for auto-refresh
+    document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
+    document.getElementById('selectChartType').addEventListener('change', autoRefreshChart);
+    document.getElementById('filterSexo').addEventListener('change', autoRefreshChart);
+    document.getElementById('filterGrupo').addEventListener('change', autoRefreshChart);
 
     // initial load
     (async function init(){
       // populate indicator dropdown quickly (in case fetch slow)
       const sel = document.getElementById('selectIndicator');
-      INDICATORS.forEach(i => { const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; sel.appendChild(opt); });
+      INDICATORS.forEach(i => { 
+        const opt = document.createElement('option'); 
+        opt.value = i.value; 
+        opt.textContent = i.label; 
+        sel.appendChild(opt); 
+      });
 
       await fetchAllAndRender();
 
