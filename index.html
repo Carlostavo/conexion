@@ -8,57 +8,54 @@
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Supabase JS v2 -->
+  <!-- Supabase JS v2 (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 
-  <!-- Simple-DataTables (para tabla profesional) -->
+  <!-- Simple-DataTables -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
 
   <style>
-    body { background: linear-gradient(180deg,#f7fafc 0%, #ffffff 100%); }
-    .card { background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,23,42,0.06); }
+    body { background: linear-gradient(180deg,#f5f7fb 0%, #ffffff 100%); }
+    .card { background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(2,6,23,0.06); }
     .muted { color: #6b7280; }
-    .accent { color: #065f46; }
-    .control { border: 1px solid #e6e6e6; padding: 0.5rem 0.75rem; border-radius: 8px; }
-    /* responsive chart container */
-    .chart-wrap { max-height: 520px; }
+    .chart-container { display:flex; justify-content:center; align-items:center; padding: 1rem 0; }
+    .percent-label { font-weight:600; color:#065f46; }
+    .small { font-size:0.85rem; color:#6b7280; }
+    table.dataTable thead th { background: transparent; }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
 
   <!-- HEADER -->
-  <header class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white">
+  <header class="bg-emerald-600 text-white">
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none"><path d="M12 2l3 6 6 .5-4.5 4 1 6L12 17l-5.5 2.5 1-6L3 8.5 9 8 12 2z" fill="#fff"/></svg>
         <div>
           <h1 class="text-xl font-semibold">Dashboard Proambiental</h1>
-          <p class="text-sm muted">Indicadores de comportamiento proambiental y autosustentabilidad</p>
+          <p class="text-sm muted">Indicadores — comportamiento proambiental y autosustentabilidad</p>
         </div>
       </div>
-      <div class="text-sm muted">
-        Tabla: <span class="font-medium text-emerald-100">cuestionario_comportamiento_proambiental_autosustentabilidad</span>
-      </div>
+      <div class="text-sm muted">Tabla: <span class="font-medium text-emerald-100">cuestionario_comportamiento_proambiental_autosustentabilidad</span></div>
     </div>
   </header>
 
-  <!-- MAIN -->
   <main class="max-w-7xl mx-auto px-6 py-8">
     <!-- CONTROLES -->
     <div class="grid md:grid-cols-4 gap-4 mb-6">
       <div class="card p-4">
         <label class="block text-sm text-slate-600 mb-2">Indicador</label>
-        <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
-        <p class="text-xs muted mt-2">Selecciona el indicador para visualizar.</p>
+        <select id="selectIndicator" class="w-full rounded-lg border py-2 px-3"></select>
+        <p class="text-xs muted mt-2">Selecciona el indicador para analizar.</p>
       </div>
 
       <div class="card p-4">
         <label class="block text-sm text-slate-600 mb-2">Tipo de gráfico</label>
-        <select id="selectChartType" class="w-full control">
+        <select id="selectChartType" class="w-full rounded-lg border py-2 px-3">
           <option value="bar">Barras</option>
           <option value="pie">Pastel</option>
           <option value="doughnut">Doughnut</option>
@@ -69,406 +66,503 @@
           <option value="bubble">Bubble</option>
           <option value="mixed">Mixed</option>
         </select>
-        <p class="text-xs muted mt-2">Cambia el tipo de visualización.</p>
+        <p class="text-xs muted mt-2">Cambia la visualización; los porcentajes se muestran cuando aplica.</p>
       </div>
 
       <div class="card p-4">
-        <label class="block text-sm text-slate-600 mb-2">Filtros rápidos</label>
+        <label class="block text-sm text-slate-600 mb-2">Filtros</label>
         <div class="flex gap-2">
-          <select id="filterSexo" class="flex-1 control">
+          <select id="filterSexo" class="flex-1 rounded-lg border py-2 px-3">
             <option value="todos">Sexo: Todos</option>
             <option value="masculino">Masculino</option>
             <option value="femenino">Femenino</option>
           </select>
-          <select id="filterGrupo" class="w-40 control">
+          <select id="filterGrupo" class="w-40 rounded-lg border py-2 px-3">
             <option value="todos">Grupo: Todos</option>
           </select>
         </div>
-        <p class="text-xs muted mt-2">Aplica filtros para segmentar los resultados.</p>
+        <p class="text-xs muted mt-2">Filtros aplican en tiempo real.</p>
       </div>
 
       <div class="card p-4 flex flex-col justify-between">
         <div>
-          <label class="block text-sm text-slate-600 mb-2">Acciones</label>
+          <label class="block text-sm text-slate-600 mb-2">Exportar</label>
           <div class="flex gap-2">
-            <button id="btnRefresh" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">Actualizar</button>
-            <button id="btnExportChart" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">Exportar gráfico</button>
+            <button id="btnExportChart" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg">Exportar gráfico</button>
+            <button id="btnExportCSV" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">Exportar CSV</button>
           </div>
         </div>
-        <div class="mt-3">
-          <button id="btnExportCSV" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border">Exportar tabla (CSV)</button>
+
+        <div class="mt-3 small">
+          Actualización: automática (filtros, indicador y datos en tiempo real).
         </div>
       </div>
     </div>
 
-    <!-- RESUMEN -->
-    <div class="grid md:grid-cols-4 gap-4 mb-6">
-      <div class="card p-4">
-        <div class="text-sm muted">Total encuestas</div>
-        <div id="totalSurveys" class="text-2xl font-semibold mt-1">—</div>
+    <!-- TARJETAS RESUMEN -->
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
+      <div class="card p-5">
+        <div class="text-sm muted">Resumen general</div>
+        <div id="cardTotal" class="text-2xl font-semibold mt-2">—</div>
+        <div class="small mt-1 muted">Total de respuestas (con filtros aplicados)</div>
       </div>
-      <div class="card p-4">
-        <div class="text-sm muted">Promedio de edad</div>
-        <div id="avgAge" class="text-2xl font-semibold mt-1">—</div>
+
+      <div class="card p-5">
+        <div class="text-sm muted">Principales estadísticas numéricas</div>
+        <div id="cardNumeric" class="mt-2 space-y-1">
+          <!-- se llenará dinamicamente -->
+        </div>
+        <div class="small mt-1 muted">Min / Max / Media / Mediana / Moda</div>
       </div>
-      <div class="card p-4">
-        <div class="text-sm muted">Separa residuos (%)</div>
-        <div id="pctSeparate" class="text-2xl font-semibold mt-1">—</div>
-      </div>
-      <div class="card p-4">
-        <div class="text-sm muted">Participaría en talleres (%)</div>
-        <div id="pctWorkshops" class="text-2xl font-semibold mt-1">—</div>
+
+      <div class="card p-5">
+        <div class="text-sm muted">Variación</div>
+        <div id="cardVariation" class="mt-2 space-y-1">
+          <!-- varianza y desviación -->
+        </div>
+        <div class="small mt-1 muted">Varianza, desviación estándar, rango</div>
       </div>
     </div>
 
-    <!-- GRAFICO -->
+    <!-- GRAFICO CENTRADO -->
     <div class="card p-6 mb-6">
       <div class="flex items-center justify-between mb-4">
         <div>
           <h2 id="chartTitle" class="text-lg font-semibold">Indicador</h2>
-          <p id="chartSubtitle" class="text-xs muted mt-1">Selecciona indicador y tipo de gráfico, luego presiona <strong>Actualizar</strong>.</p>
+          <p id="chartSubtitle" class="text-xs muted mt-1"></p>
         </div>
-        <div class="text-sm muted">Datos en vivo desde Supabase</div>
+        <div id="chartPercentLegend" class="text-right small muted"></div>
       </div>
-      <div class="chart-wrap">
-        <canvas id="mainChart"></canvas>
+
+      <div class="chart-container">
+        <canvas id="mainChart" style="max-width:900px; width:100%;"></canvas>
       </div>
+
       <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
     </div>
 
-    <!-- TABLA -->
+    <!-- TABLA DISTRIBUCION Y ESTADISTICAS -->
     <div class="card p-6 mb-8">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-lg font-semibold">Tabla de registros</h3>
-          <p class="text-xs muted mt-1">Visualiza todos los registros de la tabla. Usa el buscador/ordenación/paginación abajo.</p>
+          <h3 class="text-lg font-semibold">Distribución del indicador</h3>
+          <p class="text-xs muted mt-1">Tabla interactiva con conteo, porcentaje y estadísticas avanzadas (vinculada a filtros).</p>
         </div>
-        <div class="text-sm muted">Live table</div>
       </div>
 
-      <div class="overflow-x-auto">
-        <table id="dataTable" class="w-full">
+      <div class="overflow-x-auto mb-4">
+        <table id="distTable" class="w-full">
           <thead>
-            <tr id="tableHeaderRow"></tr>
+            <tr>
+              <th>Categoria / Valor</th>
+              <th>Conteo</th>
+              <th>Porcentaje</th>
+            </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="distBody"></tbody>
         </table>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="p-4 border rounded">
+          <h4 class="font-semibold">Estadísticas numéricas (cuando aplican)</h4>
+          <div id="numericStats" class="mt-2 small muted"></div>
+        </div>
+        <div class="p-4 border rounded">
+          <h4 class="font-semibold">Resumen estadístico</h4>
+          <div id="summaryStats" class="mt-2 small muted"></div>
+        </div>
       </div>
     </div>
 
-    <footer class="text-center text-sm muted mb-8">© 2025 Proyecto Proambiental — Supabase & Chart.js</footer>
   </main>
 
   <script>
-    /**************************************************************************
-     * Supabase config (usa las credenciales que me diste)
-     **************************************************************************/
-    const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
-    const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  /***************************************************************************
+   * CONFIG SUPABASE (usa tus credenciales)
+   ***************************************************************************/
+  const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzYSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+  const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    /**************************************************************************
-     * Indicadores solicitados (tu lista exacta)
-     **************************************************************************/
-    const INDICATORS = [
-      { value: 'sexo', label: 'Sexo' },
-      { value: 'estado_civil', label: 'Estado civil' },
-      { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
-      { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
-      { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
-      { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
-      { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
-      { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
-      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
-      { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
-      { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
-      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
-    ];
+  /***************************************************************************
+   * INDICATORS (los que nos diste)
+   ***************************************************************************/
+  const INDICATORS = [
+    { value: 'sexo', label: 'Sexo' },
+    { value: 'estado_civil', label: 'Estado civil' },
+    { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
+    { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
+    { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
+    { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
+    { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
+    { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
+    { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
+    { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
+    { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
+    { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
+  ];
 
-    /**************************************************************************
-     * Likert defaults (para las preguntas tipo Likert)
-     **************************************************************************/
-    const LIKERT_LEVELS = [
-      "Totalmente en desacuerdo",
-      "En desacuerdo",
-      "Indiferente",
-      "De acuerdo",
-      "Totalmente de acuerdo"
-    ];
+  const LIKERT_LEVELS = [
+    "Totalmente en desacuerdo","En desacuerdo","Indiferente","De acuerdo","Totalmente de acuerdo"
+  ];
 
-    function normalize(v) {
-      if (v === null || v === undefined) return null;
-      return String(v).trim();
-    }
+  /***************************************************************************
+   * UTIL: normalizacion y estadisticas
+   ***************************************************************************/
+  function normalize(v) { if (v===null || v===undefined) return null; return String(v).trim(); }
 
-    function countCategorical(arr) {
-      const counts = {};
-      arr.forEach(v => {
-        const k = normalize(v) || "No declarado";
-        counts[k] = (counts[k] || 0) + 1;
+  function mean(arr){ if(!arr.length) return null; return arr.reduce((a,b)=>a+b,0)/arr.length; }
+  function median(arr){
+    if(!arr.length) return null;
+    const s = arr.slice().sort((a,b)=>a-b);
+    const m = Math.floor(s.length/2);
+    return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+  }
+  function mode(arr){
+    if(!arr.length) return null;
+    const counts = {};
+    arr.forEach(v=> counts[v] = (counts[v]||0)+1);
+    let max=0, mod=null;
+    Object.entries(counts).forEach(([k,c])=> { if(c>max){ max=c; mod=k; }});
+    return mod;
+  }
+  function variance(arr){
+    if(!arr.length) return null;
+    const m = mean(arr);
+    return arr.reduce((s,x)=> s+Math.pow(x-m,2),0)/arr.length;
+  }
+  function stdev(arr){ const v = variance(arr); return v===null ? null : Math.sqrt(v); }
+  function sum(arr){ return arr.reduce((a,b)=>a+b,0); }
+  function rangeArr(arr){ if(!arr.length) return null; return Math.max(...arr)-Math.min(...arr); }
+
+  /***************************************************************************
+   * Chart handling
+   ***************************************************************************/
+  let chart = null;
+  function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart=null; } }
+
+  function renderChart(type, labels, values, title){
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    destroyChart();
+
+    // if numeric totals = show percentages optionally convert to percentages
+    const total = values.reduce((a,b)=>a+b,0);
+    const percentData = values.map(v=> total? Math.round((v/total)*10000)/100 : 0);
+
+    // for pie/doughnut/polarArea show percentages inside the table and percent labels
+    if(type==='mixed'){
+      chart = new Chart(ctx, {
+        data: { labels, datasets: [{ type:'bar', label:'Conteo', data: values, backgroundColor:'#2a9d8f' }, { type:'line', label:'% (tendencia)', data: percentData, borderColor:'#e76f51', yAxisID:'percent', tension:0.25, fill:false }] },
+        options:{ scales:{ y:{ beginAtZero:true }, percent:{ display:false } }, plugins:{ tooltip:{ callbacks:{ label(ctx){ const i=ctx.dataIndex; const v=values[i]; const p = percentData[i]; return `${v} (${p}%)`; } } } }
       });
-      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
-      return { labels: entries.map(e=>e[0]), values: entries.map(e=>e[1]) };
+      return;
     }
 
-    function countLikert(arr) {
-      const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
+    // special types
+    if(type==='scatter' || type==='bubble'){
+      // scatter/bubble handled as indices for display only
+      const ds = type==='scatter' ? values.map((v,i)=>({x:i+1,y:v})) : values.map((v,i)=>({x:i+1,y:v,r: Math.max(4, (v/Math.max(...values,1))*18)}));
+      chart = new Chart(ctx, { type, data: { datasets:[{ label:title, data:ds, backgroundColor:'#2a9d8f' }] }, options:{ scales:{ x:{ title:{ display:true, text:'Índice' }}, y:{ beginAtZero:true } }, plugins:{ tooltip:{ callbacks:{ label(tp){ if(tp.raw.r) return `x:${tp.raw.x} y:${tp.raw.y} (r:${tp.raw.r})`; return `x:${tp.raw.x} y:${tp.raw.y}` } } } } });
+      return;
+    }
+
+    // default charts
+    const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
+    const bg = palette.slice(0, labels.length);
+    chart = new Chart(ctx, {
+      type,
+      data: { labels, datasets:[{ label:title, data: values, backgroundColor: bg, borderColor:'#fff', borderWidth:0.6 }] },
+      options:{ responsive:true, plugins:{ tooltip:{ callbacks:{ label(ctx){ const i=ctx.dataIndex; const v=values[i]; const p = total?Math.round((v/total)*10000)/100:0; return `${v} (${p}%)`; } } } }, scales: type==='bar' ? { y:{ beginAtZero:true } } : {} }
+    });
+
+    // update percent legend area
+    const percentLegend = document.getElementById('chartPercentLegend');
+    percentLegend.innerHTML = ''; // we also display top 3 categories with percentages
+    const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
+    const top = sorted.slice(0,3);
+    if(top.length){
+      percentLegend.innerHTML = top.map(t=> `<div><span class="percent-label">${t.p}%</span> — <span class="small">${t.label}</span></div>`).join('');
+    }
+  }
+
+  /***************************************************************************
+   * Data handling: fetch + process
+   ***************************************************************************/
+  async function fetchAll(){
+    const { data, error } = await supabase.from(TABLE).select('*');
+    if(error){ console.error("Supabase error:", error); return []; }
+    window.__RAW = data || [];
+    return window.__RAW;
+  }
+
+  // build indicators dropdown
+  function populateIndicators(){
+    const sel = document.getElementById('selectIndicator');
+    sel.innerHTML = '';
+    INDICATORS.forEach(i=> { const o = document.createElement('option'); o.value = i.value; o.textContent = i.label; sel.appendChild(o); });
+  }
+
+  // build group filter from data
+  function populateGroupFilter(data){
+    const groups = Array.from(new Set(data.map(d=> normalize(d.grupo)).filter(Boolean)));
+    const sel = document.getElementById('filterGrupo');
+    sel.innerHTML = '<option value="todos">Grupo: Todos</option>';
+    groups.forEach(g=> { const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o); });
+  }
+
+  // process indicator - returns { labels, values, isNumeric, numericArray }
+  function processIndicator(indKey, rows){
+    const arrRaw = rows.map(r => r[indKey]).filter(v => v!==undefined && v!==null);
+    if(!arrRaw.length) return { labels:[], values:[], isNumeric:false, numeric:[] };
+
+    // check if numeric (all values convertible to number)
+    const numericCand = arrRaw.map(v=> { const n = Number(String(v).replace(/[^0-9\.\-]/g,'')); return isNaN(n)?null:n; });
+    const numericCount = numericCand.filter(n=>n!==null).length;
+    const isNumeric = numericCount / arrRaw.length >= 0.9; // threshold
+
+    if(isNumeric){
+      const numeric = numericCand.filter(n=>n!==null);
+      // we will create buckets for display (auto ranges)
+      // Create 5 buckets (quantiles) or use simple unique values if few
+      const uniqueVals = Array.from(new Set(numeric));
+      if(uniqueVals.length <= 8){
+        const labels = uniqueVals.map(v=>String(v));
+        const counts = labels.map(l=> numeric.filter(x=> String(x)===String(l)).length);
+        return { labels, values:counts, isNumeric:true, numeric };
+      } else {
+        // build histogram with 6 bins
+        const min = Math.min(...numeric), max = Math.max(...numeric);
+        const bins = 6;
+        const step = (max - min)/bins || 1;
+        const edges = [];
+        for(let i=0;i<bins;i++){ edges.push({min: min + i*step, max: (i===bins-1? max: min + (i+1)*step)}); }
+        const labels = edges.map((e,i)=> `${Math.round(e.min)}-${Math.round(e.max)}`);
+        const counts = edges.map(e=> numeric.filter(n=> n>=e.min && n<=e.max).length);
+        return { labels, values:counts, isNumeric:true, numeric };
+      }
+    }
+
+    // not numeric: check likert match
+    const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
+    const matchCount = arrRaw.reduce((s,v) => lower.includes(String(v).toLowerCase()) ? s+1 : s, 0);
+    if(matchCount / arrRaw.length >= 0.25){
+      // treat as likert - enforce LIKERT_LEVELS order
       const counts = LIKERT_LEVELS.map(()=>0);
-      arr.forEach(v => {
-        const s = normalize(v);
-        if (!s) return;
+      arrRaw.forEach(v=>{
+        const s = String(v).trim();
         const idx = lower.indexOf(s.toLowerCase());
-        if (idx !== -1) counts[idx] += 1;
+        if(idx !== -1) counts[idx] += 1;
         else {
-          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
-          for (let i=0;i<lower.length;i++){
-            if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
+          // partial match
+          for(let i=0;i<lower.length;i++){
+            if(s.toLowerCase().includes(lower[i].split(' ')[0])){ counts[i]++; break;}
           }
         }
       });
-      return { labels: LIKERT_LEVELS.slice(), values: counts };
+      return { labels: LIKERT_LEVELS.slice(), values: counts, isNumeric:false, numeric:[] };
     }
 
-    /**************************************************************************
-     * Chart handling
-     **************************************************************************/
-    let chartInstance = null;
-    function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
-
-    function renderChart(type, labels, values, title) {
-      const ctx = document.getElementById('mainChart').getContext('2d');
-      destroyChart();
-
-      // Special handling for scatter/bubble/mixed
-      if (type === 'scatter') {
-        const dataPoints = values.map((v,i) => ({ x: i+1, y: v }));
-        chartInstance = new Chart(ctx, { type: 'scatter', data: { datasets: [{ label: title, data: dataPoints, backgroundColor: '#2a9d8f' }] }, options: { scales:{ x:{ title:{display:true,text:'Índice'} }, y:{ beginAtZero:true } } } });
-        return;
-      }
-      if (type === 'bubble') {
-        const max = Math.max(...values,1);
-        const dataPoints = values.map((v,i) => ({ x: i+1, y: v, r: Math.max(4, (v/max)*18) }));
-        chartInstance = new Chart(ctx, { type: 'bubble', data: { datasets: [{ label: title, data: dataPoints, backgroundColor: '#2a9d8f' }] }, options: { scales:{ x:{ title:{display:true,text:'Índice'} }, y:{ beginAtZero:true } } } });
-        return;
-      }
-      if (type === 'mixed') {
-        // barras + linea
-        chartInstance = new Chart(ctx, {
-          data: {
-            labels,
-            datasets: [
-              { type:'bar', label:'Conteo', data: values, backgroundColor:'#2a9d8f' },
-              { type:'line', label:'Tendencia', data: values.map((v,i)=> i>0? (values[i]+values[i-1])/2 : values[i]), borderColor:'#e76f51', tension:0.3, fill:false }
-            ]
-          },
-          options: { responsive:true, scales:{ y:{ beginAtZero:true } } }
-        });
-        return;
-      }
-
-      // default chart types
-      const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
-      const bg = palette.slice(0, labels.length);
-      chartInstance = new Chart(ctx, {
-        type,
-        data: { labels, datasets: [{ label: title, data: values, backgroundColor: bg, borderColor:'#fff', borderWidth:0.6 }] },
-        options: { responsive:true, scales: type === 'bar' ? { y:{ beginAtZero:true } } : {} }
-      });
-    }
-
-    /**************************************************************************
-     * Table handling (Simple-DataTables)
-     **************************************************************************/
-    let dataTable = null;
-    function buildTableHeaders(columns) {
-      const headerRow = document.getElementById('tableHeaderRow');
-      headerRow.innerHTML = '';
-      columns.forEach(c => {
-        const th = document.createElement('th');
-        th.innerText = c;
-        headerRow.appendChild(th);
-      });
-    }
-    function buildTableBody(rows, columns) {
-      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
-      rows.forEach(r => {
-        const tr = document.createElement('tr');
-        columns.forEach(col => {
-          const td = document.createElement('td');
-          td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-      // init or reinit datatable after DOM updated
-      setTimeout(() => {
-        try { if (dataTable) dataTable.destroy(); } catch(e){}
-        dataTable = new simpleDatatables.DataTable("#dataTable", { searchable: true, fixedHeight: true, perPage: 10 });
-      }, 60);
-    }
-
-    /**************************************************************************
-     * Fetch data from Supabase and render all (chart + table + summaries)
-     **************************************************************************/
-    async function fetchAllAndRender() {
-      // fetch
-      const { data, error } = await supabase.from(TABLE).select("*");
-      if (error) { console.error("Supabase error:", error); alert("Error cargando datos desde Supabase. Revisar consola."); return; }
-      // store raw
-      window.__RAW_DATA = data || [];
-
-      // populate group filter
-      const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
-      const filterGrupo = document.getElementById('filterGrupo');
-      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
-      groups.forEach(g => { const opt = document.createElement('option'); opt.value = g; opt.textContent = g; filterGrupo.appendChild(opt); });
-
-      // populate indicator selector (once)
-      const sel = document.getElementById('selectIndicator');
-      if (!sel.options.length) {
-        INDICATORS.forEach(i => {
-          const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; sel.appendChild(opt);
-        });
-      }
-
-      // build table headers & body
-      const columns = Object.keys(data[0] || { id: 'id' });
-      buildTableHeaders(columns);
-      buildTableBody(data, columns);
-
-      // update summaries
-      updateSummaries(data);
-
-      // initial render: first indicator
-      const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
-      const chartType = document.getElementById('selectChartType').value || 'bar';
-      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
-    }
-
-    function updateSummaries(rows) {
-      document.getElementById('totalSurveys').innerText = rows.length;
-      const ages = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
-      const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
-      document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg} años`;
-
-      const separaArr = rows.map(r => normalize(r.practica_separacion_reciclaje_ingreso)).filter(Boolean);
-      const separaPos = separaArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
-      document.getElementById('pctSeparate').innerText = separaArr.length ? `${Math.round((separaPos/separaArr.length)*100)}%` : '—';
-
-      const talleresArr = rows.map(r => normalize(r.participaria_talleres_buenas_practicas)).filter(Boolean);
-      const talleresPos = talleresArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
-      document.getElementById('pctWorkshops').innerText = talleresArr.length ? `${Math.round((talleresPos/talleresArr.length)*100)}%` : '—';
-    }
-
-    /**************************************************************************
-     * Render indicator with filters
-     **************************************************************************/
-    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
-      const data = window.__RAW_DATA || [];
-      let filtered = data.slice();
-      if (filters.sexo && filters.sexo !== 'todos') filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
-      if (filters.grupo && filters.grupo !== 'todos') filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
-
-      updateSummaries(filtered);
-
-      // find label
-      const indObj = INDICATORS.find(i=> i.value === indicatorKey);
-      const title = indObj ? indObj.label : indicatorKey;
-
-      // prepare labels/values
-      let labels = [], values = [];
-      // numeric special: treat 'sexo' and others as categorical; only 'edad' was numeric but it's not in INDICATORS list.
-      // Determine if field likely Likert: check if many values match Likert list
-      const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
-
-      // if arr empty -> show no data
-      if (!arr.length) {
-        document.getElementById('noDataMsg').classList.remove('hidden');
-        destroyChart();
-        return;
-      } else {
-        document.getElementById('noDataMsg').classList.add('hidden');
-      }
-
-      // decide processing: if many arr elements match likert options => likert
-      const lowerLikert = LIKERT_LEVELS.map(l => l.toLowerCase());
-      const matchCount = arr.reduce((acc, v) => lowerLikert.includes(String(v).toLowerCase()) ? acc+1 : acc, 0);
-      const isLikert = (matchCount / arr.length) >= 0.25; // threshold 25%
-
-      if (isLikert) {
-        const res = countLikert(arr);
-        labels = res.labels; values = res.values;
-      } else {
-        // categorical
-        const res = countCategorical(arr);
-        labels = res.labels; values = res.values;
-      }
-
-      document.getElementById('chartTitle').innerText = title;
-      document.getElementById('chartSubtitle').innerText = `Tipo: ${chartType} — ${filtered.length} respuestas (filtros aplicados)`;
-      renderChart(chartType, labels, values, title);
-    }
-
-    /**************************************************************************
-     * Export table as CSV
-     **************************************************************************/
-    function exportTableCSV() {
-      const data = window.__RAW_DATA || [];
-      if (!data.length) return alert("No hay datos para exportar.");
-      const cols = Object.keys(data[0]);
-      const csvRows = [cols.join(",")];
-      data.forEach(row => {
-        const vals = cols.map(c => {
-          let v = row[c];
-          if (v === null || v === undefined) return "";
-          // escape quotes
-          v = String(v).replace(/"/g, '""');
-          if (v.includes(",") || v.includes("\n")) return `"${v}"`;
-          return v;
-        });
-        csvRows.push(vals.join(","));
-      });
-      const csv = csvRows.join("\n");
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `tabla_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
-    }
-
-    /**************************************************************************
-     * Export chart image
-     **************************************************************************/
-    function exportChartImage() {
-      if (!chartInstance) return alert("No hay gráfico para exportar.");
-      const url = document.getElementById('mainChart').toDataURL('image/png', 1);
-      const a = document.createElement('a'); a.href = url; a.download = `grafico_${Date.now()}.png`; a.click();
-    }
-
-    /**************************************************************************
-     * Init UI & events
-     **************************************************************************/
-    document.getElementById('btnRefresh').addEventListener('click', async () => {
-      const indicator = document.getElementById('selectIndicator').value;
-      const chartType = document.getElementById('selectChartType').value;
-      const sexo = document.getElementById('filterSexo').value;
-      const grupo = document.getElementById('filterGrupo').value;
-      await renderIndicator(indicator, chartType, { sexo, grupo });
+    // default categorical
+    const map = {};
+    arrRaw.forEach(v=> {
+      const k = normalize(v) || 'No declarado';
+      map[k] = (map[k]||0)+1;
     });
+    const entries = Object.entries(map).sort((a,b)=> b[1]-a[1]);
+    const labels = entries.map(e=>e[0]);
+    const values = entries.map(e=>e[1]);
+    return { labels, values, isNumeric:false, numeric:[] };
+  }
 
-    document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
-    document.getElementById('btnExportChart').addEventListener('click', exportChartImage);
+  // update cards and table based on processed indicator & filtered rows
+  function updateUIForIndicator(indKey, processed, filteredRows){
+    // total
+    const total = filteredRows.length;
+    document.getElementById('cardTotal').textContent = total;
 
-    // initial load
-    (async function init(){
-      // populate indicator dropdown quickly (in case fetch slow)
-      const sel = document.getElementById('selectIndicator');
-      INDICATORS.forEach(i => { const opt = document.createElement('option'); opt.value = i.value; opt.textContent = i.label; sel.appendChild(opt); });
+    // numeric stats card and variation card
+    const numericContainer = document.getElementById('cardNumeric');
+    const variationContainer = document.getElementById('cardVariation');
+    const numericStatsBlock = document.getElementById('numericStats');
+    const summaryStatsBlock = document.getElementById('summaryStats');
 
-      await fetchAllAndRender();
+    numericContainer.innerHTML = '';
+    variationContainer.innerHTML = '';
+    numericStatsBlock.innerHTML = '';
+    summaryStatsBlock.innerHTML = '';
 
-      // optional: auto-refresh every 60s (uncomment if desired)
-      // setInterval(async ()=> { await fetchAllAndRender(); }, 60000);
-    })();
+    if(processed.isNumeric && processed.numeric.length){
+      const arr = processed.numeric;
+      const mn = Math.min(...arr), mx = Math.max(...arr);
+      const avg = mean(arr).toFixed(2);
+      const med = median(arr);
+      const mod = mode(arr);
+      const varr = variance(arr);
+      const sd = stdev(arr);
+      const rng = rangeArr(arr);
+      const ssum = sum(arr);
+      const n = arr.length;
+
+      numericContainer.innerHTML = `<div class="text-lg font-semibold">${avg}</div><div class="small muted">Media (1)</div>
+        <div class="mt-2">Min: <strong>${mn}</strong> • Max: <strong>${mx}</strong></div>
+        <div>Mediana: <strong>${med}</strong> • Moda: <strong>${mod}</strong></div>`;
+
+      variationContainer.innerHTML = `<div>Varianza: <strong>${varr!==null?varr.toFixed(2):'—'}</strong></div>
+        <div>Desv. estándar: <strong>${sd!==null?sd.toFixed(2):'—'}</strong></div>
+        <div>Rango: <strong>${rng!==null?rng:'—'}</strong></div>`;
+
+      numericStatsBlock.innerHTML = `<ul class="list-disc pl-5">
+        <li>Min: ${mn}</li><li>Max: ${mx}</li><li>Media: ${avg}</li><li>Mediana: ${med}</li><li>Moda: ${mod}</li>
+        <li>Suma: ${ssum}</li><li>N: ${n}</li></ul>`;
+
+      summaryStatsBlock.innerHTML = `<ul class="list-disc pl-5">
+        <li>Varianza: ${varr!==null?varr.toFixed(3):'—'}</li>
+        <li>Desv. est.: ${sd!==null?sd.toFixed(3):'—'}</li>
+        <li>Rango: ${rng!==null?rng:'—'}</li></ul>`;
+    } else {
+      // no numeric values — show placeholder
+      numericContainer.innerHTML = `<div class="text-lg font-semibold">—</div><div class="small muted">No aplica (no numérico)</div>`;
+      variationContainer.innerHTML = `<div class="text-lg font-semibold">—</div>`;
+      numericStatsBlock.innerHTML = `<div class="muted">No hay estadísticas numéricas para este indicador.</div>`;
+      summaryStatsBlock.innerHTML = `<div class="muted">Resumen no numérico disponible en la tabla de distribución.</div>`;
+    }
+
+    // build distribution table
+    const distBody = document.getElementById('distBody');
+    distBody.innerHTML = '';
+    const labels = processed.labels || [];
+    const values = processed.values || [];
+    const totalCounts = values.reduce((a,b)=>a+b,0) || 0;
+
+    if(!labels.length){
+      document.getElementById('noDataMsg').classList.remove('hidden');
+      return;
+    } else {
+      document.getElementById('noDataMsg').classList.add('hidden');
+    }
+
+    for(let i=0;i<labels.length;i++){
+      const lab = labels[i];
+      const cnt = values[i] || 0;
+      const pct = totalCounts ? Math.round((cnt/totalCounts)*10000)/100 : 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${lab}</td><td>${cnt}</td><td>${pct}%</td>`;
+      distBody.appendChild(tr);
+    }
+
+    // add a summary row (total)
+    const trTotal = document.createElement('tr');
+    trTotal.innerHTML = `<td><strong>Total</strong></td><td><strong>${totalCounts}</strong></td><td><strong>100%</strong></td>`;
+    distBody.appendChild(trTotal);
+
+    // init/refresh Simple-DataTables for distTable
+    setTimeout(()=> {
+      try{ if(window._distTable) window._distTable.destroy(); } catch(e){}
+      window._distTable = new simpleDatatables.DataTable("#distTable", { searchable: true, perPage: 8 });
+    }, 80);
+
+    // update chart
+    document.getElementById('chartTitle').textContent = INDICATORS.find(i=>i.value===indKey)?.label || indKey;
+    document.getElementById('chartSubtitle').textContent = `${total} respuestas (filtros aplicados)`;
+    renderChart(document.getElementById('selectChartType').value, labels, values, INDICATORS.find(i=>i.value===indKey)?.label || indKey);
+  }
+
+  /***************************************************************************
+   * Filtering helper
+   ***************************************************************************/
+  function applyFilters(rows){
+    const sexo = document.getElementById('filterSexo').value;
+    const grupo = document.getElementById('filterGrupo').value;
+    let filtered = rows.slice();
+    if(sexo && sexo!=='todos') filtered = filtered.filter(r=> (r.sexo||'').toLowerCase() === sexo.toLowerCase());
+    if(grupo && grupo!=='todos') filtered = filtered.filter(r=> (r.grupo||'').toLowerCase() === grupo.toLowerCase());
+    return filtered;
+  }
+
+  /***************************************************************************
+   * Main rendering flow
+   ***************************************************************************/
+  async function refreshAll(){
+    const data = await fetchAll();
+    populateGroupFilter(data);
+    updateCardsInitial(data);
+
+    // re-render indicator with current selections
+    const ind = document.getElementById('selectIndicator').value || INDICATORS[0].value;
+    const filtered = applyFilters(data);
+    const processed = processIndicator(ind, filtered);
+    updateUIForIndicator(ind, processed, filtered);
+  }
+
+  function updateCardsInitial(data){
+    document.getElementById('cardTotal').textContent = data.length;
+  }
+
+  // listeners: indicator, chart type, filters -> update immediately
+  document.addEventListener('change', async (e)=>{
+    if(['selectIndicator','selectChartType','filterSexo','filterGrupo'].includes(e.target.id)){
+      const all = window.__RAW || await fetchAll();
+      const filtered = applyFilters(all);
+      const ind = document.getElementById('selectIndicator').value;
+      const processed = processIndicator(ind, filtered);
+      updateUIForIndicator(ind, processed, filtered);
+    }
+  });
+
+  // export CSV: export raw data (full table)
+  function exportCSV(){
+    const rows = window.__RAW || [];
+    if(!rows.length) return alert('No hay datos para exportar.');
+    const cols = Object.keys(rows[0]);
+    const csv = [cols.join(',')].concat(rows.map(r=> cols.map(c=>{
+      const v = r[c]===null||r[c]===undefined ? '' : String(r[c]).replace(/"/g,'""');
+      return v.includes(',')||v.includes('\n') ? `"${v}"` : v;
+    }).join(','))).join('\n');
+    const blob = new Blob([csv], { type:'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `datos_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+  }
+  document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+
+  // export chart image
+  document.getElementById('btnExportChart').addEventListener('click', ()=>{
+    if(!chart) return alert('No hay gráfico para exportar.');
+    const url = document.getElementById('mainChart').toDataURL('image/png',1);
+    const a = document.createElement('a'); a.href = url; a.download = `grafico_${Date.now()}.png`; a.click();
+  });
+
+  /***************************************************************************
+   * Real-time updates: subscribe to changes on the table and refresh
+   ***************************************************************************/
+  function setupRealtime(){
+    try{
+      const channel = supabase.channel('realtime-table-'+TABLE)
+        .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, payload => {
+          // whenever change occurs, refetch and update
+          // debounce to avoid too frequent calls
+          if(window._rtDebounce) clearTimeout(window._rtDebounce);
+          window._rtDebounce = setTimeout(()=> { refreshAll(); }, 700);
+        })
+        .subscribe();
+    }catch(e){ console.warn('Realtime not available or subscription failed', e); }
+  }
+
+  /***************************************************************************
+   * INIT
+   ***************************************************************************/
+  (async function init(){
+    populateIndicators();
+    await fetchAll();
+    await refreshAll();
+    setupRealtime();
+
+    // automatically re-render every 90s as backup (optional)
+    // setInterval(()=> refreshAll(), 90000);
+  })();
+
   </script>
+
 </body>
 </html>
