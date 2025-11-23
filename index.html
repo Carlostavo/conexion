@@ -138,7 +138,7 @@
       </div>
 
       <div class="chart-container">
-        <canvas id="mainChart" style="max-width:900px; width:100%;"></canvas>
+        <canvas id="mainChart" style="max-width:900px; width:100%; height: 400px;"></canvas>
       </div>
 
       <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
@@ -217,6 +217,13 @@
   const LIKERT_CODES = ['A', 'B', 'C', 'D', 'E'];
 
   /***************************************************************************
+   * Variables globales
+   ***************************************************************************/
+  let chart = null;
+  let currentData = [];
+  let currentIndicator = null;
+
+  /***************************************************************************
    * Manejo de estado de conexión
    ***************************************************************************/
   function showConnectionError(message) {
@@ -281,17 +288,31 @@
   function rangeArr(arr){ if(!arr.length) return null; return Math.max(...arr)-Math.min(...arr); }
 
   /***************************************************************************
-   * Chart handling
+   * Chart handling - FUNCIÓN MEJORADA
    ***************************************************************************/
-  let chart = null;
-  function destroyChart(){ if(chart){ try{ chart.destroy(); }catch(e){} chart=null; } }
+  function destroyChart(){ 
+    if(chart){ 
+      try{ 
+        chart.destroy(); 
+      }catch(e){
+        console.warn("Error destroying chart:", e);
+      }
+      chart = null; 
+    } 
+  }
 
   function renderChart(type, labels, values, title){
-    const ctx = document.getElementById('mainChart').getContext('2d');
+    const ctx = document.getElementById('mainChart');
+    if (!ctx) {
+      console.error("Canvas element not found");
+      return;
+    }
+
     destroyChart();
 
     if (!labels.length || !values.length) {
-      console.warn("No data to render chart");
+      console.warn("No data to render chart for:", title);
+      document.getElementById('noDataMsg').classList.remove('hidden');
       return;
     }
 
@@ -301,40 +322,63 @@
     const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
     const bg = palette.slice(0, labels.length);
     
-    chart = new Chart(ctx, {
-      type,
-      data: { 
-        labels, 
-        datasets:[{ 
-          label: title, 
-          data: values, 
-          backgroundColor: bg, 
-          borderColor: '#fff', 
-          borderWidth: 1 
-        }] 
-      },
-      options:{ 
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{ 
-          legend: {
-            position: 'top',
-          },
-          tooltip:{ 
-            callbacks:{ 
-              label(ctx){ 
-                const i = ctx.dataIndex; 
-                const v = values[i]; 
-                const p = total ? Math.round((v/total)*10000)/100 : 0; 
-                return `${v} respuestas (${p}%)`; 
+    try {
+      chart = new Chart(ctx, {
+        type,
+        data: { 
+          labels, 
+          datasets:[{ 
+            label: title, 
+            data: values, 
+            backgroundColor: bg, 
+            borderColor: '#fff', 
+            borderWidth: 2 
+          }] 
+        },
+        options:{ 
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins:{ 
+            legend: {
+              position: 'top',
+            },
+            tooltip:{ 
+              callbacks:{ 
+                label(ctx){ 
+                  const i = ctx.dataIndex; 
+                  const v = values[i]; 
+                  const p = total ? Math.round((v/total)*10000)/100 : 0; 
+                  return `${v} respuestas (${p}%)`; 
+                } 
               } 
             } 
-          } 
+          },
+          scales: type === 'bar' ? { 
+            y: { 
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            } 
+          } : {}
         }
-      }
-    });
+      });
 
+      // Actualizar leyenda de porcentajes
+      updatePercentLegend(labels, values, total);
+      
+      document.getElementById('noDataMsg').classList.add('hidden');
+      
+    } catch (error) {
+      console.error("Error rendering chart:", error);
+      document.getElementById('noDataMsg').classList.remove('hidden');
+    }
+  }
+
+  function updatePercentLegend(labels, values, total) {
     const percentLegend = document.getElementById('chartPercentLegend');
+    if (!percentLegend) return;
+    
     percentLegend.innerHTML = '';
     const sorted = labels.map((l,i)=>({label:l, v:values[i], p: total?Math.round((values[i]/total)*10000)/100:0})).sort((a,b)=>b.v-a.v);
     const top = sorted.slice(0,3);
@@ -369,8 +413,8 @@
         showConnectionSuccess(`Cargados ${data.length} registros`);
       }
       
-      window.__RAW = data || [];
-      return window.__RAW;
+      currentData = data || [];
+      return currentData;
     } catch (error) {
       console.error("Error fetching data:", error);
       showConnectionError("No se pudieron cargar los datos: " + error.message);
@@ -465,14 +509,6 @@
         const index = LIKERT_CODES.indexOf(strVal);
         if (index !== -1) {
           values[index]++;
-        } else {
-          // Si no encuentra el código, buscar por texto
-          const lowerVal = strVal.toLowerCase();
-          if (lowerVal.includes('totalmente') && lowerVal.includes('desacuerdo')) values[0]++;
-          else if (lowerVal.includes('desacuerdo')) values[1]++;
-          else if (lowerVal.includes('indiferente')) values[2]++;
-          else if (lowerVal.includes('acuerdo') && !lowerVal.includes('totalmente')) values[3]++;
-          else if (lowerVal.includes('totalmente') && lowerVal.includes('acuerdo')) values[4]++;
         }
       });
       
@@ -484,27 +520,35 @@
       };
     }
     else if (indicator.type === 'categorical' && indicator.options) {
-      // Procesar respuestas categóricas con opciones definidas - SIN "Otros"
+      // Procesar respuestas categóricas con opciones definidas
       const values = {};
       Object.keys(indicator.options).forEach(key => {
         values[key] = 0;
       });
+      values['Otros'] = 0;
       
       arrRaw.forEach(v => {
         const strVal = String(v).trim().toUpperCase();
         if (values.hasOwnProperty(strVal)) {
           values[strVal]++;
+        } else {
+          values['Otros']++;
         }
-        // NO agregamos la categoría "Otros" - solo contamos las opciones definidas
       });
       
       const labels = Object.keys(indicator.options).map(key => indicator.options[key]);
       const valueCounts = Object.keys(indicator.options).map(key => values[key]);
       
+      // Agregar "Otros" si hay valores
+      if (values['Otros'] > 0) {
+        labels.push('Otros');
+        valueCounts.push(values['Otros']);
+      }
+      
       return { labels, values: valueCounts, isNumeric: false, numeric: [] };
     }
     else {
-      // Procesamiento genérico para datos categóricos sin opciones predefinidas
+      // Procesamiento genérico para datos categóricos
       const counts = {};
       arrRaw.forEach(v => {
         const key = normalize(v) || 'No especificado';
@@ -519,7 +563,12 @@
     }
   }
 
+  /***************************************************************************
+   * FUNCIÓN PRINCIPAL ACTUALIZADA - CORREGIDA
+   ***************************************************************************/
   function updateUIForIndicator(indKey, processed, filteredRows){
+    console.log("Updating UI for indicator:", indKey, processed);
+    
     const total = filteredRows.length;
     document.getElementById('cardTotal').textContent = total;
 
@@ -576,8 +625,7 @@
       const totalResponses = processed.values.reduce((a, b) => a + b, 0);
       const uniqueCategories = processed.labels.length;
       const maxValue = Math.max(...processed.values);
-      const maxIndex = processed.values.indexOf(maxValue);
-      const maxCategory = processed.labels[maxIndex];
+      const maxCategory = processed.labels[processed.values.indexOf(maxValue)];
 
       numericContainer.innerHTML = `
         <div class="text-lg font-semibold">${uniqueCategories}</div>
@@ -632,7 +680,9 @@
     distBody.appendChild(trTotal);
 
     setTimeout(()=> {
-      try{ if(window._distTable) window._distTable.destroy(); } catch(e){}
+      try{ 
+        if(window._distTable) window._distTable.destroy(); 
+      } catch(e){}
       window._distTable = new simpleDatatables.DataTable("#distTable", { 
         searchable: true, 
         perPage: 8,
@@ -650,6 +700,8 @@
     document.getElementById('chartSubtitle').textContent = `${total} encuestas (${totalCounts} respuestas válidas)`;
     
     const chartType = document.getElementById('selectChartType').value;
+    
+    // RENDERIZAR EL GRÁFICO CON LOS DATOS CORRECTOS
     renderChart(chartType, labels, values, indicator ? indicator.label : indKey);
   }
 
@@ -666,7 +718,7 @@
   }
 
   /***************************************************************************
-   * Main rendering flow - ACTUALIZACIÓN AUTOMÁTICA
+   * FUNCIÓN PRINCIPAL MEJORADA - ACTUALIZACIÓN EN TIEMPO REAL
    ***************************************************************************/
   async function refreshAll(){
     try {
@@ -693,9 +745,24 @@
     document.getElementById('cardTotal').textContent = data.length;
   }
 
-  // Función para actualizar automáticamente cuando cambia cualquier control
-  function updateDashboard() {
-    const all = window.__RAW || [];
+  /***************************************************************************
+   * EVENT LISTENERS MEJORADOS
+   ***************************************************************************/
+  function setupEventListeners() {
+    // Listener para cambios en controles
+    document.getElementById('selectIndicator').addEventListener('change', handleControlChange);
+    document.getElementById('selectChartType').addEventListener('change', handleControlChange);
+    document.getElementById('filterSexo').addEventListener('change', handleControlChange);
+    document.getElementById('filterGrupo').addEventListener('change', handleControlChange);
+
+    // Listeners para botones de exportación
+    document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+    document.getElementById('btnExportChart').addEventListener('click', exportChart);
+  }
+
+  function handleControlChange() {
+    console.log("Control changed, updating chart...");
+    const all = currentData || [];
     if (all.length === 0) return;
     
     const filtered = applyFilters(all);
@@ -704,23 +771,8 @@
     updateUIForIndicator(ind, processed, filtered);
   }
 
-  /***************************************************************************
-   * Event Listeners para actualización automática
-   ***************************************************************************/
-  document.addEventListener('DOMContentLoaded', function() {
-    // Listeners para todos los controles que deben actualizar el dashboard
-    document.getElementById('selectIndicator').addEventListener('change', updateDashboard);
-    document.getElementById('selectChartType').addEventListener('change', updateDashboard);
-    document.getElementById('filterSexo').addEventListener('change', updateDashboard);
-    document.getElementById('filterGrupo').addEventListener('change', updateDashboard);
-    
-    // Listeners para exportación
-    document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
-    document.getElementById('btnExportChart').addEventListener('click', exportChart);
-  });
-
   function exportCSV(){
-    const rows = window.__RAW || [];
+    const rows = currentData || [];
     if(!rows.length) return alert('No hay datos para exportar.');
     const cols = Object.keys(rows[0]);
     const csv = [cols.join(',')].concat(rows.map(r=> cols.map(c=>{
@@ -735,7 +787,7 @@
     a.click(); 
     URL.revokeObjectURL(url);
   }
-
+  
   function exportChart(){
     if(!chart) return alert('No hay gráfico para exportar.');
     const url = document.getElementById('mainChart').toDataURL('image/png',1);
@@ -746,51 +798,21 @@
   }
 
   /***************************************************************************
-   * INIT
+   * INIT MEJORADO
    ***************************************************************************/
   (async function init(){
     populateIndicators();
+    setupEventListeners();
     
     showConnectionSuccess("Conectando a Supabase...");
     
     try {
       await refreshAll();
-      
-      // Configurar actualizaciones en tiempo real
-      setupRealtime();
     } catch (error) {
       console.error("Error en inicialización:", error);
       showConnectionError("Error al inicializar la aplicación: " + error.message);
     }
   })();
-
-  /***************************************************************************
-   * Actualizaciones en tiempo real con Supabase
-   ***************************************************************************/
-  function setupRealtime() {
-    try {
-      const channel = supabase
-        .channel('table-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: TABLE
-          },
-          (payload) => {
-            console.log('Cambio detectado en la tabla:', payload);
-            showConnectionSuccess('Datos actualizados en tiempo real');
-            refreshAll();
-          }
-        )
-        .subscribe();
-
-      console.log('Suscripción a cambios en tiempo real configurada');
-    } catch (error) {
-      console.warn('No se pudo configurar la suscripción en tiempo real:', error);
-    }
-  }
 
   </script>
 
