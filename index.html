@@ -18,6 +18,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
 
+  <!-- Font Awesome para iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     body { 
       background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); 
@@ -177,6 +180,75 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .badge-max {
+      background: #10b981;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge-min {
+      background: #ef4444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    /* Estilos personalizados para Simple-DataTables */
+    .dataTable-wrapper {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .dataTable-container {
+      background: white;
+    }
+    .dataTable-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .dataTable-table th {
+      background: #f8fafc;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .dataTable-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .dataTable-table tr:hover {
+      background: #f8fafc;
+    }
+    .dataTable-input {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+    }
+    .dataTable-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .dataTable-pagination {
+      margin-top: 16px;
+    }
+    .dataTable-pagination li a {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 0 2px;
+    }
+    .dataTable-pagination li.active a {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -186,9 +258,7 @@
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="bg-white/20 p-2 rounded-xl">
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2l3 6 6 .5-4.5 4 1 6L12 17l-5.5 2.5 1-6L3 8.5 9 8 12 2z" />
-          </svg>
+          <i class="fas fa-leaf text-white text-2xl"></i>
         </div>
         <div>
           <h1 class="text-2xl font-bold">Dashboard Proambiental</h1>
@@ -269,15 +339,11 @@
         </div>
         <div class="flex gap-3">
           <button id="btnExportChart" class="btn-secondary flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+            <i class="fas fa-download text-sm"></i>
             Exportar gráfico
           </button>
           <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+            <i class="fas fa-file-csv text-sm"></i>
             Exportar CSV
           </button>
         </div>
@@ -321,7 +387,10 @@
 
         <!-- Distribución Detallada -->
         <div class="card p-4 mb-4">
-          <h4 class="font-semibold text-slate-700 mb-3">Distribución de Respuestas</h4>
+          <h4 class="font-semibold text-slate-700 mb-3">
+            <i class="fas fa-chart-bar text-emerald-600 mr-2"></i>
+            Distribución de Respuestas
+          </h4>
           <div id="distributionDetails" class="space-y-2">
             <!-- Las distribuciones se generarán aquí -->
           </div>
@@ -330,13 +399,19 @@
         <!-- Insights y Análisis -->
         <div class="grid md:grid-cols-2 gap-4">
           <div class="card p-4 insight-card">
-            <h4 class="font-semibold text-slate-700 mb-2">📊 Insights del Indicador</h4>
+            <h4 class="font-semibold text-slate-700 mb-2">
+              <i class="fas fa-lightbulb text-amber-500 mr-2"></i>
+              Insights del Indicador
+            </h4>
             <div id="insightsContent" class="text-sm text-slate-600 space-y-1">
               <!-- Los insights se generarán aquí -->
             </div>
           </div>
           <div class="card p-4">
-            <h4 class="font-semibold text-slate-700 mb-2">📈 Métricas Avanzadas</h4>
+            <h4 class="font-semibold text-slate-700 mb-2">
+              <i class="fas fa-calculator text-blue-500 mr-2"></i>
+              Métricas Avanzadas
+            </h4>
             <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
               <!-- Métricas avanzadas se generarán aquí -->
             </div>
@@ -345,9 +420,7 @@
       </div>
       
       <div id="noDataMsg" class="text-center py-8 muted hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <i class="fas fa-database text-slate-300 text-4xl mb-3"></i>
         <p class="text-lg font-medium text-slate-500">No hay datos para los filtros aplicados.</p>
         <p class="text-sm text-slate-400 mt-1">Intenta cambiar los filtros o seleccionar otro indicador.</p>
       </div>
@@ -361,16 +434,17 @@
           <p class="text-sm text-slate-500 mt-1">Visualiza todos los registros de la tabla. Usa el buscador, ordenación y paginación.</p>
         </div>
         <div class="text-sm bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
+          <i class="fas fa-sync-alt mr-1"></i>
           Datos en tiempo real
         </div>
       </div>
 
-      <div class="overflow-x-auto rounded-lg border border-slate-200">
+      <div class="overflow-x-auto rounded-lg">
         <table id="dataTable" class="w-full">
-          <thead class="bg-slate-50">
+          <thead>
             <tr id="tableHeaderRow"></tr>
           </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-200"></tbody>
+          <tbody id="tableBody"></tbody>
         </table>
       </div>
     </div>
@@ -590,16 +664,16 @@
         const isMin = value === stats.min.value;
         
         return `
-          <div class="flex items-center justify-between p-2 ${isMax ? 'bg-emerald-50 rounded' : ''}">
+          <div class="flex items-center justify-between p-2 ${isMax ? 'bg-emerald-50 rounded' : isMin ? 'bg-red-50 rounded' : ''}">
             <div class="flex items-center gap-3 flex-1">
-              <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : 'text-slate-700'} truncate max-w-[200px]">
+              <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : isMin ? 'text-red-700' : 'text-slate-700'} truncate max-w-[200px]">
                 ${label}
-                ${isMax ? ' 👑' : ''}
-                ${isMin ? ' 📉' : ''}
+                ${isMax ? '<span class="badge-max ml-2">MÁX</span>' : ''}
+                ${isMin ? '<span class="badge-min ml-2">MÍN</span>' : ''}
               </span>
             </div>
             <div class="flex items-center gap-3">
-              <span class="text-sm font-semibold ${isMax ? 'text-emerald-600' : 'text-slate-600'}">${value}</span>
+              <span class="text-sm font-semibold ${isMax ? 'text-emerald-600' : isMin ? 'text-red-600' : 'text-slate-600'}">${value}</span>
               <span class="text-xs text-slate-500 w-12 text-right">${percentage}%</span>
               <div class="progress-bar w-20">
                 <div class="progress-fill" style="width: ${percentage}%"></div>
@@ -614,6 +688,7 @@
       const insights = generateInsights(stats, labels, values, indicatorKey);
       insightsContainer.innerHTML = insights.map(insight => `
         <p class="flex items-start gap-2">
+          <i class="fas fa-chevron-right text-emerald-500 mt-1 text-xs"></i>
           <span>${insight}</span>
         </p>
       `).join('');
@@ -622,37 +697,37 @@
       const metricsContainer = document.getElementById('advancedMetrics');
       metricsContainer.innerHTML = `
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Desviación estándar:</span>
-            <span class="float-right">${stats.stdDev}</span>
+            <span>${stats.stdDev}</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Coef. variación:</span>
-            <span class="float-right">${stats.cv}%</span>
+            <span>${stats.cv}%</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Media:</span>
-            <span class="float-right">${stats.mean}</span>
+            <span>${stats.mean}</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Asimetría:</span>
-            <span class="float-right">${stats.skewness}</span>
+            <span>${stats.skewness}</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Q1 (25%):</span>
-            <span class="float-right">${stats.percentiles.q1}</span>
+            <span>${stats.percentiles.q1}</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Mediana:</span>
-            <span class="float-right">${stats.percentiles.median}</span>
+            <span>${stats.percentiles.median}</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Q3 (75%):</span>
-            <span class="float-right">${stats.percentiles.q3}</span>
+            <span>${stats.percentiles.q3}</span>
           </div>
-          <div>
+          <div class="flex justify-between">
             <span class="font-medium">Rango:</span>
-            <span class="float-right">${stats.max.value - stats.min.value}</span>
+            <span>${stats.max.value - stats.min.value}</span>
           </div>
         </div>
       `;
