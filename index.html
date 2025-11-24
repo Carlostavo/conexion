@@ -95,6 +95,7 @@
     .summary-card {
       text-align: center;
       padding: 1.5rem 1rem;
+      position: relative;
     }
     .summary-value {
       font-size: 1.75rem;
@@ -195,6 +196,12 @@
       border-radius: 4px;
       font-size: 0.7rem;
       font-weight: 600;
+    }
+    .summary-icon {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      opacity: 0.7;
     }
     /* Estilos personalizados para Simple-DataTables en español */
     .dataTable-wrapper {
@@ -380,23 +387,27 @@
       </div>
     </div>
 
-    <!-- RESUMEN -->
+    <!-- RESUMEN MEJORADO -->
     <div class="grid md:grid-cols-4 gap-5 mb-8">
       <div class="card summary-card">
+        <i class="fas fa-users summary-icon text-emerald-500"></i>
         <div class="summary-label">Total encuestas</div>
         <div id="totalSurveys" class="summary-value">—</div>
       </div>
       <div class="card summary-card">
+        <i class="fas fa-birthday-cake summary-icon text-blue-500"></i>
         <div class="summary-label">Promedio de edad</div>
         <div id="avgAge" class="summary-value">—</div>
       </div>
       <div class="card summary-card">
-        <div class="summary-label">Separa residuos</div>
-        <div id="pctSeparate" class="summary-value">—</div>
+        <i class="fas fa-recycle summary-icon text-green-500"></i>
+        <div class="summary-label">Conoce clasificación</div>
+        <div id="pctKnowsClassification" class="summary-value">—</div>
       </div>
       <div class="card summary-card">
-        <div class="summary-label">Participaría en talleres</div>
-        <div id="pctWorkshops" class="summary-value">—</div>
+        <i class="fas fa-clock summary-icon text-amber-500"></i>
+        <div class="summary-label">Dedica tiempo RR</div>
+        <div id="pctDedicaTiempo" class="summary-value">—</div>
       </div>
     </div>
 
@@ -1070,17 +1081,21 @@
 
     function updateSummaries(rows) {
       document.getElementById('totalSurveys').innerText = rows.length;
+      
+      // Promedio de edad
       const ages = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
       const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
       document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg} años`;
 
-      const separaArr = rows.map(r => normalize(r.practica_separacion_reciclaje_ingreso)).filter(Boolean);
-      const separaPos = separaArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
-      document.getElementById('pctSeparate').innerText = separaArr.length ? `${Math.round((separaPos/separaArr.length)*100)}%` : '—';
+      // Conoce clasificación de desechos
+      const conoceArr = rows.map(r => normalize(r.clasificacion_correcta_desechos)).filter(Boolean);
+      const conocePos = conoceArr.filter(s => /si|sí|de acuerdo|correcta/i.test(s)).length;
+      document.getElementById('pctKnowsClassification').innerText = conoceArr.length ? `${Math.round((conocePos/conoceArr.length)*100)}%` : '—';
 
-      const talleresArr = rows.map(r => normalize(r.participaria_talleres_buenas_practicas)).filter(Boolean);
-      const talleresPos = talleresArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
-      document.getElementById('pctWorkshops').innerText = talleresArr.length ? `${Math.round((talleresPos/talleresArr.length)*100)}%` : '—';
+      // Dedica tiempo a reducir/reutilizar/reciclar
+      const tiempoArr = rows.map(r => normalize(r.dedica_tiempo_reducir_reutilizar_reciclar)).filter(Boolean);
+      const tiempoPos = tiempoArr.filter(s => /si|sí|de acuerdo/i.test(s)).length;
+      document.getElementById('pctDedicaTiempo').innerText = tiempoArr.length ? `${Math.round((tiempoPos/tiempoArr.length)*100)}%` : '—';
     }
 
     /**************************************************************************
