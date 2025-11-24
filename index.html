@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Proambiental — Indicadores</title>
+  <title>Dashboard Proambiental — Análisis de Indicadores</title>
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -344,6 +344,43 @@
     .trend-negative {
       color: #ef4444;
     }
+    .table-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+    }
+    .search-box input {
+      padding-left: 40px;
+      width: 100%;
+    }
+    .export-btn {
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .export-btn:hover {
+      background: #f1f5f9;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -353,15 +390,16 @@
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="bg-white/20 p-2 rounded-xl">
-          <i class="fas fa-leaf text-white text-2xl"></i>
+          <i class="fas fa-chart-line text-white text-2xl"></i>
         </div>
         <div>
           <h1 class="text-2xl font-bold">Dashboard Proambiental</h1>
-          <p class="text-sm opacity-90 mt-1">Indicadores de comportamiento proambiental y autosustentabilidad</p>
+          <p class="text-sm opacity-90 mt-1">Análisis estadístico de comportamiento proambiental y autosustentabilidad</p>
         </div>
       </div>
       <div class="text-sm bg-white/10 px-3 py-2 rounded-lg">
-        Tabla: <span class="font-medium">cuestionario_comportamiento_proambiental_autosustentabilidad</span>
+        <i class="fas fa-database mr-2"></i>
+        Base de datos: cuestionario_comportamiento_proambiental
       </div>
     </div>
   </header>
@@ -369,39 +407,60 @@
   <!-- MAIN -->
   <main class="max-w-7xl mx-auto px-6 py-8">
     <!-- CONTROLES -->
-    <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <div class="grid md:grid-cols-4 gap-6 mb-8">
       <div class="card p-5 indicator-highlight">
-        <label class="block text-sm font-medium text-slate-700 mb-3">Indicador</label>
+        <label class="block text-sm font-medium text-slate-700 mb-3">
+          <i class="fas fa-chart-bar mr-2 text-emerald-600"></i>
+          Variable de Análisis
+        </label>
         <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
-        <p class="text-xs muted mt-3">Selecciona el indicador para visualizar.</p>
+        <p class="text-xs muted mt-3">Selecciona la variable categórica para análisis estadístico</p>
       </div>
 
       <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">Tipo de gráfico</label>
+        <label class="block text-sm font-medium text-slate-700 mb-3">
+          <i class="fas fa-chart-pie mr-2 text-blue-600"></i>
+          Método de Visualización
+        </label>
         <select id="selectChartType" class="w-full control">
-          <option value="bar">Barras</option>
-          <option value="pie">Pastel</option>
-          <option value="doughnut">Doughnut</option>
-          <option value="line">Línea</option>
-          <option value="radar">Radar</option>
-          <option value="polarArea">Polar Area</option>
+          <option value="bar">Gráfico de Barras</option>
+          <option value="pie">Gráfico Circular</option>
+          <option value="doughnut">Gráfico de Dona</option>
+          <option value="line">Gráfico de Líneas</option>
+          <option value="radar">Gráfico Radar</option>
+          <option value="polarArea">Gráfico Polar</option>
         </select>
-        <p class="text-xs muted mt-3">Cambia el tipo de visualización.</p>
+        <p class="text-xs muted mt-3">Selecciona el tipo de representación gráfica</p>
       </div>
 
       <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">Filtros rápidos</label>
+        <label class="block text-sm font-medium text-slate-700 mb-3">
+          <i class="fas fa-filter mr-2 text-purple-600"></i>
+          Filtros Demográficos
+        </label>
         <div class="flex flex-col gap-3">
           <select id="filterSexo" class="w-full control">
-            <option value="todos">Sexo: Todos</option>
+            <option value="todos">Género: Total de la muestra</option>
             <option value="masculino">Masculino</option>
             <option value="femenino">Femenino</option>
           </select>
           <select id="filterGrupo" class="w-full control">
-            <option value="todos">Grupo: Todos</option>
+            <option value="todos">Grupo: Todos los segmentos</option>
           </select>
         </div>
-        <p class="text-xs muted mt-3">Aplica filtros para segmentar los resultados.</p>
+        <p class="text-xs muted mt-3">Filtra por características demográficas específicas</p>
+      </div>
+
+      <div class="card p-5">
+        <label class="block text-sm font-medium text-slate-700 mb-3">
+          <i class="fas fa-calendar-alt mr-2 text-amber-600"></i>
+          Segmentación Temporal
+        </label>
+        <div class="flex flex-col gap-3">
+          <input type="date" id="filterFechaInicio" class="w-full control" placeholder="Fecha inicial">
+          <input type="date" id="filterFechaFin" class="w-full control" placeholder="Fecha final">
+        </div>
+        <p class="text-xs muted mt-3">Define el rango temporal del análisis</p>
       </div>
     </div>
 
@@ -410,37 +469,37 @@
       <div class="card summary-card">
         <div class="summary-label">
           <i class="fas fa-users text-emerald-600"></i>
-          Total encuestas
+          Tamaño Muestral
         </div>
         <div id="totalSurveys" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendSurveys">Carga completada</div>
+        <div class="summary-trend trend-positive" id="trendSurveys">Muestra representativa</div>
       </div>
       
       <div class="card summary-card">
         <div class="summary-label">
           <i class="fas fa-birthday-cake text-blue-600"></i>
-          Edad promedio
+          Edad Promedio
         </div>
         <div id="avgAge" class="summary-value">—</div>
-        <div class="summary-trend" id="trendAge">Años</div>
+        <div class="summary-trend" id="trendAge">Distribución etaria</div>
       </div>
       
       <div class="card summary-card">
         <div class="summary-label">
           <i class="fas fa-graduation-cap text-purple-600"></i>
-          Nivel educativo
+          Nivel Educativo
         </div>
         <div id="educationLevel" class="summary-value">—</div>
-        <div class="summary-trend" id="trendEducation">Más frecuente</div>
+        <div class="summary-trend" id="trendEducation">Perfil académico</div>
       </div>
       
       <div class="card summary-card">
         <div class="summary-label">
           <i class="fas fa-recycle text-amber-600"></i>
-          Conciencia ambiental
+          Conciencia Ambiental
         </div>
         <div id="environmentalAwareness" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendAwareness">Positiva</div>
+        <div class="summary-trend trend-positive" id="trendAwareness">Indicador compuesto</div>
       </div>
     </div>
 
@@ -448,17 +507,13 @@
     <div class="card p-6 mb-8">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
-          <h2 id="chartTitle" class="chart-title">Indicador</h2>
-          <p id="chartSubtitle" class="chart-subtitle mt-1">Selecciona un indicador para visualizar los datos.</p>
+          <h2 id="chartTitle" class="chart-title">Análisis de Variable</h2>
+          <p id="chartSubtitle" class="chart-subtitle mt-1">Selecciona una variable para iniciar el análisis estadístico</p>
         </div>
         <div class="flex gap-3">
           <button id="btnExportChart" class="btn-secondary flex items-center gap-2">
             <i class="fas fa-download text-sm"></i>
-            Exportar gráfico
-          </button>
-          <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
-            <i class="fas fa-file-csv text-sm"></i>
-            Exportar CSV
+            Exportar Visualización
           </button>
         </div>
       </div>
@@ -466,7 +521,7 @@
       <!-- Loading State -->
       <div id="chartLoading" class="hidden">
         <div class="loading-spinner mb-4"></div>
-        <p class="text-center text-slate-500">Cargando datos...</p>
+        <p class="text-center text-slate-500">Procesando datos estadísticos...</p>
       </div>
       
       <div class="chart-container">
@@ -477,33 +532,36 @@
       
       <!-- ESTADÍSTICAS DETALLADAS -->
       <div id="statisticsSection" class="mt-8 hidden">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Análisis Estadístico Detallado</h3>
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">
+          <i class="fas fa-chart-line mr-2 text-emerald-600"></i>
+          Análisis Estadístico Descriptivo
+        </h3>
         
         <!-- Estadísticas Principales -->
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div class="stat-item">
             <div class="stat-value" id="statTotal">—</div>
-            <div class="stat-label">Total de respuestas</div>
+            <div class="stat-label">Tamaño de Muestra</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statMode">—</div>
-            <div class="stat-label">Valor más frecuente</div>
+            <div class="stat-label">Moda Estadística</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statDiversity">—</div>
-            <div class="stat-label">Índice de diversidad</div>
+            <div class="stat-label">Índice de Diversidad</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statConcentration">—</div>
-            <div class="stat-label">Índice de concentración</div>
+            <div class="stat-label">Índice de Concentración</div>
           </div>
         </div>
 
         <!-- Distribución Detallada -->
         <div class="card p-4 mb-4">
           <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-chart-bar text-emerald-600 mr-2"></i>
-            Distribución de Respuestas
+            <i class="fas fa-table mr-2 text-emerald-600"></i>
+            Distribución de Frecuencias
           </h4>
           <div id="distributionDetails" class="space-y-2">
             <!-- Las distribuciones se generarán aquí -->
@@ -514,8 +572,8 @@
         <div class="grid md:grid-cols-2 gap-4">
           <div class="card p-4 insight-card">
             <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-lightbulb text-amber-500 mr-2"></i>
-              Insights del Indicador
+              <i class="fas fa-lightbulb mr-2 text-amber-500"></i>
+              Interpretación de Resultados
             </h4>
             <div id="insightsContent" class="text-sm text-slate-600 space-y-1">
               <!-- Los insights se generarán aquí -->
@@ -523,8 +581,8 @@
           </div>
           <div class="card p-4">
             <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-calculator text-blue-500 mr-2"></i>
-              Métricas Avanzadas
+              <i class="fas fa-calculator mr-2 text-blue-500"></i>
+              Métricas Estadísticas
             </h4>
             <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
               <!-- Métricas avanzadas se generarán aquí -->
@@ -535,8 +593,8 @@
       
       <div id="noDataMsg" class="text-center py-8 muted hidden">
         <i class="fas fa-database text-slate-300 text-4xl mb-3"></i>
-        <p class="text-lg font-medium text-slate-500">No hay datos para los filtros aplicados.</p>
-        <p class="text-sm text-slate-400 mt-1">Intenta cambiar los filtros o seleccionar otro indicador.</p>
+        <p class="text-lg font-medium text-slate-500">No se encontraron datos para los criterios seleccionados</p>
+        <p class="text-sm text-slate-400 mt-1">Ajusta los filtros o selecciona una variable diferente</p>
       </div>
     </div>
 
@@ -544,13 +602,28 @@
     <div class="card p-6 mb-8">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
-          <h3 class="text-xl font-semibold text-slate-800">Tabla de registros</h3>
-          <p class="text-sm text-slate-500 mt-1">Visualiza todos los registros de la tabla. Usa el buscador, ordenación y paginación.</p>
+          <h3 class="text-xl font-semibold text-slate-800">
+            <i class="fas fa-table mr-2 text-emerald-600"></i>
+            Base de Datos Completa
+          </h3>
+          <p class="text-sm text-slate-500 mt-1">Dataset completo para análisis detallado y exportación</p>
         </div>
         <div class="text-sm bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
           <i class="fas fa-sync-alt mr-1"></i>
-          Datos en tiempo real
+          Datos en Tiempo Real
         </div>
+      </div>
+
+      <!-- Barra de acciones de la tabla -->
+      <div class="table-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="tableSearch" class="control" placeholder="Buscar en todos los registros...">
+        </div>
+        <button id="btnExportCSV" class="export-btn flex items-center gap-2">
+          <i class="fas fa-file-export text-sm"></i>
+          Exportar Dataset (CSV)
+        </button>
       </div>
 
       <div class="dataTable-wrapper">
@@ -566,7 +639,7 @@
     </div>
 
     <footer class="text-center text-sm text-slate-500 mb-8 py-6 border-t border-slate-200">
-      <p>© 2025 Proyecto Proambiental — Desarrollado con Supabase & Chart.js</p>
+      <p>© 2025 Proyecto Proambiental — Plataforma de Análisis Estadístico con Supabase & Chart.js</p>
     </footer>
   </main>
 
@@ -580,21 +653,21 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     /**************************************************************************
-     * Indicadores solicitados (tu lista exacta)
+     * Indicadores con títulos mejorados
      **************************************************************************/
     const INDICATORS = [
-      { value: 'sexo', label: 'Sexo' },
-      { value: 'estado_civil', label: 'Estado civil' },
-      { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
-      { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
-      { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
-      { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
-      { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
-      { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
-      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
-      { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
-      { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
-      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
+      { value: 'sexo', label: 'Distribución por Género' },
+      { value: 'estado_civil', label: 'Estado Civil de los Encuestados' },
+      { value: 'educacion_jefe_hogar', label: 'Nivel Educativo del Jefe de Hogar' },
+      { value: 'situacion_laboral_jefe_hogar', label: 'Situación Laboral Principal' },
+      { value: 'ingreso_mensual_jefe_hogar', label: 'Distribución de Ingresos Mensuales' },
+      { value: 'conoce_desechos_solidos', label: 'Conocimiento sobre Desechos Sólidos' },
+      { value: 'clasificacion_correcta_desechos', label: 'Clasificación Correcta de Residuos' },
+      { value: 'separar_desechos_por_origen', label: 'Práctica de Separación de Desechos' },
+      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Tiempo Dedicado a Prácticas Ambientales' },
+      { value: 'desechos_hogar_reutilizados', label: 'Reutilización de Materiales en el Hogar' },
+      { value: 'participaria_talleres_buenas_practicas', label: 'Disposición para Capacitación Ambiental' },
+      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Percepción del Impacto Ambiental' }
     ];
 
     /**************************************************************************
@@ -616,7 +689,7 @@
     function countCategorical(arr) {
       const counts = {};
       arr.forEach(v => {
-        const k = normalize(v) || "No declarado";
+        const k = normalize(v) || "No especificado";
         counts[k] = (counts[k] || 0) + 1;
       });
       const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
@@ -785,36 +858,36 @@
       
       // Insight sobre concentración
       if (stats.concentration > 0.5) {
-        insights.push("• Alta concentración en una categoría dominante");
+        insights.push("• Distribución altamente concentrada en categorías específicas");
       } else if (stats.concentration < 0.2) {
-        insights.push("• Distribución equilibrada entre categorías");
+        insights.push("• Distribución equilibrada entre las diferentes categorías");
       } else {
         insights.push("• Distribución moderadamente concentrada");
       }
       
       // Insight sobre diversidad
       if (stats.diversity > 1.5) {
-        insights.push("• Alta diversidad de respuestas");
+        insights.push("• Alta diversidad en las respuestas de la muestra");
       } else if (stats.diversity < 0.5) {
-        insights.push("• Baja diversidad, respuestas concentradas");
+        insights.push("• Baja diversidad, respuestas concentradas en pocas categorías");
       }
       
       // Insight sobre moda
       if (stats.max.percentage > 60) {
-        insights.push(`• La categoría "${stats.max.label}" domina con el ${stats.max.percentage}%`);
+        insights.push(`• La categoría "${stats.max.label}" representa el ${stats.max.percentage}% de las respuestas`);
       }
       
       // Insight específico por tipo de indicador
       if (indicatorKey.includes('ingreso')) {
-        insights.push("• Indicador económico: analizar distribución de ingresos");
+        insights.push("• Variable económica: análisis de distribución de ingresos relevante para políticas sociales");
       }
       
       if (indicatorKey.includes('talleres') || indicatorKey.includes('participaria')) {
-        insights.push("• Indicador de disposición: alto potencial de participación");
+        insights.push("• Alta disposición para participación en programas de capacitación ambiental");
       }
       
       if (indicatorKey.includes('desechos') || indicatorKey.includes('reciclar')) {
-        insights.push("• Indicador ambiental: clave para políticas de sostenibilidad");
+        insights.push("• Indicador clave para el diseño de políticas de gestión de residuos sostenibles");
       }
       
       return insights;
@@ -823,7 +896,7 @@
     function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
       // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
-      document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
+      document.getElementById('statMode').textContent = `${stats.max.percentage}%`;
       document.getElementById('statDiversity').textContent = stats.diversity;
       document.getElementById('statConcentration').textContent = stats.concentration;
       
@@ -840,8 +913,8 @@
             <div class="flex items-center gap-3 flex-1">
               <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : isMin ? 'text-red-700' : 'text-slate-700'} truncate max-w-[200px]">
                 ${label}
-                ${isMax ? '<span class="badge-max ml-2">MÁX</span>' : ''}
-                ${isMin ? '<span class="badge-min ml-2">MÍN</span>' : ''}
+                ${isMax ? '<span class="badge-max ml-2">MODA</span>' : ''}
+                ${isMin ? '<span class="badge-min ml-2">MÍNIMO</span>' : ''}
               </span>
             </div>
             <div class="flex items-center gap-3">
@@ -870,15 +943,15 @@
       metricsContainer.innerHTML = `
         <div class="grid grid-cols-2 gap-2 text-xs">
           <div class="flex justify-between">
-            <span class="font-medium">Desviación estándar:</span>
+            <span class="font-medium">Desviación Estándar:</span>
             <span>${stats.stdDev}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Coef. variación:</span>
+            <span class="font-medium">Coef. Variación:</span>
             <span>${stats.cv}%</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Media:</span>
+            <span class="font-medium">Media Aritmética:</span>
             <span>${stats.mean}</span>
           </div>
           <div class="flex justify-between">
@@ -886,19 +959,19 @@
             <span>${stats.skewness}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Q1 (25%):</span>
+            <span class="font-medium">Primer Cuartil (Q1):</span>
             <span>${stats.percentiles.q1}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Mediana:</span>
+            <span class="font-medium">Mediana (Q2):</span>
             <span>${stats.percentiles.median}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Q3 (75%):</span>
+            <span class="font-medium">Tercer Cuartil (Q3):</span>
             <span>${stats.percentiles.q3}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Rango:</span>
+            <span class="font-medium">Rango Estadístico:</span>
             <span>${stats.max.value - stats.min.value}</span>
           </div>
         </div>
@@ -909,7 +982,7 @@
     }
 
     /**************************************************************************
-     * Chart handling
+     * Chart handling mejorado con exportación de porcentajes
      **************************************************************************/
     let chartInstance = null;
     function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
@@ -933,6 +1006,10 @@
       // default chart types
       const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
       const bg = palette.slice(0, labels.length);
+      
+      // Calcular porcentajes para tooltips
+      const total = values.reduce((a, b) => a + b, 0);
+      const percentages = values.map(value => ((value / total) * 100).toFixed(1) + '%');
       
       // Configuración común para todos los gráficos
       const commonOptions = {
@@ -968,9 +1045,8 @@
               label: function(context) {
                 const label = context.label || '';
                 const value = context.raw || 0;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: ${value} (${percentage}%)`;
+                const percentage = percentages[context.dataIndex];
+                return `${label}: ${value} casos (${percentage})`;
               }
             }
           }
@@ -984,10 +1060,18 @@
         chartOptions.scales = {
           y: { 
             beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' }
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            title: {
+              display: true,
+              text: 'Frecuencia Absoluta'
+            }
           },
           x: {
-            grid: { display: false }
+            grid: { display: false },
+            title: {
+              display: true,
+              text: 'Categorías'
+            }
           }
         };
       } else if (type === 'line') {
@@ -1050,7 +1134,7 @@
       headerRow.innerHTML = '';
       columns.forEach(c => {
         const th = document.createElement('th');
-        th.innerText = c;
+        th.innerText = c.charAt(0).toUpperCase() + c.slice(1).replace(/_/g, ' ');
         headerRow.appendChild(th);
       });
     }
@@ -1080,14 +1164,14 @@
           perPage: 10,
           perPageSelect: [5, 10, 15, 20],
           labels: {
-            placeholder: "Buscar en la tabla...",
-            searchTitle: "Buscar en la tabla",
+            placeholder: "Buscar en todos los campos...",
+            searchTitle: "Búsqueda en dataset",
             pageTitle: "Página {page}",
             perPage: "registros por página",
-            noRows: "No se encontraron registros",
-            noResults: "No hay resultados que coincidan con la búsqueda",
-            info: "Mostrando {start} a {end} de {rows} registros",
-            loading: "Cargando...",
+            noRows: "No se encontraron registros coincidentes",
+            noResults: "No hay resultados para la búsqueda realizada",
+            info: "Mostrando {start} a {end} de {rows} entradas",
+            loading: "Cargando base de datos...",
             infoFiltered: "(Filtrado de {rows} registros totales)"
           },
           classes: {
@@ -1108,6 +1192,14 @@
             wrapper: "dataTable-wrapper"
           }
         });
+
+        // Conectar el buscador personalizado
+        const searchInput = document.getElementById('tableSearch');
+        if (searchInput) {
+          searchInput.addEventListener('input', (e) => {
+            dataTable.search(e.target.value);
+          });
+        }
       }, 60);
     }
 
@@ -1118,11 +1210,25 @@
       // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
+      // Construir query con filtros de fecha
+      let query = supabase.from(TABLE).select("*");
+      
+      // Aplicar filtros de fecha si están presentes
+      const fechaInicio = document.getElementById('filterFechaInicio').value;
+      const fechaFin = document.getElementById('filterFechaFin').value;
+      
+      if (fechaInicio) {
+        query = query.gte('created_at', fechaInicio);
+      }
+      if (fechaFin) {
+        query = query.lte('created_at', fechaFin);
+      }
+      
       // fetch
-      const { data, error } = await supabase.from(TABLE).select("*");
+      const { data, error } = await query;
       if (error) { 
         console.error("Supabase error:", error); 
-        alert("Error cargando datos desde Supabase. Revisar consola."); 
+        alert("Error en la conexión con la base de datos. Verifique la consola para detalles."); 
         document.getElementById('chartLoading').classList.add('hidden');
         return; 
       }
@@ -1132,7 +1238,7 @@
       // populate group filter
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
-      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
+      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos los segmentos</option>';
       groups.forEach(g => { 
         const opt = document.createElement('option'); 
         opt.value = g; 
@@ -1256,7 +1362,7 @@
       
       // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
-      document.getElementById('chartSubtitle').innerText = `Tipo: ${chartType} — ${filtered.length} respuestas (filtros aplicados)`;
+      document.getElementById('chartSubtitle').innerText = `Método: ${chartType} • Muestra: ${filtered.length} casos válidos`;
       renderChart(chartType, labels, values, title);
       renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
@@ -1269,7 +1375,7 @@
      **************************************************************************/
     function exportTableCSV() {
       const data = window.__RAW_DATA || [];
-      if (!data.length) return alert("No hay datos para exportar.");
+      if (!data.length) return alert("No hay datos disponibles para exportar.");
       const cols = Object.keys(data[0]);
       const csvRows = [cols.join(",")];
       data.forEach(row => {
@@ -1288,20 +1394,47 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); 
       a.href = url; 
-      a.download = `tabla_${Date.now()}.csv`; 
+      a.download = `dataset_proambiental_${new Date().toISOString().split('T')[0]}.csv`; 
       a.click(); 
       URL.revokeObjectURL(url);
     }
 
     /**************************************************************************
-     * Export chart image
+     * Export chart image con porcentajes
      **************************************************************************/
     function exportChartImage() {
-      if (!chartInstance) return alert("No hay gráfico para exportar.");
-      const url = document.getElementById('mainChart').toDataURL('image/png', 1);
+      if (!chartInstance) return alert("No hay visualización disponible para exportar.");
+      
+      // Crear un canvas temporal para la exportación
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      const originalCanvas = document.getElementById('mainChart');
+      
+      // Configurar el tamaño del canvas temporal
+      tempCanvas.width = originalCanvas.width * 2;
+      tempCanvas.height = originalCanvas.height * 2;
+      tempCtx.scale(2, 2);
+      
+      // Fondo blanco
+      tempCtx.fillStyle = 'white';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      
+      // Copiar el gráfico original
+      tempCtx.drawImage(originalCanvas, 0, 0);
+      
+      // Agregar título y metadatos
+      tempCtx.font = '16px Arial';
+      tempCtx.fillStyle = '#333';
+      tempCtx.fillText(document.getElementById('chartTitle').textContent, 20, 30);
+      tempCtx.font = '12px Arial';
+      tempCtx.fillStyle = '#666';
+      tempCtx.fillText(`Exportado: ${new Date().toLocaleDateString()} | Muestra: ${window.__RAW_DATA?.length || 0} casos`, 20, 50);
+      
+      // Exportar la imagen
+      const url = tempCanvas.toDataURL('image/png', 1.0);
       const a = document.createElement('a'); 
       a.href = url; 
-      a.download = `grafico_${Date.now()}.png`; 
+      a.download = `analisis_${document.getElementById('chartTitle').textContent.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`; 
       a.click();
     }
 
@@ -1327,6 +1460,12 @@
     document.getElementById('selectChartType').addEventListener('change', autoRefreshChart);
     document.getElementById('filterSexo').addEventListener('change', autoRefreshChart);
     document.getElementById('filterGrupo').addEventListener('change', autoRefreshChart);
+    document.getElementById('filterFechaInicio').addEventListener('change', fetchAllAndRender);
+    document.getElementById('filterFechaFin').addEventListener('change', fetchAllAndRender);
+
+    // Set default dates for filters
+    document.getElementById('filterFechaInicio').value = '2024-01-01';
+    document.getElementById('filterFechaFin').value = new Date().toISOString().split('T')[0];
 
     // initial load
     (async function init(){
