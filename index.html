@@ -119,6 +119,41 @@
       background: linear-gradient(120deg, #d1fae5 0%, #a7f3d0 100%);
       border-left: 4px solid #10b981;
     }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .stat-item {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #10b981;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f766e;
+    }
+    .stat-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-top: 0.25rem;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, #10b981, #059669);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -202,7 +237,7 @@
       </div>
     </div>
 
-    <!-- GRAFICO -->
+    <!-- GRAFICO Y ESTADÍSTICAS -->
     <div class="card p-6 mb-8">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
@@ -230,6 +265,15 @@
           <canvas id="mainChart"></canvas>
         </div>
       </div>
+      
+      <!-- ESTADÍSTICAS DETALLADAS -->
+      <div id="statisticsSection" class="mt-8 hidden">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Estadísticas Detalladas</h3>
+        <div class="stats-grid" id="statsGrid">
+          <!-- Las estadísticas se generarán dinámicamente aquí -->
+        </div>
+      </div>
+      
       <div id="noDataMsg" class="text-center py-8 muted hidden">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -316,7 +360,11 @@
         counts[k] = (counts[k] || 0) + 1;
       });
       const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
-      return { labels: entries.map(e=>e[0]), values: entries.map(e=>e[1]) };
+      return { 
+        labels: entries.map(e=>e[0]), 
+        values: entries.map(e=>e[1]),
+        counts: counts
+      };
     }
 
     function countLikert(arr) {
@@ -334,7 +382,134 @@
           }
         }
       });
-      return { labels: LIKERT_LEVELS.slice(), values: counts };
+      const countsObj = {};
+      LIKERT_LEVELS.forEach((level, i) => {
+        countsObj[level] = counts[i];
+      });
+      return { 
+        labels: LIKERT_LEVELS.slice(), 
+        values: counts,
+        counts: countsObj
+      };
+    }
+
+    /**************************************************************************
+     * Funciones estadísticas
+     **************************************************************************/
+    function calculateStatistics(values, labels, total) {
+      if (!values.length || !total) return null;
+      
+      const maxValue = Math.max(...values);
+      const maxIndex = values.indexOf(maxValue);
+      const maxLabel = labels[maxIndex];
+      const maxPercentage = ((maxValue / total) * 100).toFixed(1);
+      
+      const minValue = Math.min(...values.filter(v => v > 0));
+      const minIndex = values.indexOf(minValue);
+      const minLabel = labels[minIndex];
+      const minPercentage = ((minValue / total) * 100).toFixed(1);
+      
+      // Calcular diversidad (índice de Shannon)
+      let diversity = 0;
+      values.forEach(value => {
+        if (value > 0) {
+          const p = value / total;
+          diversity -= p * Math.log(p);
+        }
+      });
+      diversity = diversity.toFixed(3);
+      
+      // Calcular moda (valor más frecuente)
+      const modeValue = maxValue;
+      const modeLabel = maxLabel;
+      
+      return {
+        total: total,
+        max: { value: maxValue, label: maxLabel, percentage: maxPercentage },
+        min: { value: minValue, label: minLabel, percentage: minPercentage },
+        diversity: diversity,
+        mode: { value: modeValue, label: modeLabel }
+      };
+    }
+
+    function renderStatistics(stats, counts, labels, values) {
+      const statsGrid = document.getElementById('statsGrid');
+      const statsSection = document.getElementById('statisticsSection');
+      
+      if (!stats) {
+        statsSection.classList.add('hidden');
+        return;
+      }
+      
+      statsGrid.innerHTML = '';
+      
+      // Estadística: Total de respuestas
+      const totalStat = document.createElement('div');
+      totalStat.className = 'stat-item';
+      totalStat.innerHTML = `
+        <div class="stat-value">${stats.total}</div>
+        <div class="stat-label">Total de respuestas</div>
+      `;
+      statsGrid.appendChild(totalStat);
+      
+      // Estadística: Valor más frecuente
+      const modeStat = document.createElement('div');
+      modeStat.className = 'stat-item';
+      modeStat.innerHTML = `
+        <div class="stat-value">${stats.mode.percentage}%</div>
+        <div class="stat-label">Más frecuente: ${stats.mode.label}</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${stats.mode.percentage}%"></div>
+        </div>
+      `;
+      statsGrid.appendChild(modeStat);
+      
+      // Estadística: Valor menos frecuente
+      const minStat = document.createElement('div');
+      minStat.className = 'stat-item';
+      minStat.innerHTML = `
+        <div class="stat-value">${stats.min.percentage}%</div>
+        <div class="stat-label">Menos frecuente: ${stats.min.label}</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${stats.min.percentage}%"></div>
+        </div>
+      `;
+      statsGrid.appendChild(minStat);
+      
+      // Estadística: Diversidad
+      const diversityStat = document.createElement('div');
+      diversityStat.className = 'stat-item';
+      diversityStat.innerHTML = `
+        <div class="stat-value">${stats.diversity}</div>
+        <div class="stat-label">Índice de diversidad</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${(stats.diversity / Math.log(labels.length)) * 100}%"></div>
+        </div>
+      `;
+      statsGrid.appendChild(diversityStat);
+      
+      // Distribución detallada
+      const distributionStat = document.createElement('div');
+      distributionStat.className = 'stat-item col-span-2';
+      distributionStat.innerHTML = `
+        <div class="stat-value">Distribución</div>
+        <div class="stat-label mt-2 space-y-2">
+          ${labels.map((label, index) => `
+            <div class="flex justify-between items-center">
+              <span class="text-sm truncate max-w-[120px]">${label}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium">${values[index]} (${((values[index] / stats.total) * 100).toFixed(1)}%)</span>
+                <div class="progress-bar w-20">
+                  <div class="progress-fill" style="width: ${((values[index] / stats.total) * 100)}%"></div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      statsGrid.appendChild(distributionStat);
+      
+      statsSection.classList.remove('hidden');
     }
 
     /**************************************************************************
@@ -392,7 +567,16 @@
             titleFont: { size: 12 },
             bodyFont: { size: 12 },
             padding: 10,
-            cornerRadius: 6
+            cornerRadius: 6,
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} (${percentage}%)`;
+              }
+            }
           }
         }
       };
@@ -601,7 +785,7 @@
       const title = indObj ? indObj.label : indicatorKey;
 
       // prepare labels/values
-      let labels = [], values = [];
+      let labels = [], values = [], counts = {};
       
       // Get the data for the selected indicator
       const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
@@ -609,6 +793,7 @@
       // if arr empty -> show no data
       if (!arr.length) {
         document.getElementById('noDataMsg').classList.remove('hidden');
+        document.getElementById('statisticsSection').classList.add('hidden');
         destroyChart();
         return;
       } else {
@@ -624,16 +809,24 @@
         const res = countLikert(arr);
         labels = res.labels; 
         values = res.values;
+        counts = res.counts;
       } else {
         // categorical
         const res = countCategorical(arr);
         labels = res.labels; 
         values = res.values;
+        counts = res.counts;
       }
 
+      // Calcular estadísticas
+      const total = values.reduce((sum, val) => sum + val, 0);
+      const stats = calculateStatistics(values, labels, total);
+      
+      // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
       document.getElementById('chartSubtitle').innerText = `Tipo: ${chartType} — ${filtered.length} respuestas (filtros aplicados)`;
       renderChart(chartType, labels, values, title);
+      renderStatistics(stats, counts, labels, values);
     }
 
     /**************************************************************************
