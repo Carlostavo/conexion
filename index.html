@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Proambiental — Indicadores</title>
+  <title>Dashboard Proambiental — Análisis de Indicadores</title>
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,171 +23,151 @@
 
   <style>
     body { 
-      background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); 
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); 
       font-family: 'Segoe UI', system-ui, sans-serif;
     }
     .card { 
       background: white; 
-      border-radius: 12px; 
-      box-shadow: 0 4px 12px rgba(15,23,42,0.08); 
-      border: 1px solid #f1f5f9;
-      transition: all 0.3s ease;
-    }
-    .card:hover {
-      box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+      border-radius: 8px; 
+      box-shadow: 0 2px 8px rgba(15,23,42,0.06); 
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
     }
     .muted { color: #64748b; }
     .accent { color: #065f46; }
     .control { 
-      border: 1px solid #e2e8f0; 
-      padding: 0.6rem 0.75rem; 
-      border-radius: 8px; 
+      border: 1px solid #cbd5e1; 
+      padding: 0.5rem 0.75rem; 
+      border-radius: 6px; 
       background: white;
       transition: all 0.2s ease;
+      font-size: 0.875rem;
     }
     .control:focus {
       outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      border-color: #059669;
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1);
     }
     /* responsive chart container */
     .chart-container {
-      max-height: 520px;
+      max-height: 500px;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 10px;
+      padding: 20px;
     }
     .chart-wrapper {
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       margin: 0 auto;
       position: relative;
     }
     .btn-primary {
-      background: linear-gradient(to right, #10b981, #059669);
+      background: #059669;
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
       font-weight: 500;
-      transition: all 0.3s ease;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
     }
     .btn-primary:hover {
-      background: linear-gradient(to right, #059669, #047857);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      background: #047857;
     }
     .btn-secondary {
-      background: #f8fafc;
+      background: #f1f5f9;
       color: #475569;
-      border: 1px solid #e2e8f0;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
       font-weight: 500;
-      transition: all 0.3s ease;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
     }
     .btn-secondary:hover {
-      background: #f1f5f9;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+      background: #e2e8f0;
     }
     .summary-card {
       text-align: center;
-      padding: 1.5rem 1rem;
+      padding: 1.25rem 0.75rem;
       position: relative;
-      overflow: hidden;
-    }
-    .summary-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(to right, #10b981, #059669);
     }
     .summary-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-top: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 0.25rem;
       color: #0f766e;
     }
     .summary-label {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       color: #64748b;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.375rem;
     }
     .chart-title {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
       font-weight: 600;
-      color: #0f172a;
+      color: #1e293b;
     }
     .chart-subtitle {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       color: #64748b;
     }
     .header-gradient {
-      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
     }
     .indicator-highlight {
-      background: linear-gradient(120deg, #d1fae5 0%, #a7f3d0 100%);
-      border-left: 4px solid #10b981;
+      background: #f0fdf4;
+      border-left: 3px solid #059669;
     }
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.25rem;
     }
     .stat-item {
       background: #f8fafc;
-      padding: 1rem;
-      border-radius: 8px;
-      border-left: 4px solid #10b981;
+      padding: 0.875rem;
+      border-radius: 6px;
+      border-left: 3px solid #059669;
     }
     .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.25rem;
+      font-weight: 600;
       color: #0f766e;
     }
     .stat-label {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       color: #64748b;
-      margin-top: 0.25rem;
+      margin-top: 0.125rem;
     }
     .progress-bar {
-      height: 6px;
+      height: 4px;
       background: #e2e8f0;
-      border-radius: 3px;
+      border-radius: 2px;
       overflow: hidden;
-      margin-top: 0.5rem;
+      margin-top: 0.375rem;
     }
     .progress-fill {
       height: 100%;
-      background: linear-gradient(to right, #10b981, #059669);
-      border-radius: 3px;
+      background: #059669;
+      border-radius: 2px;
       transition: width 0.5s ease;
     }
-    .trend-up {
-      color: #10b981;
-    }
-    .trend-down {
-      color: #ef4444;
-    }
     .insight-card {
-      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      background: #f0fdf4;
       border: 1px solid #bbf7d0;
     }
     .loading-spinner {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #10b981;
+      border: 2px solid #f1f5f9;
+      border-top: 2px solid #059669;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       animation: spin 1s linear infinite;
       margin: 0 auto;
     }
@@ -196,31 +176,31 @@
       100% { transform: rotate(360deg); }
     }
     .badge-max {
-      background: #10b981;
+      background: #059669;
       color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.625rem;
       font-weight: 600;
     }
     .badge-min {
-      background: #ef4444;
+      background: #dc2626;
       color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.625rem;
       font-weight: 600;
     }
     /* Estilos personalizados para Simple-DataTables en español */
     .dataTable-wrapper {
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
       background: white;
     }
     .dataTable-container {
       background: white;
-      max-height: 600px;
+      max-height: 500px;
       overflow: auto;
     }
     .dataTable-table {
@@ -230,7 +210,7 @@
     }
     .dataTable-table th {
       background: #f8fafc;
-      padding: 12px 16px;
+      padding: 10px 12px;
       text-align: left;
       font-weight: 600;
       color: #374151;
@@ -238,41 +218,43 @@
       position: sticky;
       top: 0;
       z-index: 10;
+      font-size: 0.75rem;
     }
     .dataTable-table td {
-      padding: 12px 16px;
+      padding: 10px 12px;
       border-bottom: 1px solid #f1f5f9;
       white-space: nowrap;
+      font-size: 0.75rem;
     }
     .dataTable-table tr:hover {
       background: #f8fafc;
     }
     /* Estilos para la barra de búsqueda */
     .dataTable-input {
-      border: 1px solid #d1d5db;
+      border: 1px solid #cbd5e1;
       border-radius: 6px;
-      padding: 8px 12px;
-      margin: 16px;
-      width: calc(100% - 32px);
-      font-size: 14px;
+      padding: 6px 10px;
+      margin: 12px;
+      width: calc(100% - 24px);
+      font-size: 0.75rem;
     }
     .dataTable-input:focus {
       outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+      border-color: #059669;
+      box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.1);
     }
     /* Estilos para la paginación */
     .dataTable-pagination {
-      margin: 16px;
+      margin: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
     .dataTable-pagination-list {
       display: flex;
-      gap: 4px;
+      gap: 3px;
       list-style: none;
       margin: 0;
       padding: 0;
@@ -281,20 +263,20 @@
       margin: 0;
     }
     .dataTable-pagination-list li a {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 6px 10px;
       text-decoration: none;
       color: #374151;
-      font-size: 14px;
+      font-size: 0.75rem;
       transition: all 0.2s ease;
     }
     .dataTable-pagination-list li a:hover {
       background: #f3f4f6;
     }
     .dataTable-pagination-list li.active a {
-      background: #10b981;
-      border-color: #10b981;
+      background: #059669;
+      border-color: #059669;
       color: white;
     }
     .dataTable-pagination-list li.disabled a {
@@ -308,118 +290,124 @@
     .dataTable-info {
       margin: 0;
       color: #6b7280;
-      font-size: 14px;
+      font-size: 0.75rem;
     }
     /* Selector de registros por página */
     .dataTable-selector {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 6px 8px;
-      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 0.75rem;
       background: white;
     }
     /* Scrollbar personalizado */
     .dataTable-container::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
     }
     .dataTable-container::-webkit-scrollbar-track {
       background: #f1f5f9;
-      border-radius: 4px;
+      border-radius: 3px;
     }
     .dataTable-container::-webkit-scrollbar-thumb {
       background: #cbd5e1;
-      border-radius: 4px;
+      border-radius: 3px;
     }
     .dataTable-container::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
     .summary-trend {
-      font-size: 0.75rem;
-      margin-top: 0.25rem;
+      font-size: 0.625rem;
+      margin-top: 0.125rem;
     }
     .trend-positive {
-      color: #10b981;
+      color: #059669;
     }
     .trend-negative {
-      color: #ef4444;
+      color: #dc2626;
+    }
+    .export-section {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
+      margin-top: 1rem;
     }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
 
   <!-- HEADER -->
-  <header class="header-gradient text-white shadow-lg">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="bg-white/20 p-2 rounded-xl">
-          <i class="fas fa-leaf text-white text-2xl"></i>
+  <header class="header-gradient text-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-white/10 p-1.5 rounded-lg">
+            <i class="fas fa-chart-line text-white text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-semibold">Dashboard de Análisis Proambiental</h1>
+            <p class="text-xs opacity-90 mt-0.5">Sistema de visualización de indicadores de sostenibilidad</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-2xl font-bold">Dashboard Proambiental</h1>
-          <p class="text-sm opacity-90 mt-1">Indicadores de comportamiento proambiental y autosustentabilidad</p>
+        <div class="text-xs bg-white/10 px-2 py-1 rounded">
+          Fuente: <span class="font-medium">Encuesta de Comportamiento Proambiental</span>
         </div>
-      </div>
-      <div class="text-sm bg-white/10 px-3 py-2 rounded-lg">
-        Tabla: <span class="font-medium">cuestionario_comportamiento_proambiental_autosustentabilidad</span>
       </div>
     </div>
   </header>
 
   <!-- MAIN -->
-  <main class="max-w-7xl mx-auto px-6 py-8">
+  <main class="max-w-7xl mx-auto px-6 py-6">
     <!-- CONTROLES -->
-    <div class="grid md:grid-cols-3 gap-6 mb-8">
-      <div class="card p-5 indicator-highlight">
-        <label class="block text-sm font-medium text-slate-700 mb-3">Indicador</label>
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
+      <div class="card p-4 indicator-highlight">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Variable de Análisis</label>
         <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
-        <p class="text-xs muted mt-3">Selecciona el indicador para visualizar.</p>
+        <p class="text-xs muted mt-2">Seleccione la variable para el análisis estadístico</p>
       </div>
 
-      <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">Tipo de gráfico</label>
+      <div class="card p-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Método de Visualización</label>
         <select id="selectChartType" class="w-full control">
-          <option value="bar">Barras</option>
-          <option value="pie">Pastel</option>
-          <option value="doughnut">Doughnut</option>
-          <option value="line">Línea</option>
-          <option value="radar">Radar</option>
-          <option value="polarArea">Polar Area</option>
+          <option value="bar">Gráfico de Barras</option>
+          <option value="pie">Gráfico Circular</option>
+          <option value="doughnut">Gráfico de Anillo</option>
+          <option value="line">Gráfico de Líneas</option>
+          <option value="radar">Gráfico Radar</option>
         </select>
-        <p class="text-xs muted mt-3">Cambia el tipo de visualización.</p>
+        <p class="text-xs muted mt-2">Seleccione el tipo de representación gráfica</p>
       </div>
 
-      <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">Filtros rápidos</label>
-        <div class="flex flex-col gap-3">
+      <div class="card p-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Segmentación de Datos</label>
+        <div class="flex flex-col gap-2">
           <select id="filterSexo" class="w-full control">
-            <option value="todos">Sexo: Todos</option>
+            <option value="todos">Sexo: Total</option>
             <option value="masculino">Masculino</option>
             <option value="femenino">Femenino</option>
           </select>
           <select id="filterGrupo" class="w-full control">
-            <option value="todos">Grupo: Todos</option>
+            <option value="todos">Grupo: Total</option>
           </select>
         </div>
-        <p class="text-xs muted mt-3">Aplica filtros para segmentar los resultados.</p>
+        <p class="text-xs muted mt-2">Aplique filtros para análisis segmentado</p>
       </div>
     </div>
 
-    <!-- RESUMEN MEJORADO -->
-    <div class="grid md:grid-cols-4 gap-5 mb-8">
+    <!-- RESUMEN ESTADÍSTICO -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
       <div class="card summary-card">
         <div class="summary-label">
-          <i class="fas fa-users text-emerald-600"></i>
-          Total encuestas
+          <i class="fas fa-database text-slate-500"></i>
+          Muestra Total
         </div>
         <div id="totalSurveys" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendSurveys">Carga completada</div>
+        <div class="summary-trend trend-positive" id="trendSurveys">Registros válidos</div>
       </div>
       
       <div class="card summary-card">
         <div class="summary-label">
-          <i class="fas fa-birthday-cake text-blue-600"></i>
-          Edad promedio
+          <i class="fas fa-user-friends text-slate-500"></i>
+          Edad Promedio
         </div>
         <div id="avgAge" class="summary-value">—</div>
         <div class="summary-trend" id="trendAge">Años</div>
@@ -427,46 +415,36 @@
       
       <div class="card summary-card">
         <div class="summary-label">
-          <i class="fas fa-graduation-cap text-purple-600"></i>
-          Nivel educativo
+          <i class="fas fa-graduation-cap text-slate-500"></i>
+          Nivel Educativo
         </div>
         <div id="educationLevel" class="summary-value">—</div>
-        <div class="summary-trend" id="trendEducation">Más frecuente</div>
+        <div class="summary-trend" id="trendEducation">Moda estadística</div>
       </div>
       
       <div class="card summary-card">
         <div class="summary-label">
-          <i class="fas fa-recycle text-amber-600"></i>
-          Conciencia ambiental
+          <i class="fas fa-seedling text-slate-500"></i>
+          Conciencia Ambiental
         </div>
         <div id="environmentalAwareness" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendAwareness">Positiva</div>
+        <div class="summary-trend trend-positive" id="trendAwareness">Indicador compuesto</div>
       </div>
     </div>
 
-    <!-- GRAFICO Y ESTADÍSTICAS -->
-    <div class="card p-6 mb-8">
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+    <!-- ANÁLISIS GRÁFICO -->
+    <div class="card p-5 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
         <div>
-          <h2 id="chartTitle" class="chart-title">Indicador</h2>
-          <p id="chartSubtitle" class="chart-subtitle mt-1">Selecciona un indicador para visualizar los datos.</p>
-        </div>
-        <div class="flex gap-3">
-          <button id="btnExportChart" class="btn-secondary flex items-center gap-2">
-            <i class="fas fa-download text-sm"></i>
-            Exportar gráfico
-          </button>
-          <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
-            <i class="fas fa-file-csv text-sm"></i>
-            Exportar CSV
-          </button>
+          <h2 id="chartTitle" class="chart-title">Distribución de Variable</h2>
+          <p id="chartSubtitle" class="chart-subtitle mt-0.5">Visualización de la distribución estadística</p>
         </div>
       </div>
       
       <!-- Loading State -->
       <div id="chartLoading" class="hidden">
-        <div class="loading-spinner mb-4"></div>
-        <p class="text-center text-slate-500">Cargando datos...</p>
+        <div class="loading-spinner mb-3"></div>
+        <p class="text-center text-slate-500">Procesando datos...</p>
       </div>
       
       <div class="chart-container">
@@ -476,84 +454,99 @@
       </div>
       
       <!-- ESTADÍSTICAS DETALLADAS -->
-      <div id="statisticsSection" class="mt-8 hidden">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Análisis Estadístico Detallado</h3>
+      <div id="statisticsSection" class="mt-6 hidden">
+        <h3 class="text-base font-semibold text-slate-800 mb-3">Análisis Estadístico Descriptivo</h3>
         
         <!-- Estadísticas Principales -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           <div class="stat-item">
             <div class="stat-value" id="statTotal">—</div>
-            <div class="stat-label">Total de respuestas</div>
+            <div class="stat-label">Tamaño de Muestra</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statMode">—</div>
-            <div class="stat-label">Valor más frecuente</div>
+            <div class="stat-label">Valor Modal</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statDiversity">—</div>
-            <div class="stat-label">Índice de diversidad</div>
+            <div class="stat-label">Índice de Diversidad</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statConcentration">—</div>
-            <div class="stat-label">Índice de concentración</div>
+            <div class="stat-label">Índice de Concentración</div>
           </div>
         </div>
 
         <!-- Distribución Detallada -->
-        <div class="card p-4 mb-4">
-          <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-chart-bar text-emerald-600 mr-2"></i>
-            Distribución de Respuestas
+        <div class="card p-3 mb-3">
+          <h4 class="font-semibold text-slate-700 mb-2 text-sm">
+            <i class="fas fa-chart-bar text-slate-500 mr-1"></i>
+            Distribución de Frecuencias
           </h4>
-          <div id="distributionDetails" class="space-y-2">
+          <div id="distributionDetails" class="space-y-1">
             <!-- Las distribuciones se generarán aquí -->
           </div>
         </div>
 
         <!-- Insights y Análisis -->
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="card p-4 insight-card">
-            <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-lightbulb text-amber-500 mr-2"></i>
-              Insights del Indicador
+        <div class="grid md:grid-cols-2 gap-3">
+          <div class="card p-3 insight-card">
+            <h4 class="font-semibold text-slate-700 mb-1 text-sm">
+              <i class="fas fa-chart-line text-slate-500 mr-1"></i>
+              Interpretación de Resultados
             </h4>
-            <div id="insightsContent" class="text-sm text-slate-600 space-y-1">
+            <div id="insightsContent" class="text-xs text-slate-600 space-y-0.5">
               <!-- Los insights se generarán aquí -->
             </div>
           </div>
-          <div class="card p-4">
-            <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-calculator text-blue-500 mr-2"></i>
-              Métricas Avanzadas
+          <div class="card p-3">
+            <h4 class="font-semibold text-slate-700 mb-1 text-sm">
+              <i class="fas fa-calculator text-slate-500 mr-1"></i>
+              Métricas Estadísticas
             </h4>
-            <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
+            <div id="advancedMetrics" class="text-xs text-slate-600 space-y-1">
               <!-- Métricas avanzadas se generarán aquí -->
             </div>
           </div>
         </div>
       </div>
       
-      <div id="noDataMsg" class="text-center py-8 muted hidden">
-        <i class="fas fa-database text-slate-300 text-4xl mb-3"></i>
-        <p class="text-lg font-medium text-slate-500">No hay datos para los filtros aplicados.</p>
-        <p class="text-sm text-slate-400 mt-1">Intenta cambiar los filtros o seleccionar otro indicador.</p>
+      <!-- SECCIÓN DE EXPORTACIÓN -->
+      <div class="export-section">
+        <div class="flex justify-between items-center">
+          <div class="text-sm text-slate-600">
+            <i class="fas fa-download mr-1"></i>
+            Exportar resultados
+          </div>
+          <button id="btnExportCSV" class="btn-primary flex items-center gap-1 text-xs">
+            <i class="fas fa-file-export"></i>
+            Descargar Dataset
+          </button>
+        </div>
+      </div>
+      
+      <div id="noDataMsg" class="text-center py-6 muted hidden">
+        <i class="fas fa-chart-pie text-slate-300 text-3xl mb-2"></i>
+        <p class="text-base font-medium text-slate-500">No hay datos disponibles</p>
+        <p class="text-xs text-slate-400 mt-0.5">Modifique los criterios de segmentación</p>
       </div>
     </div>
 
-    <!-- TABLA MEJORADA -->
-    <div class="card p-6 mb-8">
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+    <!-- BASE DE DATOS COMPLETA -->
+    <div class="card p-5 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
         <div>
-          <h3 class="text-xl font-semibold text-slate-800">Tabla de registros</h3>
-          <p class="text-sm text-slate-500 mt-1">Visualiza todos los registros de la tabla. Usa el buscador, ordenación y paginación.</p>
+          <h3 class="text-lg font-semibold text-slate-800">Base de Datos Completa</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Dataset completo para análisis detallado</p>
         </div>
-        <div class="text-sm bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
-          <i class="fas fa-sync-alt mr-1"></i>
-          Datos en tiempo real
+        <div class="text-xs bg-slate-50 text-slate-600 px-2 py-1 rounded font-medium">
+          <i class="fas fa-table mr-1"></i>
+          Navegación avanzada
         </div>
       </div>
 
       <div class="dataTable-wrapper">
+        <!-- El buscador se genera automáticamente por Simple-DataTables -->
         <div class="dataTable-container">
           <table id="dataTable" class="dataTable-table">
             <thead>
@@ -565,14 +558,14 @@
       </div>
     </div>
 
-    <footer class="text-center text-sm text-slate-500 mb-8 py-6 border-t border-slate-200">
-      <p>© 2025 Proyecto Proambiental — Desarrollado con Supabase & Chart.js</p>
+    <footer class="text-center text-xs text-slate-400 py-4 border-t border-slate-200">
+      <p>Sistema de Análisis Proambiental — Desarrollado para investigación académica</p>
     </footer>
   </main>
 
   <script>
     /**************************************************************************
-     * Supabase config (usa las credenciales que me diste)
+     * Supabase config
      **************************************************************************/
     const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
@@ -580,25 +573,25 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     /**************************************************************************
-     * Indicadores solicitados (tu lista exacta)
+     * Indicadores académicos
      **************************************************************************/
     const INDICATORS = [
-      { value: 'sexo', label: 'Sexo' },
-      { value: 'estado_civil', label: 'Estado civil' },
-      { value: 'educacion_jefe_hogar', label: 'Educación del jefe del hogar' },
-      { value: 'situacion_laboral_jefe_hogar', label: 'Situación laboral' },
-      { value: 'ingreso_mensual_jefe_hogar', label: 'Ingreso mensual' },
-      { value: 'conoce_desechos_solidos', label: 'Conoce desechos sólidos' },
-      { value: 'clasificacion_correcta_desechos', label: 'Clasificación correcta' },
-      { value: 'separar_desechos_por_origen', label: 'Separa desechos' },
-      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Dedica tiempo a reducir/reutilizar/reciclar' },
-      { value: 'desechos_hogar_reutilizados', label: 'Desechos reutilizados en hogar' },
-      { value: 'participaria_talleres_buenas_practicas', label: 'Participaría en talleres' },
-      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Impacto del manejo adecuado' }
+      { value: 'sexo', label: 'Distribución por Sexo' },
+      { value: 'estado_civil', label: 'Estado Civil' },
+      { value: 'educacion_jefe_hogar', label: 'Nivel Educativo del Hogar' },
+      { value: 'situacion_laboral_jefe_hogar', label: 'Situación Laboral' },
+      { value: 'ingreso_mensual_jefe_hogar', label: 'Nivel de Ingresos' },
+      { value: 'conoce_desechos_solidos', label: 'Conocimiento de Residuos Sólidos' },
+      { value: 'clasificacion_correcta_desechos', label: 'Clasificación de Residuos' },
+      { value: 'separar_desechos_por_origen', label: 'Práctica de Separación' },
+      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Tiempo en Prácticas Sostenibles' },
+      { value: 'desechos_hogar_reutilizados', label: 'Reutilización en Hogar' },
+      { value: 'participaria_talleres_buenas_practicas', label: 'Disposición a Capacitación' },
+      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Percepción de Impacto Ambiental' }
     ];
 
     /**************************************************************************
-     * Likert defaults (para las preguntas tipo Likert)
+     * Likert defaults
      **************************************************************************/
     const LIKERT_LEVELS = [
       "Totalmente en desacuerdo",
@@ -616,7 +609,7 @@
     function countCategorical(arr) {
       const counts = {};
       arr.forEach(v => {
-        const k = normalize(v) || "No declarado";
+        const k = normalize(v) || "No especificado";
         counts[k] = (counts[k] || 0) + 1;
       });
       const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
@@ -636,7 +629,6 @@
         const idx = lower.indexOf(s.toLowerCase());
         if (idx !== -1) counts[idx] += 1;
         else {
-          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
           for (let i=0;i<lower.length;i++){
             if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
           }
@@ -654,7 +646,7 @@
     }
 
     /**************************************************************************
-     * Funciones para calcular las nuevas métricas de resumen
+     * Funciones para calcular métricas de resumen
      **************************************************************************/
     function calculateEducationLevel(rows) {
       const educationData = rows.map(r => normalize(r.educacion_jefe_hogar)).filter(Boolean);
@@ -674,7 +666,6 @@
     }
 
     function calculateEnvironmentalAwareness(rows) {
-      // Combinar múltiples indicadores de conciencia ambiental
       const awarenessIndicators = [
         'conoce_desechos_solidos',
         'clasificacion_correcta_desechos', 
@@ -715,7 +706,6 @@
     function calculateAdvancedStatistics(values, labels, total) {
       if (!values.length || !total) return null;
       
-      // Estadísticas básicas
       const maxValue = Math.max(...values);
       const maxIndex = values.indexOf(maxValue);
       const maxLabel = labels[maxIndex];
@@ -726,7 +716,6 @@
       const minLabel = labels[minIndex];
       const minPercentage = ((minValue / total) * 100).toFixed(1);
       
-      // Calcular diversidad (índice de Shannon)
       let diversity = 0;
       values.forEach(value => {
         if (value > 0) {
@@ -736,7 +725,6 @@
       });
       diversity = diversity.toFixed(3);
       
-      // Calcular índice de concentración (Herfindahl-Hirschman)
       let concentration = 0;
       values.forEach(value => {
         const p = value / total;
@@ -744,25 +732,20 @@
       });
       concentration = concentration.toFixed(3);
       
-      // Calcular moda
       const modeValue = maxValue;
       const modeLabel = maxLabel;
       
-      // Calcular desviación estándar
       const mean = total / values.length;
       const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
       const stdDev = Math.sqrt(variance).toFixed(2);
       
-      // Calcular coeficiente de variación
       const cv = ((stdDev / mean) * 100).toFixed(1);
       
-      // Calcular percentiles
       const sortedValues = [...values].sort((a, b) => a - b);
       const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
       const median = sortedValues[Math.floor(sortedValues.length * 0.5)];
       const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
       
-      // Calcular asimetría (skewness)
       const skewness = values.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0) / values.length;
       
       return {
@@ -783,51 +766,45 @@
     function generateInsights(stats, labels, values, indicatorKey) {
       const insights = [];
       
-      // Insight sobre concentración
       if (stats.concentration > 0.5) {
-        insights.push("• Alta concentración en una categoría dominante");
+        insights.push("• Distribución concentrada en categoría dominante");
       } else if (stats.concentration < 0.2) {
         insights.push("• Distribución equilibrada entre categorías");
       } else {
         insights.push("• Distribución moderadamente concentrada");
       }
       
-      // Insight sobre diversidad
       if (stats.diversity > 1.5) {
-        insights.push("• Alta diversidad de respuestas");
+        insights.push("• Alta diversidad en las respuestas");
       } else if (stats.diversity < 0.5) {
-        insights.push("• Baja diversidad, respuestas concentradas");
+        insights.push("• Baja diversidad, respuestas homogéneas");
       }
       
-      // Insight sobre moda
       if (stats.max.percentage > 60) {
-        insights.push(`• La categoría "${stats.max.label}" domina con el ${stats.max.percentage}%`);
+        insights.push(`• Categoría "${stats.max.label}" representa el ${stats.max.percentage}%`);
       }
       
-      // Insight específico por tipo de indicador
       if (indicatorKey.includes('ingreso')) {
-        insights.push("• Indicador económico: analizar distribución de ingresos");
+        insights.push("• Variable económica: análisis de distribución requerido");
       }
       
       if (indicatorKey.includes('talleres') || indicatorKey.includes('participaria')) {
-        insights.push("• Indicador de disposición: alto potencial de participación");
+        insights.push("• Alta disposición a participación en iniciativas");
       }
       
       if (indicatorKey.includes('desechos') || indicatorKey.includes('reciclar')) {
-        insights.push("• Indicador ambiental: clave para políticas de sostenibilidad");
+        insights.push("• Indicador clave para políticas de sostenibilidad");
       }
       
       return insights;
     }
 
     function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
-      // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
-      document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
+      document.getElementById('statMode').textContent = `${stats.max.percentage}%`;
       document.getElementById('statDiversity').textContent = stats.diversity;
       document.getElementById('statConcentration').textContent = stats.concentration;
       
-      // Renderizar distribución detallada
       const distributionContainer = document.getElementById('distributionDetails');
       distributionContainer.innerHTML = labels.map((label, index) => {
         const value = values[index];
@@ -836,18 +813,18 @@
         const isMin = value === stats.min.value;
         
         return `
-          <div class="flex items-center justify-between p-2 ${isMax ? 'bg-emerald-50 rounded' : isMin ? 'bg-red-50 rounded' : ''}">
-            <div class="flex items-center gap-3 flex-1">
-              <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : isMin ? 'text-red-700' : 'text-slate-700'} truncate max-w-[200px]">
+          <div class="flex items-center justify-between p-1.5 ${isMax ? 'bg-emerald-50 rounded' : isMin ? 'bg-red-50 rounded' : ''}">
+            <div class="flex items-center gap-2 flex-1">
+              <span class="text-xs font-medium ${isMax ? 'text-emerald-700' : isMin ? 'text-red-700' : 'text-slate-700'} truncate max-w-[180px]">
                 ${label}
-                ${isMax ? '<span class="badge-max ml-2">MÁX</span>' : ''}
-                ${isMin ? '<span class="badge-min ml-2">MÍN</span>' : ''}
+                ${isMax ? '<span class="badge-max ml-1">MODA</span>' : ''}
+                ${isMin ? '<span class="badge-min ml-1">MÍN</span>' : ''}
               </span>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="text-sm font-semibold ${isMax ? 'text-emerald-600' : isMin ? 'text-red-600' : 'text-slate-600'}">${value}</span>
-              <span class="text-xs text-slate-500 w-12 text-right">${percentage}%</span>
-              <div class="progress-bar w-20">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold ${isMax ? 'text-emerald-600' : isMin ? 'text-red-600' : 'text-slate-600'}">${value}</span>
+              <span class="text-xs text-slate-500 w-10 text-right">${percentage}%</span>
+              <div class="progress-bar w-16">
                 <div class="progress-fill" style="width: ${percentage}%"></div>
               </div>
             </div>
@@ -855,26 +832,24 @@
         `;
       }).join('');
       
-      // Renderizar insights
       const insightsContainer = document.getElementById('insightsContent');
       const insights = generateInsights(stats, labels, values, indicatorKey);
       insightsContainer.innerHTML = insights.map(insight => `
-        <p class="flex items-start gap-2">
-          <i class="fas fa-chevron-right text-emerald-500 mt-1 text-xs"></i>
+        <p class="flex items-start gap-1">
+          <i class="fas fa-chevron-right text-slate-400 mt-0.5 text-xs"></i>
           <span>${insight}</span>
         </p>
       `).join('');
       
-      // Renderizar métricas avanzadas
       const metricsContainer = document.getElementById('advancedMetrics');
       metricsContainer.innerHTML = `
-        <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="grid grid-cols-2 gap-1 text-xs">
           <div class="flex justify-between">
-            <span class="font-medium">Desviación estándar:</span>
+            <span class="font-medium">Desviación:</span>
             <span>${stats.stdDev}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Coef. variación:</span>
+            <span class="font-medium">Coef. Var:</span>
             <span>${stats.cv}%</span>
           </div>
           <div class="flex justify-between">
@@ -886,7 +861,7 @@
             <span>${stats.skewness}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Q1 (25%):</span>
+            <span class="font-medium">Q1:</span>
             <span>${stats.percentiles.q1}</span>
           </div>
           <div class="flex justify-between">
@@ -894,7 +869,7 @@
             <span>${stats.percentiles.median}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Q3 (75%):</span>
+            <span class="font-medium">Q3:</span>
             <span>${stats.percentiles.q3}</span>
           </div>
           <div class="flex justify-between">
@@ -904,12 +879,11 @@
         </div>
       `;
       
-      // Mostrar sección de estadísticas
       document.getElementById('statisticsSection').classList.remove('hidden');
     }
 
     /**************************************************************************
-     * Chart handling
+     * Chart handling mejorado
      **************************************************************************/
     let chartInstance = null;
     function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
@@ -919,7 +893,6 @@
       const ctx = canvas.getContext('2d');
       destroyChart();
 
-      // Ajustar tamaño del canvas para gráficos circulares
       if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
         canvas.style.width = '100%';
         canvas.style.maxWidth = '500px';
@@ -930,19 +903,19 @@
         canvas.style.height = '400px';
       }
 
-      // default chart types
-      const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
+      const palette = ["#059669", "#3b82f6", "#f59e0b", "#dc2626", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
       const bg = palette.slice(0, labels.length);
       
-      // Configuración común para todos los gráficos
+      const total = values.reduce((sum, val) => sum + val, 0);
+      
       const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
         layout: {
           padding: {
-            top: 10,
+            top: 15,
             right: 15,
-            bottom: 10,
+            bottom: 15,
             left: 15
           }
         },
@@ -950,25 +923,24 @@
           legend: {
             position: 'top',
             labels: {
-              boxWidth: 12,
-              padding: 15,
+              boxWidth: 10,
+              padding: 12,
               font: {
-                size: 12
+                size: 11
               },
               usePointStyle: true
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleFont: { size: 12 },
-            bodyFont: { size: 12 },
-            padding: 10,
-            cornerRadius: 6,
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleFont: { size: 11 },
+            bodyFont: { size: 11 },
+            padding: 8,
+            cornerRadius: 4,
             callbacks: {
               label: function(context) {
                 const label = context.label || '';
                 const value = context.raw || 0;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
                 const percentage = ((value / total) * 100).toFixed(1);
                 return `${label}: ${value} (${percentage}%)`;
               }
@@ -977,27 +949,30 @@
         }
       };
 
-      // Opciones específicas por tipo de gráfico
       let chartOptions = { ...commonOptions };
       
       if (type === 'bar') {
         chartOptions.scales = {
           y: { 
             beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' }
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { font: { size: 10 } }
           },
           x: {
-            grid: { display: false }
+            grid: { display: false },
+            ticks: { font: { size: 10 } }
           }
         };
       } else if (type === 'line') {
         chartOptions.scales = {
           y: { 
             beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' }
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { font: { size: 10 } }
           },
           x: {
-            grid: { display: false }
+            grid: { display: false },
+            ticks: { font: { size: 10 } }
           }
         };
       } else if (type === 'radar') {
@@ -1008,19 +983,18 @@
             angleLines: { color: 'rgba(0,0,0,0.1)' },
             pointLabels: {
               font: {
-                size: 11
+                size: 10
               }
             }
           }
         };
       } else if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
-        // Opciones específicas para gráficos circulares
         chartOptions.plugins.legend.position = 'right';
         chartOptions.layout.padding = {
-          top: 20,
-          right: 20,
-          bottom: 20,
-          left: 20
+          top: 15,
+          right: 15,
+          bottom: 15,
+          left: 15
         };
       }
 
@@ -1032,9 +1006,9 @@
             label: title, 
             data: values, 
             backgroundColor: bg, 
-            borderColor: type === 'line' || type === 'radar' ? bg.map(color => color.replace('0.8', '1')) : '#fff',
+            borderColor: type === 'line' || type === 'radar' ? bg : '#fff',
             borderWidth: type === 'line' || type === 'radar' ? 2 : 1,
-            hoverOffset: 15
+            hoverOffset: 12
           }] 
         },
         options: chartOptions
@@ -1042,7 +1016,7 @@
     }
 
     /**************************************************************************
-     * Table handling (Simple-DataTables) - MEJORADO
+     * Table handling mejorado
      **************************************************************************/
     let dataTable = null;
     function buildTableHeaders(columns) {
@@ -1068,7 +1042,6 @@
         tbody.appendChild(tr);
       });
       
-      // Inicializar o reinicializar DataTable con configuración en español
       setTimeout(() => {
         try { 
           if (dataTable) dataTable.destroy(); 
@@ -1080,14 +1053,14 @@
           perPage: 10,
           perPageSelect: [5, 10, 15, 20],
           labels: {
-            placeholder: "Buscar en la tabla...",
-            searchTitle: "Buscar en la tabla",
+            placeholder: "Buscar en los registros...",
+            searchTitle: "Búsqueda en dataset",
             pageTitle: "Página {page}",
             perPage: "registros por página",
             noRows: "No se encontraron registros",
             noResults: "No hay resultados que coincidan con la búsqueda",
             info: "Mostrando {start} a {end} de {rows} registros",
-            loading: "Cargando...",
+            loading: "Cargando datos...",
             infoFiltered: "(Filtrado de {rows} registros totales)"
           },
           classes: {
@@ -1112,27 +1085,24 @@
     }
 
     /**************************************************************************
-     * Fetch data from Supabase and render all (chart + table + summaries)
+     * Fetch data from Supabase
      **************************************************************************/
     async function fetchAllAndRender() {
-      // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
-      // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
       if (error) { 
         console.error("Supabase error:", error); 
-        alert("Error cargando datos desde Supabase. Revisar consola."); 
+        alert("Error en la conexión con la base de datos."); 
         document.getElementById('chartLoading').classList.add('hidden');
         return; 
       }
-      // store raw
+      
       window.__RAW_DATA = data || [];
 
-      // populate group filter
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
-      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
+      filterGrupo.innerHTML = '<option value="todos">Grupo: Total</option>';
       groups.forEach(g => { 
         const opt = document.createElement('option'); 
         opt.value = g; 
@@ -1140,7 +1110,6 @@
         filterGrupo.appendChild(opt); 
       });
 
-      // populate indicator selector (once)
       const sel = document.getElementById('selectIndicator');
       if (!sel.options.length) {
         INDICATORS.forEach(i => {
@@ -1151,39 +1120,31 @@
         });
       }
 
-      // build table headers & body
       const columns = Object.keys(data[0] || { id: 'id' });
       buildTableHeaders(columns);
       buildTableBody(data, columns);
 
-      // update summaries
       updateSummaries(data);
 
-      // initial render: first indicator
       const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
       const chartType = document.getElementById('selectChartType').value || 'bar';
       await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
       
-      // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
     }
 
     function updateSummaries(rows) {
-      // Total de encuestas
       document.getElementById('totalSurveys').innerText = rows.length;
       
-      // Edad promedio
       const ages = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
       const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
       document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg}`;
       
-      // Nivel educativo más frecuente
       const education = calculateEducationLevel(rows);
       document.getElementById('educationLevel').innerText = education.level;
       document.getElementById('trendEducation').textContent = education.percentage !== 'Sin datos' ? 
         `${education.percentage}%` : 'Sin datos';
       
-      // Conciencia ambiental
       const awareness = calculateEnvironmentalAwareness(rows);
       document.getElementById('environmentalAwareness').innerText = awareness.percentage;
       document.getElementById('trendAwareness').textContent = awareness.level;
@@ -1197,7 +1158,6 @@
      * Render indicator with filters
      **************************************************************************/
     async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
-      // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
       const data = window.__RAW_DATA || [];
@@ -1211,17 +1171,13 @@
 
       updateSummaries(filtered);
 
-      // find label
       const indObj = INDICATORS.find(i=> i.value === indicatorKey);
       const title = indObj ? indObj.label : indicatorKey;
 
-      // prepare labels/values
       let labels = [], values = [], counts = {};
       
-      // Get the data for the selected indicator
       const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
 
-      // if arr empty -> show no data
       if (!arr.length) {
         document.getElementById('noDataMsg').classList.remove('hidden');
         document.getElementById('statisticsSection').classList.add('hidden');
@@ -1232,10 +1188,9 @@
         document.getElementById('noDataMsg').classList.add('hidden');
       }
 
-      // decide processing: if many arr elements match likert options => likert
       const lowerLikert = LIKERT_LEVELS.map(l => l.toLowerCase());
       const matchCount = arr.reduce((acc, v) => lowerLikert.includes(String(v).toLowerCase()) ? acc+1 : acc, 0);
-      const isLikert = (matchCount / arr.length) >= 0.25; // threshold 25%
+      const isLikert = (matchCount / arr.length) >= 0.25;
 
       if (isLikert) {
         const res = countLikert(arr);
@@ -1243,24 +1198,20 @@
         values = res.values;
         counts = res.counts;
       } else {
-        // categorical
         const res = countCategorical(arr);
         labels = res.labels; 
         values = res.values;
         counts = res.counts;
       }
 
-      // Calcular estadísticas avanzadas
       const total = values.reduce((sum, val) => sum + val, 0);
       const stats = calculateAdvancedStatistics(values, labels, total);
       
-      // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
-      document.getElementById('chartSubtitle').innerText = `Tipo: ${chartType} — ${filtered.length} respuestas (filtros aplicados)`;
+      document.getElementById('chartSubtitle').innerText = `Análisis de ${filtered.length} observaciones`;
       renderChart(chartType, labels, values, title);
       renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
-      // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
     }
 
@@ -1269,14 +1220,13 @@
      **************************************************************************/
     function exportTableCSV() {
       const data = window.__RAW_DATA || [];
-      if (!data.length) return alert("No hay datos para exportar.");
+      if (!data.length) return alert("No hay datos disponibles para exportar.");
       const cols = Object.keys(data[0]);
       const csvRows = [cols.join(",")];
       data.forEach(row => {
         const vals = cols.map(c => {
           let v = row[c];
           if (v === null || v === undefined) return "";
-          // escape quotes
           v = String(v).replace(/"/g, '""');
           if (v.includes(",") || v.includes("\n")) return `"${v}"`;
           return v;
@@ -1288,21 +1238,9 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); 
       a.href = url; 
-      a.download = `tabla_${Date.now()}.csv`; 
+      a.download = `dataset_proambiental_${new Date().toISOString().split('T')[0]}.csv`; 
       a.click(); 
       URL.revokeObjectURL(url);
-    }
-
-    /**************************************************************************
-     * Export chart image
-     **************************************************************************/
-    function exportChartImage() {
-      if (!chartInstance) return alert("No hay gráfico para exportar.");
-      const url = document.getElementById('mainChart').toDataURL('image/png', 1);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `grafico_${Date.now()}.png`; 
-      a.click();
     }
 
     /**************************************************************************
@@ -1320,7 +1258,6 @@
      * Init UI & events
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
-    document.getElementById('btnExportChart').addEventListener('click', exportChartImage);
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
@@ -1330,7 +1267,6 @@
 
     // initial load
     (async function init(){
-      // populate indicator dropdown quickly (in case fetch slow)
       const sel = document.getElementById('selectIndicator');
       INDICATORS.forEach(i => { 
         const opt = document.createElement('option'); 
@@ -1340,9 +1276,6 @@
       });
 
       await fetchAllAndRender();
-
-      // optional: auto-refresh every 60s (uncomment if desired)
-      // setInterval(async ()=> { await fetchAllAndRender(); }, 60000);
     })();
   </script>
 </body>
