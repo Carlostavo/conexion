@@ -53,6 +53,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 10px;
+    }
+    .chart-wrapper {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
     }
     .btn-primary {
       background: linear-gradient(to right, #10b981, #059669);
@@ -219,7 +226,7 @@
       </div>
       
       <div class="chart-container">
-        <div class="w-full max-w-4xl">
+        <div class="chart-wrapper">
           <canvas id="mainChart"></canvas>
         </div>
       </div>
@@ -337,8 +344,20 @@
     function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
 
     function renderChart(type, labels, values, title) {
-      const ctx = document.getElementById('mainChart').getContext('2d');
+      const canvas = document.getElementById('mainChart');
+      const ctx = canvas.getContext('2d');
       destroyChart();
+
+      // Ajustar tamaño del canvas para gráficos circulares
+      if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
+        canvas.style.width = '100%';
+        canvas.style.maxWidth = '500px';
+        canvas.style.height = '400px';
+      } else {
+        canvas.style.width = '100%';
+        canvas.style.maxWidth = '100%';
+        canvas.style.height = '400px';
+      }
 
       // default chart types
       const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
@@ -347,7 +366,15 @@
       // Configuración común para todos los gráficos
       const commonOptions = {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 10,
+            right: 15,
+            bottom: 10,
+            left: 15
+          }
+        },
         plugins: {
           legend: {
             position: 'top',
@@ -356,7 +383,8 @@
               padding: 15,
               font: {
                 size: 12
-              }
+              },
+              usePointStyle: true
             }
           },
           tooltip: {
@@ -392,6 +420,28 @@
             grid: { display: false }
           }
         };
+      } else if (type === 'radar') {
+        chartOptions.scales = {
+          r: {
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.1)' },
+            angleLines: { color: 'rgba(0,0,0,0.1)' },
+            pointLabels: {
+              font: {
+                size: 11
+              }
+            }
+          }
+        };
+      } else if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
+        // Opciones específicas para gráficos circulares
+        chartOptions.plugins.legend.position = 'right';
+        chartOptions.layout.padding = {
+          top: 20,
+          right: 20,
+          bottom: 20,
+          left: 20
+        };
       }
 
       chartInstance = new Chart(ctx, {
@@ -402,7 +452,7 @@
             label: title, 
             data: values, 
             backgroundColor: bg, 
-            borderColor: type === 'line' || type === 'radar' ? bg : '#fff',
+            borderColor: type === 'line' || type === 'radar' ? bg.map(color => color.replace('0.8', '1')) : '#fff',
             borderWidth: type === 'line' || type === 'radar' ? 2 : 1,
             hoverOffset: 15
           }] 
