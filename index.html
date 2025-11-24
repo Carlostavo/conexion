@@ -154,6 +154,29 @@
       border-radius: 3px;
       transition: width 0.5s ease;
     }
+    .trend-up {
+      color: #10b981;
+    }
+    .trend-down {
+      color: #ef4444;
+    }
+    .insight-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #bbf7d0;
+    }
+    .loading-spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #10b981;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -260,6 +283,12 @@
         </div>
       </div>
       
+      <!-- Loading State -->
+      <div id="chartLoading" class="hidden">
+        <div class="loading-spinner mb-4"></div>
+        <p class="text-center text-slate-500">Cargando datos...</p>
+      </div>
+      
       <div class="chart-container">
         <div class="chart-wrapper">
           <canvas id="mainChart"></canvas>
@@ -268,9 +297,50 @@
       
       <!-- ESTADÍSTICAS DETALLADAS -->
       <div id="statisticsSection" class="mt-8 hidden">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Estadísticas Detalladas</h3>
-        <div class="stats-grid" id="statsGrid">
-          <!-- Las estadísticas se generarán dinámicamente aquí -->
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Análisis Estadístico Detallado</h3>
+        
+        <!-- Estadísticas Principales -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="stat-item">
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-label">Total de respuestas</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statMode">—</div>
+            <div class="stat-label">Valor más frecuente</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statDiversity">—</div>
+            <div class="stat-label">Índice de diversidad</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="statConcentration">—</div>
+            <div class="stat-label">Índice de concentración</div>
+          </div>
+        </div>
+
+        <!-- Distribución Detallada -->
+        <div class="card p-4 mb-4">
+          <h4 class="font-semibold text-slate-700 mb-3">Distribución de Respuestas</h4>
+          <div id="distributionDetails" class="space-y-2">
+            <!-- Las distribuciones se generarán aquí -->
+          </div>
+        </div>
+
+        <!-- Insights y Análisis -->
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="card p-4 insight-card">
+            <h4 class="font-semibold text-slate-700 mb-2">📊 Insights del Indicador</h4>
+            <div id="insightsContent" class="text-sm text-slate-600 space-y-1">
+              <!-- Los insights se generarán aquí -->
+            </div>
+          </div>
+          <div class="card p-4">
+            <h4 class="font-semibold text-slate-700 mb-2">📈 Métricas Avanzadas</h4>
+            <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
+              <!-- Métricas avanzadas se generarán aquí -->
+            </div>
+          </div>
         </div>
       </div>
       
@@ -394,11 +464,12 @@
     }
 
     /**************************************************************************
-     * Funciones estadísticas
+     * Funciones estadísticas avanzadas
      **************************************************************************/
-    function calculateStatistics(values, labels, total) {
+    function calculateAdvancedStatistics(values, labels, total) {
       if (!values.length || !total) return null;
       
+      // Estadísticas básicas
       const maxValue = Math.max(...values);
       const maxIndex = values.indexOf(maxValue);
       const maxLabel = labels[maxIndex];
@@ -419,97 +490,175 @@
       });
       diversity = diversity.toFixed(3);
       
-      // Calcular moda (valor más frecuente)
+      // Calcular índice de concentración (Herfindahl-Hirschman)
+      let concentration = 0;
+      values.forEach(value => {
+        const p = value / total;
+        concentration += p * p;
+      });
+      concentration = concentration.toFixed(3);
+      
+      // Calcular moda
       const modeValue = maxValue;
       const modeLabel = maxLabel;
+      
+      // Calcular desviación estándar
+      const mean = total / values.length;
+      const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
+      const stdDev = Math.sqrt(variance).toFixed(2);
+      
+      // Calcular coeficiente de variación
+      const cv = ((stdDev / mean) * 100).toFixed(1);
+      
+      // Calcular percentiles
+      const sortedValues = [...values].sort((a, b) => a - b);
+      const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
+      const median = sortedValues[Math.floor(sortedValues.length * 0.5)];
+      const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
+      
+      // Calcular asimetría (skewness)
+      const skewness = values.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0) / values.length;
       
       return {
         total: total,
         max: { value: maxValue, label: maxLabel, percentage: maxPercentage },
         min: { value: minValue, label: minLabel, percentage: minPercentage },
         diversity: diversity,
-        mode: { value: modeValue, label: modeLabel }
+        concentration: concentration,
+        mode: { value: modeValue, label: modeLabel },
+        stdDev: stdDev,
+        cv: cv,
+        percentiles: { q1, median, q3 },
+        skewness: skewness.toFixed(3),
+        mean: mean.toFixed(2)
       };
     }
 
-    function renderStatistics(stats, counts, labels, values) {
-      const statsGrid = document.getElementById('statsGrid');
-      const statsSection = document.getElementById('statisticsSection');
+    function generateInsights(stats, labels, values, indicatorKey) {
+      const insights = [];
       
-      if (!stats) {
-        statsSection.classList.add('hidden');
-        return;
+      // Insight sobre concentración
+      if (stats.concentration > 0.5) {
+        insights.push("• Alta concentración en una categoría dominante");
+      } else if (stats.concentration < 0.2) {
+        insights.push("• Distribución equilibrada entre categorías");
+      } else {
+        insights.push("• Distribución moderadamente concentrada");
       }
       
-      statsGrid.innerHTML = '';
+      // Insight sobre diversidad
+      if (stats.diversity > 1.5) {
+        insights.push("• Alta diversidad de respuestas");
+      } else if (stats.diversity < 0.5) {
+        insights.push("• Baja diversidad, respuestas concentradas");
+      }
       
-      // Estadística: Total de respuestas
-      const totalStat = document.createElement('div');
-      totalStat.className = 'stat-item';
-      totalStat.innerHTML = `
-        <div class="stat-value">${stats.total}</div>
-        <div class="stat-label">Total de respuestas</div>
-      `;
-      statsGrid.appendChild(totalStat);
+      // Insight sobre moda
+      if (stats.max.percentage > 60) {
+        insights.push(`• La categoría "${stats.max.label}" domina con el ${stats.max.percentage}%`);
+      }
       
-      // Estadística: Valor más frecuente
-      const modeStat = document.createElement('div');
-      modeStat.className = 'stat-item';
-      modeStat.innerHTML = `
-        <div class="stat-value">${stats.mode.percentage}%</div>
-        <div class="stat-label">Más frecuente: ${stats.mode.label}</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${stats.mode.percentage}%"></div>
-        </div>
-      `;
-      statsGrid.appendChild(modeStat);
+      // Insight específico por tipo de indicador
+      if (indicatorKey.includes('ingreso')) {
+        insights.push("• Indicador económico: analizar distribución de ingresos");
+      }
       
-      // Estadística: Valor menos frecuente
-      const minStat = document.createElement('div');
-      minStat.className = 'stat-item';
-      minStat.innerHTML = `
-        <div class="stat-value">${stats.min.percentage}%</div>
-        <div class="stat-label">Menos frecuente: ${stats.min.label}</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${stats.min.percentage}%"></div>
-        </div>
-      `;
-      statsGrid.appendChild(minStat);
+      if (indicatorKey.includes('talleres') || indicatorKey.includes('participaria')) {
+        insights.push("• Indicador de disposición: alto potencial de participación");
+      }
       
-      // Estadística: Diversidad
-      const diversityStat = document.createElement('div');
-      diversityStat.className = 'stat-item';
-      diversityStat.innerHTML = `
-        <div class="stat-value">${stats.diversity}</div>
-        <div class="stat-label">Índice de diversidad</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${(stats.diversity / Math.log(labels.length)) * 100}%"></div>
-        </div>
-      `;
-      statsGrid.appendChild(diversityStat);
+      if (indicatorKey.includes('desechos') || indicatorKey.includes('reciclar')) {
+        insights.push("• Indicador ambiental: clave para políticas de sostenibilidad");
+      }
       
-      // Distribución detallada
-      const distributionStat = document.createElement('div');
-      distributionStat.className = 'stat-item col-span-2';
-      distributionStat.innerHTML = `
-        <div class="stat-value">Distribución</div>
-        <div class="stat-label mt-2 space-y-2">
-          ${labels.map((label, index) => `
-            <div class="flex justify-between items-center">
-              <span class="text-sm truncate max-w-[120px]">${label}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-medium">${values[index]} (${((values[index] / stats.total) * 100).toFixed(1)}%)</span>
-                <div class="progress-bar w-20">
-                  <div class="progress-fill" style="width: ${((values[index] / stats.total) * 100)}%"></div>
-                </div>
+      return insights;
+    }
+
+    function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
+      // Actualizar estadísticas principales
+      document.getElementById('statTotal').textContent = stats.total;
+      document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
+      document.getElementById('statDiversity').textContent = stats.diversity;
+      document.getElementById('statConcentration').textContent = stats.concentration;
+      
+      // Renderizar distribución detallada
+      const distributionContainer = document.getElementById('distributionDetails');
+      distributionContainer.innerHTML = labels.map((label, index) => {
+        const value = values[index];
+        const percentage = ((value / stats.total) * 100).toFixed(1);
+        const isMax = value === stats.max.value;
+        const isMin = value === stats.min.value;
+        
+        return `
+          <div class="flex items-center justify-between p-2 ${isMax ? 'bg-emerald-50 rounded' : ''}">
+            <div class="flex items-center gap-3 flex-1">
+              <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : 'text-slate-700'} truncate max-w-[200px]">
+                ${label}
+                ${isMax ? ' 👑' : ''}
+                ${isMin ? ' 📉' : ''}
+              </span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-semibold ${isMax ? 'text-emerald-600' : 'text-slate-600'}">${value}</span>
+              <span class="text-xs text-slate-500 w-12 text-right">${percentage}%</span>
+              <div class="progress-bar w-20">
+                <div class="progress-fill" style="width: ${percentage}%"></div>
               </div>
             </div>
-          `).join('')}
+          </div>
+        `;
+      }).join('');
+      
+      // Renderizar insights
+      const insightsContainer = document.getElementById('insightsContent');
+      const insights = generateInsights(stats, labels, values, indicatorKey);
+      insightsContainer.innerHTML = insights.map(insight => `
+        <p class="flex items-start gap-2">
+          <span>${insight}</span>
+        </p>
+      `).join('');
+      
+      // Renderizar métricas avanzadas
+      const metricsContainer = document.getElementById('advancedMetrics');
+      metricsContainer.innerHTML = `
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <span class="font-medium">Desviación estándar:</span>
+            <span class="float-right">${stats.stdDev}</span>
+          </div>
+          <div>
+            <span class="font-medium">Coef. variación:</span>
+            <span class="float-right">${stats.cv}%</span>
+          </div>
+          <div>
+            <span class="font-medium">Media:</span>
+            <span class="float-right">${stats.mean}</span>
+          </div>
+          <div>
+            <span class="font-medium">Asimetría:</span>
+            <span class="float-right">${stats.skewness}</span>
+          </div>
+          <div>
+            <span class="font-medium">Q1 (25%):</span>
+            <span class="float-right">${stats.percentiles.q1}</span>
+          </div>
+          <div>
+            <span class="font-medium">Mediana:</span>
+            <span class="float-right">${stats.percentiles.median}</span>
+          </div>
+          <div>
+            <span class="font-medium">Q3 (75%):</span>
+            <span class="float-right">${stats.percentiles.q3}</span>
+          </div>
+          <div>
+            <span class="font-medium">Rango:</span>
+            <span class="float-right">${stats.max.value - stats.min.value}</span>
+          </div>
         </div>
       `;
-      statsGrid.appendChild(distributionStat);
       
-      statsSection.classList.remove('hidden');
+      // Mostrar sección de estadísticas
+      document.getElementById('statisticsSection').classList.remove('hidden');
     }
 
     /**************************************************************************
@@ -704,11 +853,15 @@
      * Fetch data from Supabase and render all (chart + table + summaries)
      **************************************************************************/
     async function fetchAllAndRender() {
+      // Mostrar loading
+      document.getElementById('chartLoading').classList.remove('hidden');
+      
       // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
       if (error) { 
         console.error("Supabase error:", error); 
         alert("Error cargando datos desde Supabase. Revisar consola."); 
+        document.getElementById('chartLoading').classList.add('hidden');
         return; 
       }
       // store raw
@@ -748,6 +901,9 @@
       const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
       const chartType = document.getElementById('selectChartType').value || 'bar';
       await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
+      
+      // Ocultar loading
+      document.getElementById('chartLoading').classList.add('hidden');
     }
 
     function updateSummaries(rows) {
@@ -769,6 +925,9 @@
      * Render indicator with filters
      **************************************************************************/
     async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
+      // Mostrar loading
+      document.getElementById('chartLoading').classList.remove('hidden');
+      
       const data = window.__RAW_DATA || [];
       let filtered = data.slice();
       if (filters.sexo && filters.sexo !== 'todos') {
@@ -794,6 +953,7 @@
       if (!arr.length) {
         document.getElementById('noDataMsg').classList.remove('hidden');
         document.getElementById('statisticsSection').classList.add('hidden');
+        document.getElementById('chartLoading').classList.add('hidden');
         destroyChart();
         return;
       } else {
@@ -818,15 +978,18 @@
         counts = res.counts;
       }
 
-      // Calcular estadísticas
+      // Calcular estadísticas avanzadas
       const total = values.reduce((sum, val) => sum + val, 0);
-      const stats = calculateStatistics(values, labels, total);
+      const stats = calculateAdvancedStatistics(values, labels, total);
       
       // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
       document.getElementById('chartSubtitle').innerText = `Tipo: ${chartType} — ${filtered.length} respuestas (filtros aplicados)`;
       renderChart(chartType, labels, values, title);
-      renderStatistics(stats, counts, labels, values);
+      renderAdvancedStatistics(stats, labels, values, indicatorKey);
+      
+      // Ocultar loading
+      document.getElementById('chartLoading').classList.add('hidden');
     }
 
     /**************************************************************************
