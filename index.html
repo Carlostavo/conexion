@@ -19,29 +19,119 @@
   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
 
   <style>
-    body { background: linear-gradient(180deg,#f7fafc 0%, #ffffff 100%); }
-    .card { background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(15,23,42,0.06); }
-    .muted { color: #6b7280; }
+    body { 
+      background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); 
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .card { 
+      background: white; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(15,23,42,0.08); 
+      border: 1px solid #f1f5f9;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+    }
+    .muted { color: #64748b; }
     .accent { color: #065f46; }
-    .control { border: 1px solid #e6e6e6; padding: 0.5rem 0.75rem; border-radius: 8px; }
+    .control { 
+      border: 1px solid #e2e8f0; 
+      padding: 0.6rem 0.75rem; 
+      border-radius: 8px; 
+      background: white;
+      transition: all 0.2s ease;
+    }
+    .control:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
     /* responsive chart container */
-    .chart-wrap { max-height: 520px; }
+    .chart-container {
+      max-height: 520px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .btn-primary {
+      background: linear-gradient(to right, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to right, #059669, #047857);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-secondary {
+      background: #f8fafc;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+    }
+    .summary-card {
+      text-align: center;
+      padding: 1.5rem 1rem;
+    }
+    .summary-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+      color: #0f766e;
+    }
+    .summary-label {
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    .chart-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .chart-subtitle {
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    .header-gradient {
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    }
+    .indicator-highlight {
+      background: linear-gradient(120deg, #d1fae5 0%, #a7f3d0 100%);
+      border-left: 4px solid #10b981;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
 
   <!-- HEADER -->
-  <header class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white">
+  <header class="header-gradient text-white shadow-lg">
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none"><path d="M12 2l3 6 6 .5-4.5 4 1 6L12 17l-5.5 2.5 1-6L3 8.5 9 8 12 2z" fill="#fff"/></svg>
+        <div class="bg-white/20 p-2 rounded-xl">
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3 6 6 .5-4.5 4 1 6L12 17l-5.5 2.5 1-6L3 8.5 9 8 12 2z" />
+          </svg>
+        </div>
         <div>
-          <h1 class="text-xl font-semibold">Dashboard Proambiental</h1>
-          <p class="text-sm muted">Indicadores de comportamiento proambiental y autosustentabilidad</p>
+          <h1 class="text-2xl font-bold">Dashboard Proambiental</h1>
+          <p class="text-sm opacity-90 mt-1">Indicadores de comportamiento proambiental y autosustentabilidad</p>
         </div>
       </div>
-      <div class="text-sm muted">
-        Tabla: <span class="font-medium text-emerald-100">cuestionario_comportamiento_proambiental_autosustentabilidad</span>
+      <div class="text-sm bg-white/10 px-3 py-2 rounded-lg">
+        Tabla: <span class="font-medium">cuestionario_comportamiento_proambiental_autosustentabilidad</span>
       </div>
     </div>
   </header>
@@ -49,15 +139,15 @@
   <!-- MAIN -->
   <main class="max-w-7xl mx-auto px-6 py-8">
     <!-- CONTROLES -->
-    <div class="grid md:grid-cols-3 gap-4 mb-6">
-      <div class="card p-4">
-        <label class="block text-sm text-slate-600 mb-2">Indicador</label>
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="card p-5 indicator-highlight">
+        <label class="block text-sm font-medium text-slate-700 mb-3">Indicador</label>
         <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
-        <p class="text-xs muted mt-2">Selecciona el indicador para visualizar.</p>
+        <p class="text-xs muted mt-3">Selecciona el indicador para visualizar.</p>
       </div>
 
-      <div class="card p-4">
-        <label class="block text-sm text-slate-600 mb-2">Tipo de gráfico</label>
+      <div class="card p-5">
+        <label class="block text-sm font-medium text-slate-700 mb-3">Tipo de gráfico</label>
         <select id="selectChartType" class="w-full control">
           <option value="bar">Barras</option>
           <option value="pie">Pastel</option>
@@ -65,98 +155,108 @@
           <option value="line">Línea</option>
           <option value="radar">Radar</option>
           <option value="polarArea">Polar Area</option>
-          <option value="scatter">Scatter</option>
-          <option value="bubble">Bubble</option>
-          <option value="mixed">Mixed</option>
         </select>
-        <p class="text-xs muted mt-2">Cambia el tipo de visualización.</p>
+        <p class="text-xs muted mt-3">Cambia el tipo de visualización.</p>
       </div>
 
-      <div class="card p-4">
-        <label class="block text-sm text-slate-600 mb-2">Filtros rápidos</label>
-        <div class="flex gap-2">
-          <select id="filterSexo" class="flex-1 control">
+      <div class="card p-5">
+        <label class="block text-sm font-medium text-slate-700 mb-3">Filtros rápidos</label>
+        <div class="flex flex-col gap-3">
+          <select id="filterSexo" class="w-full control">
             <option value="todos">Sexo: Todos</option>
             <option value="masculino">Masculino</option>
             <option value="femenino">Femenino</option>
           </select>
-          <select id="filterGrupo" class="w-40 control">
+          <select id="filterGrupo" class="w-full control">
             <option value="todos">Grupo: Todos</option>
           </select>
         </div>
-        <p class="text-xs muted mt-2">Aplica filtros para segmentar los resultados.</p>
+        <p class="text-xs muted mt-3">Aplica filtros para segmentar los resultados.</p>
       </div>
     </div>
 
     <!-- RESUMEN -->
-    <div class="grid md:grid-cols-4 gap-4 mb-6">
-      <div class="card p-4">
-        <div class="text-sm muted">Total encuestas</div>
-        <div id="totalSurveys" class="text-2xl font-semibold mt-1">—</div>
+    <div class="grid md:grid-cols-4 gap-5 mb-8">
+      <div class="card summary-card">
+        <div class="summary-label">Total encuestas</div>
+        <div id="totalSurveys" class="summary-value">—</div>
       </div>
-      <div class="card p-4">
-        <div class="text-sm muted">Promedio de edad</div>
-        <div id="avgAge" class="text-2xl font-semibold mt-1">—</div>
+      <div class="card summary-card">
+        <div class="summary-label">Promedio de edad</div>
+        <div id="avgAge" class="summary-value">—</div>
       </div>
-      <div class="card p-4">
-        <div class="text-sm muted">Separa residuos (%)</div>
-        <div id="pctSeparate" class="text-2xl font-semibold mt-1">—</div>
+      <div class="card summary-card">
+        <div class="summary-label">Separa residuos</div>
+        <div id="pctSeparate" class="summary-value">—</div>
       </div>
-      <div class="card p-4">
-        <div class="text-sm muted">Participaría en talleres (%)</div>
-        <div id="pctWorkshops" class="text-2xl font-semibold mt-1">—</div>
+      <div class="card summary-card">
+        <div class="summary-label">Participaría en talleres</div>
+        <div id="pctWorkshops" class="summary-value">—</div>
       </div>
     </div>
 
     <!-- GRAFICO -->
-    <div class="card p-6 mb-6">
-      <div class="flex items-center justify-between mb-4">
+    <div class="card p-6 mb-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
-          <h2 id="chartTitle" class="text-lg font-semibold">Indicador</h2>
-          <p id="chartSubtitle" class="text-xs muted mt-1">Selecciona indicador y tipo de gráfico.</p>
+          <h2 id="chartTitle" class="chart-title">Indicador</h2>
+          <p id="chartSubtitle" class="chart-subtitle mt-1">Selecciona un indicador para visualizar los datos.</p>
         </div>
-        <div class="text-sm muted">Datos en vivo desde Supabase</div>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="mainChart"></canvas>
-      </div>
-      <div id="noDataMsg" class="text-center muted mt-4 hidden">No hay datos para los filtros aplicados.</div>
-    </div>
-
-    <!-- ACCIONES Y TABLA -->
-    <div class="grid md:grid-cols-4 gap-4 mb-6">
-      <div class="card p-4 flex flex-col justify-between">
-        <div>
-          <label class="block text-sm text-slate-600 mb-2">Acciones</label>
-          <div class="flex gap-2">
-            <button id="btnExportChart" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">Exportar gráfico</button>
-          </div>
-        </div>
-        <div class="mt-3">
-          <button id="btnExportCSV" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-2 rounded-lg border">Exportar tabla (CSV)</button>
+        <div class="flex gap-3">
+          <button id="btnExportChart" class="btn-secondary flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Exportar gráfico
+          </button>
+          <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Exportar CSV
+          </button>
         </div>
       </div>
-      <div class="md:col-span-3 card p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="text-lg font-semibold">Tabla de registros</h3>
-            <p class="text-xs muted mt-1">Visualiza todos los registros de la tabla. Usa el buscador/ordenación/paginación abajo.</p>
-          </div>
-          <div class="text-sm muted">Live table</div>
+      
+      <div class="chart-container">
+        <div class="w-full max-w-4xl">
+          <canvas id="mainChart"></canvas>
         </div>
-
-        <div class="overflow-x-auto">
-          <table id="dataTable" class="w-full">
-            <thead>
-              <tr id="tableHeaderRow"></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
+      </div>
+      <div id="noDataMsg" class="text-center py-8 muted hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-lg font-medium text-slate-500">No hay datos para los filtros aplicados.</p>
+        <p class="text-sm text-slate-400 mt-1">Intenta cambiar los filtros o seleccionar otro indicador.</p>
       </div>
     </div>
 
-    <footer class="text-center text-sm muted mb-8">© 2025 Proyecto Proambiental — Supabase & Chart.js</footer>
+    <!-- TABLA -->
+    <div class="card p-6 mb-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div>
+          <h3 class="text-xl font-semibold text-slate-800">Tabla de registros</h3>
+          <p class="text-sm text-slate-500 mt-1">Visualiza todos los registros de la tabla. Usa el buscador, ordenación y paginación.</p>
+        </div>
+        <div class="text-sm bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
+          Datos en tiempo real
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-slate-200">
+        <table id="dataTable" class="w-full">
+          <thead class="bg-slate-50">
+            <tr id="tableHeaderRow"></tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="text-center text-sm text-slate-500 mb-8 py-6 border-t border-slate-200">
+      <p>© 2025 Proyecto Proambiental — Desarrollado con Supabase & Chart.js</p>
+    </footer>
   </main>
 
   <script>
@@ -240,74 +340,60 @@
       const ctx = document.getElementById('mainChart').getContext('2d');
       destroyChart();
 
-      // Special handling for scatter/bubble/mixed
-      if (type === 'scatter') {
-        const dataPoints = values.map((v,i) => ({ x: i+1, y: v }));
-        chartInstance = new Chart(ctx, { 
-          type: 'scatter', 
-          data: { 
-            datasets: [{ 
-              label: title, 
-              data: dataPoints, 
-              backgroundColor: '#2a9d8f' 
-            }] 
-          }, 
-          options: { 
-            scales:{ 
-              x:{ 
-                title:{display:true,text:'Índice'} 
-              }, 
-              y:{ 
-                beginAtZero:true 
-              } 
-            } 
-          } 
-        });
-        return;
-      }
-      if (type === 'bubble') {
-        const max = Math.max(...values,1);
-        const dataPoints = values.map((v,i) => ({ x: i+1, y: v, r: Math.max(4, (v/max)*18) }));
-        chartInstance = new Chart(ctx, { 
-          type: 'bubble', 
-          data: { 
-            datasets: [{ 
-              label: title, 
-              data: dataPoints, 
-              backgroundColor: '#2a9d8f' 
-            }] 
-          }, 
-          options: { 
-            scales:{ 
-              x:{ 
-                title:{display:true,text:'Índice'} 
-              }, 
-              y:{ 
-                beginAtZero:true 
-              } 
-            } 
-          } 
-        });
-        return;
-      }
-      if (type === 'mixed') {
-        // barras + linea
-        chartInstance = new Chart(ctx, {
-          data: {
-            labels,
-            datasets: [
-              { type:'bar', label:'Conteo', data: values, backgroundColor:'#2a9d8f' },
-              { type:'line', label:'Tendencia', data: values.map((v,i)=> i>0? (values[i]+values[i-1])/2 : values[i]), borderColor:'#e76f51', tension:0.3, fill:false }
-            ]
+      // default chart types
+      const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
+      const bg = palette.slice(0, labels.length);
+      
+      // Configuración común para todos los gráficos
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              boxWidth: 12,
+              padding: 15,
+              font: {
+                size: 12
+              }
+            }
           },
-          options: { responsive:true, scales:{ y:{ beginAtZero:true } } }
-        });
-        return;
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+            titleFont: { size: 12 },
+            bodyFont: { size: 12 },
+            padding: 10,
+            cornerRadius: 6
+          }
+        }
+      };
+
+      // Opciones específicas por tipo de gráfico
+      let chartOptions = { ...commonOptions };
+      
+      if (type === 'bar') {
+        chartOptions.scales = {
+          y: { 
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            grid: { display: false }
+          }
+        };
+      } else if (type === 'line') {
+        chartOptions.scales = {
+          y: { 
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            grid: { display: false }
+          }
+        };
       }
 
-      // default chart types
-      const palette = ["#2a9d8f","#e76f51","#457b9d","#f4a261","#8ab17d","#c084fc","#60a5fa","#f472b6","#9ca3af"];
-      const bg = palette.slice(0, labels.length);
       chartInstance = new Chart(ctx, {
         type,
         data: { 
@@ -316,14 +402,12 @@
             label: title, 
             data: values, 
             backgroundColor: bg, 
-            borderColor:'#fff', 
-            borderWidth:0.6 
+            borderColor: type === 'line' || type === 'radar' ? bg : '#fff',
+            borderWidth: type === 'line' || type === 'radar' ? 2 : 1,
+            hoverOffset: 15
           }] 
         },
-        options: { 
-          responsive:true, 
-          scales: type === 'bar' ? { y:{ beginAtZero:true } } : {} 
-        }
+        options: chartOptions
       });
     }
 
@@ -336,16 +420,20 @@
       headerRow.innerHTML = '';
       columns.forEach(c => {
         const th = document.createElement('th');
+        th.className = 'px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider';
         th.innerText = c;
         headerRow.appendChild(th);
       });
     }
     function buildTableBody(rows, columns) {
-      const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
+      const tbody = document.getElementById('tableBody'); 
+      tbody.innerHTML = '';
       rows.forEach(r => {
         const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition-colors';
         columns.forEach(col => {
           const td = document.createElement('td');
+          td.className = 'px-4 py-3 text-sm text-slate-700';
           td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
           tr.appendChild(td);
         });
@@ -354,7 +442,27 @@
       // init or reinit datatable after DOM updated
       setTimeout(() => {
         try { if (dataTable) dataTable.destroy(); } catch(e){}
-        dataTable = new simpleDatatables.DataTable("#dataTable", { searchable: true, fixedHeight: true, perPage: 10 });
+        dataTable = new simpleDatatables.DataTable("#dataTable", { 
+          searchable: true, 
+          fixedHeight: false, 
+          perPage: 10,
+          classes: {
+            active: "active",
+            container: "dataTable-container",
+            cursor: "dataTable-cursor",
+            disabled: "disabled",
+            dropdown: "dataTable-dropdown",
+            header: "dataTable-header",
+            info: "dataTable-info",
+            input: "dataTable-input",
+            pagination: "dataTable-pagination",
+            selector: "dataTable-selector",
+            table: "dataTable-table",
+            tbody: "dataTable-tbody",
+            thead: "dataTable-thead",
+            wrapper: "dataTable-wrapper"
+          }
+        });
       }, 60);
     }
 
