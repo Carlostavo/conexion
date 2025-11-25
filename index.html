@@ -600,74 +600,6 @@
       border-color: #10b981;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
-    /* Nuevos estilos para estadísticas avanzadas */
-    .correlation-matrix {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    .correlation-item {
-      background: #f8fafc;
-      padding: 1rem;
-      border-radius: 8px;
-      border-left: 4px solid #3b82f6;
-    }
-    .correlation-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1d4ed8;
-    }
-    .correlation-label {
-      font-size: 0.75rem;
-      color: #64748b;
-      margin-top: 0.25rem;
-    }
-    .stat-card {
-      background: white;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border: 1px solid #e2e8f0;
-    }
-    .stat-card-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-    }
-    .stat-card-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0f766e;
-    }
-    .confidence-interval {
-      background: #fef3c7;
-      border: 1px solid #f59e0b;
-      border-radius: 6px;
-      padding: 0.75rem;
-      margin-top: 1rem;
-    }
-    .stat-badge {
-      display: inline-block;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-left: 0.5rem;
-    }
-    .badge-success {
-      background: #d1fae5;
-      color: #065f46;
-    }
-    .badge-warning {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge-danger {
-      background: #fee2e2;
-      color: #991b1b;
-    }
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .pagination-container {
@@ -835,10 +767,6 @@
             <i class="fas fa-download text-sm"></i>
             Exportar Visualización
           </button>
-          <button id="btnAdvancedStats" class="btn-primary flex items-center gap-2">
-            <i class="fas fa-chart-line text-sm"></i>
-            Estadísticas Avanzadas
-          </button>
         </div>
       </div>
       
@@ -910,53 +838,6 @@
             </h4>
             <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
               <!-- Métricas avanzadas se generarán aquí -->
-            </div>
-          </div>
-        </div>
-
-        <!-- ESTADÍSTICAS AVANZADAS (NUEVO) -->
-        <div id="advancedStatisticsSection" class="mt-6 hidden">
-          <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-chart-line text-purple-600 mr-2"></i>
-            Análisis Estadístico Avanzado
-          </h4>
-          
-          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            <div class="stat-card">
-              <div class="stat-card-title">Varianza</div>
-              <div class="stat-card-value" id="statVariance">—</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-card-title">Error Estándar</div>
-              <div class="stat-card-value" id="statStdError">—</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-card-title">Coeficiente de Variación</div>
-              <div class="stat-card-value" id="statCV">—</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-card-title">Asimetría (Skewness)</div>
-              <div class="stat-card-value" id="statSkewness">—</div>
-            </div>
-          </div>
-
-          <div class="confidence-interval">
-            <h5 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-chart-area text-amber-600 mr-2"></i>
-              Intervalo de Confianza (95%)
-            </h5>
-            <div class="text-sm text-slate-600" id="confidenceInterval">
-              Cargando cálculo de intervalo de confianza...
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <h5 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-project-diagram text-blue-600 mr-2"></i>
-              Análisis de Correlación con Variables Demográficas
-            </h5>
-            <div class="correlation-matrix" id="correlationMatrix">
-              <!-- Matriz de correlación se generará aquí -->
             </div>
           </div>
         </div>
@@ -1065,7 +946,7 @@
      * Supabase config (usa las credenciales que me diste)
      **************************************************************************/
     const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJsudXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
     const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -1160,137 +1041,6 @@
         values: counts,
         counts: countsObj
       };
-    }
-
-    /**************************************************************************
-     * FUNCIONES ESTADÍSTICAS MEJORADAS Y CORREGIDAS
-     **************************************************************************/
-    
-    // Función mejorada para calcular estadísticas numéricas
-    function calculateNumericStats(values) {
-      if (!values || values.length === 0) return null;
-      
-      const numericValues = values.map(v => {
-        const num = parseFloat(v);
-        return isNaN(num) ? null : num;
-      }).filter(v => v !== null);
-      
-      if (numericValues.length === 0) return null;
-      
-      const n = numericValues.length;
-      const sum = numericValues.reduce((a, b) => a + b, 0);
-      const mean = sum / n;
-      
-      // Calcular varianza (corregido)
-      const variance = numericValues.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / n;
-      const stdDev = Math.sqrt(variance);
-      const stdError = stdDev / Math.sqrt(n);
-      const cv = (stdDev / mean) * 100;
-      
-      // Calcular percentiles (corregido)
-      const sorted = [...numericValues].sort((a, b) => a - b);
-      const q1 = sorted[Math.floor(n * 0.25)];
-      const median = n % 2 === 0 
-        ? (sorted[n/2 - 1] + sorted[n/2]) / 2 
-        : sorted[Math.floor(n/2)];
-      const q3 = sorted[Math.floor(n * 0.75)];
-      
-      // Calcular asimetría (skewness) - fórmula corregida
-      const skewness = n > 2 ? numericValues.reduce((acc, val) => 
-        acc + Math.pow((val - mean) / stdDev, 3), 0) * n / ((n - 1) * (n - 2)) : 0;
-      
-      // Calcular curtosis (nueva funcionalidad)
-      const kurtosis = n > 3 ? numericValues.reduce((acc, val) => 
-        acc + Math.pow((val - mean) / stdDev, 4), 0) * n * (n + 1) / ((n - 1) * (n - 2) * (n - 3)) - 
-        3 * Math.pow(n - 1, 2) / ((n - 2) * (n - 3)) : 0;
-      
-      // Calcular intervalo de confianza 95% (nueva funcionalidad)
-      const tValue = 1.96; // Para 95% de confianza y n grande
-      const marginOfError = tValue * stdError;
-      const confidenceInterval = {
-        lower: mean - marginOfError,
-        upper: mean + marginOfError
-      };
-      
-      return {
-        n,
-        sum,
-        mean,
-        variance,
-        stdDev,
-        stdError,
-        cv,
-        q1,
-        median,
-        q3,
-        skewness,
-        kurtosis,
-        confidenceInterval,
-        min: Math.min(...numericValues),
-        max: Math.max(...numericValues),
-        range: Math.max(...numericValues) - Math.min(...numericValues)
-      };
-    }
-
-    // Función para calcular correlaciones entre variables (nueva funcionalidad)
-    function calculateCorrelations(data, targetVariable) {
-      const correlations = [];
-      const numericColumns = ['edad', 'ingreso_mensual_jefe_hogar'];
-      
-      numericColumns.forEach(column => {
-        if (column !== targetVariable) {
-          const targetValues = data.map(row => {
-            const val = parseFloat(row[targetVariable]);
-            return isNaN(val) ? null : val;
-          }).filter(v => v !== null);
-          
-          const columnValues = data.map(row => {
-            const val = parseFloat(row[column]);
-            return isNaN(val) ? null : val;
-          }).filter(v => v !== null);
-          
-          // Asegurar que ambos arrays tengan la misma longitud
-          const minLength = Math.min(targetValues.length, columnValues.length);
-          if (minLength > 5) { // Mínimo para cálculo de correlación
-            const corrTarget = targetValues.slice(0, minLength);
-            const corrColumn = columnValues.slice(0, minLength);
-            
-            const correlation = calculatePearsonCorrelation(corrTarget, corrColumn);
-            correlations.push({
-              variable: column,
-              correlation: correlation,
-              strength: getCorrelationStrength(correlation)
-            });
-          }
-        }
-      });
-      
-      return correlations.sort((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation));
-    }
-
-    // Función para calcular correlación de Pearson
-    function calculatePearsonCorrelation(x, y) {
-      const n = x.length;
-      const sumX = x.reduce((a, b) => a + b, 0);
-      const sumY = y.reduce((a, b) => a + b, 0);
-      const sumXY = x.reduce((acc, val, i) => acc + val * y[i], 0);
-      const sumX2 = x.reduce((acc, val) => acc + val * val, 0);
-      const sumY2 = y.reduce((acc, val) => acc + val * val, 0);
-      
-      const numerator = n * sumXY - sumX * sumY;
-      const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-      
-      return denominator === 0 ? 0 : numerator / denominator;
-    }
-
-    // Función para determinar la fuerza de la correlación
-    function getCorrelationStrength(r) {
-      const absR = Math.abs(r);
-      if (absR >= 0.8) return 'Muy fuerte';
-      if (absR >= 0.6) return 'Fuerte';
-      if (absR >= 0.4) return 'Moderada';
-      if (absR >= 0.2) return 'Débil';
-      return 'Muy débil';
     }
 
     /**************************************************************************
@@ -1502,9 +1252,9 @@
     }
 
     /**************************************************************************
-     * Funciones estadísticas avanzadas CORREGIDAS
+     * Funciones estadísticas avanzadas
      **************************************************************************/
-    function calculateAdvancedStatistics(values, labels, total, indicatorKey, data) {
+    function calculateAdvancedStatistics(values, labels, total) {
       if (!values.length || !total) return null;
       
       // Estadísticas básicas
@@ -1518,7 +1268,7 @@
       const minLabel = labels[minIndex];
       const minPercentage = ((minValue / total) * 100).toFixed(1);
       
-      // Calcular diversidad (índice de Shannon) - CORREGIDO
+      // Calcular diversidad (índice de Shannon)
       let diversity = 0;
       values.forEach(value => {
         if (value > 0) {
@@ -1526,41 +1276,49 @@
           diversity -= p * Math.log(p);
         }
       });
-      diversity = isNaN(diversity) ? 0 : diversity;
+      diversity = diversity.toFixed(3);
       
-      // Calcular índice de concentración (Herfindahl-Hirschman) - CORREGIDO
+      // Calcular índice de concentración (Herfindahl-Hirschman)
       let concentration = 0;
       values.forEach(value => {
         const p = value / total;
         concentration += p * p;
       });
+      concentration = concentration.toFixed(3);
       
       // Calcular moda
       const modeValue = maxValue;
       const modeLabel = maxLabel;
       
-      // Calcular estadísticas numéricas si es aplicable
-      let numericStats = null;
-      if (indicatorKey === 'edad' || indicatorKey === 'ingreso_mensual_jefe_hogar') {
-        const numericValues = data.map(row => row[indicatorKey]).filter(v => v !== null && v !== undefined);
-        numericStats = calculateNumericStats(numericValues);
-      }
+      // Calcular desviación estándar
+      const mean = total / values.length;
+      const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
+      const stdDev = Math.sqrt(variance).toFixed(2);
       
-      // Calcular correlaciones si es una variable numérica
-      let correlations = [];
-      if (indicatorKey === 'edad' || indicatorKey === 'ingreso_mensual_jefe_hogar') {
-        correlations = calculateCorrelations(data, indicatorKey);
-      }
+      // Calcular coeficiente de variación
+      const cv = ((stdDev / mean) * 100).toFixed(1);
+      
+      // Calcular percentiles
+      const sortedValues = [...values].sort((a, b) => a - b);
+      const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
+      const median = sortedValues[Math.floor(sortedValues.length * 0.5)];
+      const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
+      
+      // Calcular asimetría (skewness)
+      const skewness = values.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0) / values.length;
       
       return {
         total: total,
         max: { value: maxValue, label: maxLabel, percentage: maxPercentage },
         min: { value: minValue, label: minLabel, percentage: minPercentage },
-        diversity: diversity.toFixed(3),
-        concentration: concentration.toFixed(3),
+        diversity: diversity,
+        concentration: concentration,
         mode: { value: modeValue, label: modeLabel },
-        numericStats: numericStats,
-        correlations: correlations
+        stdDev: stdDev,
+        cv: cv,
+        percentiles: { q1, median, q3 },
+        skewness: skewness.toFixed(3),
+        mean: mean.toFixed(2)
       };
     }
 
@@ -1588,19 +1346,6 @@
         insights.push(`• La categoría "${stats.max.label}" representa el ${stats.max.percentage}%`);
       }
       
-      // Insights basados en estadísticas numéricas
-      if (stats.numericStats) {
-        if (stats.numericStats.skewness > 1) {
-          insights.push("• Distribución con asimetría positiva (sesgo a la derecha)");
-        } else if (stats.numericStats.skewness < -1) {
-          insights.push("• Distribución con asimetría negativa (sesgo a la izquierda)");
-        }
-        
-        if (stats.numericStats.cv > 50) {
-          insights.push("• Alta variabilidad en los datos");
-        }
-      }
-      
       // Insight específico por tipo de indicador
       if (indicatorKey.includes('ingreso')) {
         insights.push("• Variable económica: distribución de ingresos");
@@ -1617,7 +1362,7 @@
       return insights;
     }
 
-    function renderAdvancedStatistics(stats, labels, values, indicatorKey, data) {
+    function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
       // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
       document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
@@ -1664,117 +1409,45 @@
       
       // Renderizar métricas avanzadas
       const metricsContainer = document.getElementById('advancedMetrics');
-      
-      let metricsHTML = '';
-      if (stats.numericStats) {
-        metricsHTML = `
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="flex justify-between">
-              <span class="font-medium">Media Aritmética:</span>
-              <span>${stats.numericStats.mean.toFixed(2)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Desviación Estándar:</span>
-              <span>${stats.numericStats.stdDev.toFixed(2)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Varianza:</span>
-              <span>${stats.numericStats.variance.toFixed(2)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Coef. Variación:</span>
-              <span>${stats.numericStats.cv.toFixed(1)}%</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Asimetría:</span>
-              <span>${stats.numericStats.skewness.toFixed(3)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Curtosis:</span>
-              <span>${stats.numericStats.kurtosis.toFixed(3)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Q1 (25%):</span>
-              <span>${stats.numericStats.q1.toFixed(2)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Mediana:</span>
-              <span>${stats.numericStats.median.toFixed(2)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Q3 (75%):</span>
-              <span>${stats.numericStats.q3.toFixed(2)}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Rango:</span>
-              <span>${stats.numericStats.range.toFixed(2)}</span>
-            </div>
+      metricsContainer.innerHTML = `
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="flex justify-between">
+            <span class="font-medium">Desviación Estándar:</span>
+            <span>${stats.stdDev}</span>
           </div>
-        `;
-      } else {
-        metricsHTML = `
-          <div class="text-center text-slate-500 py-4">
-            <i class="fas fa-info-circle text-xl mb-2"></i>
-            <p>Métricas numéricas no disponibles para esta variable categórica</p>
+          <div class="flex justify-between">
+            <span class="font-medium">Coef. Variación:</span>
+            <span>${stats.cv}%</span>
           </div>
-        `;
-      }
-      
-      metricsContainer.innerHTML = metricsHTML;
-      
-      // Renderizar estadísticas avanzadas si están disponibles
-      const advancedSection = document.getElementById('advancedStatisticsSection');
-      if (stats.numericStats) {
-        advancedSection.classList.remove('hidden');
-        
-        // Actualizar estadísticas avanzadas
-        document.getElementById('statVariance').textContent = stats.numericStats.variance.toFixed(2);
-        document.getElementById('statStdError').textContent = stats.numericStats.stdError.toFixed(3);
-        document.getElementById('statCV').textContent = `${stats.numericStats.cv.toFixed(1)}%`;
-        document.getElementById('statSkewness').textContent = stats.numericStats.skewness.toFixed(3);
-        
-        // Actualizar intervalo de confianza
-        document.getElementById('confidenceInterval').innerHTML = `
-          <p>El valor promedio se encuentra entre <strong>${stats.numericStats.confidenceInterval.lower.toFixed(2)}</strong> 
-          y <strong>${stats.numericStats.confidenceInterval.upper.toFixed(2)}</strong> con un 95% de confianza.</p>
-        `;
-        
-        // Actualizar matriz de correlación
-        const correlationMatrix = document.getElementById('correlationMatrix');
-        if (stats.correlations && stats.correlations.length > 0) {
-          correlationMatrix.innerHTML = stats.correlations.map(corr => `
-            <div class="correlation-item">
-              <div class="correlation-value">${corr.correlation.toFixed(3)}</div>
-              <div class="correlation-label">
-                ${corr.variable.replace(/_/g, ' ')} 
-                <span class="stat-badge ${getCorrelationBadgeClass(corr.correlation)}">
-                  ${corr.strength}
-                </span>
-              </div>
-            </div>
-          `).join('');
-        } else {
-          correlationMatrix.innerHTML = `
-            <div class="col-span-4 text-center text-slate-500 py-4">
-              <i class="fas fa-info-circle text-xl mb-2"></i>
-              <p>No se encontraron correlaciones significativas con variables numéricas</p>
-            </div>
-          `;
-        }
-      } else {
-        advancedSection.classList.add('hidden');
-      }
+          <div class="flex justify-between">
+            <span class="font-medium">Media Aritmética:</span>
+            <span>${stats.mean}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Asimetría:</span>
+            <span>${stats.skewness}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Q1 (25%):</span>
+            <span>${stats.percentiles.q1}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Mediana:</span>
+            <span>${stats.percentiles.median}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Q3 (75%):</span>
+            <span>${stats.percentiles.q3}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Rango:</span>
+            <span>${stats.max.value - stats.min.value}</span>
+          </div>
+        </div>
+      `;
       
       // Mostrar sección de estadísticas
       document.getElementById('statisticsSection').classList.remove('hidden');
-    }
-
-    // Función auxiliar para determinar la clase del badge de correlación
-    function getCorrelationBadgeClass(correlation) {
-      const absCorr = Math.abs(correlation);
-      if (absCorr >= 0.7) return 'badge-success';
-      if (absCorr >= 0.5) return 'badge-warning';
-      return 'badge-danger';
     }
 
     /**************************************************************************
@@ -2388,9 +2061,9 @@
         counts = res.counts;
       }
 
-      // Calcular estadísticas avanzadas CORREGIDAS
+      // Calcular estadísticas avanzadas
       const total = values.reduce((sum, val) => sum + val, 0);
-      const stats = calculateAdvancedStatistics(values, labels, total, indicatorKey, filtered);
+      const stats = calculateAdvancedStatistics(values, labels, total);
       
       // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
@@ -2403,7 +2076,7 @@
       document.getElementById('chartSubtitle').innerText = subtitle;
       
       renderChart(chartType, labels, values, title);
-      renderAdvancedStatistics(stats, labels, values, indicatorKey, filtered);
+      renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
       // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
@@ -2456,16 +2129,6 @@
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
     document.getElementById('applyDateFilter').addEventListener('click', applyDateFilter);
     document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
-    document.getElementById('btnAdvancedStats').addEventListener('click', () => {
-      const advancedSection = document.getElementById('advancedStatisticsSection');
-      if (advancedSection.classList.contains('hidden')) {
-        advancedSection.classList.remove('hidden');
-        document.getElementById('btnAdvancedStats').innerHTML = '<i class="fas fa-chart-line text-sm"></i> Ocultar Estadísticas Avanzadas';
-      } else {
-        advancedSection.classList.add('hidden');
-        document.getElementById('btnAdvancedStats').innerHTML = '<i class="fas fa-chart-line text-sm"></i> Estadísticas Avanzadas';
-      }
-    });
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
