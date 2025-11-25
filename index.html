@@ -96,14 +96,13 @@
       background: #fef2f2;
       color: #dc2626;
       border: 1px solid #fecaca;
-      padding: 0.6rem 1rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 8px;
       font-weight: 500;
       transition: all 0.3s ease;
-      font-size: 0.875rem;
     }
     .btn-tertiary:hover {
-      background: #fee2e2;
+      background: #fecaca;
       transform: translateY(-1px);
     }
     .summary-card {
@@ -378,38 +377,45 @@
       font-weight: 600;
       color: #0f172a;
     }
-    .date-range-container {
+    .date-filter-container {
       display: flex;
-      flex-direction: column;
       gap: 0.75rem;
+      align-items: end;
+      flex-wrap: wrap;
     }
     .date-input-group {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-    }
-    .date-input-row {
-      display: flex;
-      gap: 0.75rem;
-      align-items: flex-end;
-    }
-    .date-input {
       flex: 1;
-      min-width: 0;
+      min-width: 140px;
     }
-    .date-label {
+    .date-input-group label {
       font-size: 0.875rem;
       font-weight: 500;
       color: #374151;
+    }
+    .date-input {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    .date-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
     .filter-actions {
       display: flex;
       gap: 0.5rem;
       margin-top: 0.5rem;
     }
-    .filter-active {
-      background: #ecfdf5;
-      border-color: #10b981;
+    .active-filter {
+      background: #10b981 !important;
+      color: white !important;
+      border-color: #10b981 !important;
     }
   </style>
 </head>
@@ -481,35 +487,36 @@
         <p class="text-xs muted mt-3">Filtra por características demográficas.</p>
       </div>
 
-      <!-- FILTRO DE FECHA POR INTERVALO MEJORADO -->
-      <div class="card p-5" id="dateFilterCard">
+      <!-- FILTRO DE FECHA MEJORADO -->
+      <div class="card p-5">
         <label class="block text-sm font-medium text-slate-700 mb-3">
           <i class="fas fa-calendar-alt mr-2 text-amber-600"></i>
           Filtro por Intervalo de Fecha
         </label>
-        <div class="date-range-container">
+        
+        <div class="date-filter-container">
           <div class="date-input-group">
-            <label class="date-label">Fecha inicial</label>
-            <input type="date" id="filterFechaInicio" class="w-full control date-input">
+            <label for="startDate">Fecha Inicial</label>
+            <input type="date" id="startDate" class="date-input">
           </div>
+          
           <div class="date-input-group">
-            <label class="date-label">Fecha final</label>
-            <div class="date-input-row">
-              <input type="date" id="filterFechaFin" class="w-full control date-input">
-            </div>
-          </div>
-          <div class="filter-actions">
-            <button id="btnAplicarFecha" class="btn-primary flex-1 flex items-center justify-center gap-2 py-2">
-              <i class="fas fa-check text-sm"></i>
-              Aplicar
-            </button>
-            <button id="btnLimpiarFecha" class="btn-tertiary flex items-center justify-center gap-2 py-2 px-3">
-              <i class="fas fa-times text-sm"></i>
-              Limpiar
-            </button>
+            <label for="endDate">Fecha Final</label>
+            <input type="date" id="endDate" class="date-input">
           </div>
         </div>
-        <p class="text-xs muted mt-3">Selecciona un rango de fechas para filtrar los datos.</p>
+
+        <div class="filter-actions">
+          <button id="applyDateFilter" class="btn-primary flex-1 flex items-center justify-center gap-2 text-sm py-2">
+            <i class="fas fa-check"></i>
+            Aplicar
+          </button>
+          <button id="clearDateFilter" class="btn-tertiary flex items-center justify-center gap-2 text-sm py-2 px-3">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <p class="text-xs muted mt-3">Filtra registros por rango de fecha específico.</p>
       </div>
     </div>
 
@@ -700,9 +707,9 @@
      * Variables globales para el filtro de fecha
      **************************************************************************/
     let currentDateFilter = {
-      inicio: null,
-      fin: null,
-      activo: false
+      startDate: null,
+      endDate: null,
+      active: false
     };
 
     /**************************************************************************
@@ -780,95 +787,154 @@
     }
 
     /**************************************************************************
-     * Funciones para el filtro de fecha por intervalo
+     * Funciones para el filtro de fecha profesional
      **************************************************************************/
-    function aplicarFiltroFecha() {
-      const fechaInicio = document.getElementById('filterFechaInicio').value;
-      const fechaFin = document.getElementById('filterFechaFin').value;
+    function detectDateColumn(rows) {
+      // Buscar columnas que contengan fechas en el dataset
+      const dateColumnCandidates = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp', 'fecha_registro'];
       
-      // Validar que ambas fechas estén seleccionadas
-      if (!fechaInicio || !fechaFin) {
-        alert('Por favor, selecciona ambas fechas (inicio y fin) para aplicar el filtro.');
-        return;
+      for (let col of dateColumnCandidates) {
+        if (rows[0] && rows[0][col]) {
+          const sampleValue = rows[0][col];
+          // Verificar si el valor parece una fecha
+          if (typeof sampleValue === 'string' && (
+            sampleValue.match(/\d{4}-\d{2}-\d{2}/) || 
+            sampleValue.includes('T') // formato ISO
+          )) {
+            return col;
+          }
+        }
       }
       
-      // Validar que la fecha de inicio no sea mayor que la fecha final
-      if (new Date(fechaInicio) > new Date(fechaFin)) {
-        alert('La fecha de inicio no puede ser mayor que la fecha final.');
-        return;
-      }
-      
-      currentDateFilter = {
-        inicio: fechaInicio,
-        fin: fechaFin,
-        activo: true
-      };
-      
-      // Actualizar la interfaz
-      actualizarInterfazFiltroFecha();
-      
-      // Aplicar el filtro
-      autoRefreshChart();
-    }
-
-    function limpiarFiltroFecha() {
-      document.getElementById('filterFechaInicio').value = '';
-      document.getElementById('filterFechaFin').value = '';
-      
-      currentDateFilter = {
-        inicio: null,
-        fin: null,
-        activo: false
-      };
-      
-      // Actualizar la interfaz
-      actualizarInterfazFiltroFecha();
-      
-      // Aplicar el filtro (que ahora estará limpio)
-      autoRefreshChart();
-    }
-
-    function actualizarInterfazFiltroFecha() {
-      const dateFilterCard = document.getElementById('dateFilterCard');
-      
-      if (currentDateFilter.activo) {
-        dateFilterCard.classList.add('filter-active');
-        // Mostrar el rango activo en el subtítulo
-        const fechaInicioFormateada = new Date(currentDateFilter.inicio).toLocaleDateString('es-ES');
-        const fechaFinFormateada = new Date(currentDateFilter.fin).toLocaleDateString('es-ES');
-        dateFilterCard.querySelector('.text-xs.muted').textContent = 
-          `Filtro activo: ${fechaInicioFormateada} - ${fechaFinFormateada}`;
-      } else {
-        dateFilterCard.classList.remove('filter-active');
-        dateFilterCard.querySelector('.text-xs.muted').textContent = 
-          'Selecciona un rango de fechas para filtrar los datos.';
-      }
-    }
-
-    function filtrarPorFecha(rows) {
-      if (!currentDateFilter.activo) return rows;
-      
-      return rows.filter(row => {
-        const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
-        
-        for (let col of dateColumns) {
-          if (row[col]) {
-            const rowDateStr = String(row[col]).split('T')[0];
-            if (rowDateStr.match(/\d{4}-\d{2}-\d{2}/)) {
-              const rowDate = new Date(rowDateStr);
-              const inicioDate = new Date(currentDateFilter.inicio);
-              const finDate = new Date(currentDateFilter.fin);
-              
-              // Incluir el día completo de la fecha final
-              finDate.setHours(23, 59, 59, 999);
-              
-              if (rowDate >= inicioDate && rowDate <= finDate) {
-                return true;
-              }
+      // Si no se encuentra una columna específica, buscar cualquier campo que contenga fechas
+      for (let row of rows.slice(0, 10)) { // Revisar las primeras 10 filas
+        for (let key in row) {
+          if (row[key] && typeof row[key] === 'string') {
+            if (row[key].match(/\d{4}-\d{2}-\d{2}/)) {
+              return key;
             }
           }
         }
-        return false;
+      }
+      
+      return null;
+    }
+
+    function extractDateRange(rows, dateColumn) {
+      if (!dateColumn) return { min: null, max: null };
+      
+      const dates = rows
+        .map(row => {
+          const dateStr = row[dateColumn];
+          if (!dateStr) return null;
+          
+          // Convertir a objeto Date
+          const date = new Date(dateStr);
+          return isNaN(date.getTime()) ? null : date;
+        })
+        .filter(date => date !== null);
+      
+      if (dates.length === 0) return { min: null, max: null };
+      
+      const minDate = new Date(Math.min(...dates));
+      const maxDate = new Date(Math.max(...dates));
+      
+      return {
+        min: minDate.toISOString().split('T')[0],
+        max: maxDate.toISOString().split('T')[0]
+      };
+    }
+
+    function initializeDateFilter(dateRange) {
+      const startDateInput = document.getElementById('startDate');
+      const endDateInput = document.getElementById('endDate');
+      
+      if (dateRange.min && dateRange.max) {
+        startDateInput.min = dateRange.min;
+        startDateInput.max = dateRange.max;
+        endDateInput.min = dateRange.min;
+        endDateInput.max = dateRange.max;
+        
+        // Establecer valores por defecto (últimos 30 días)
+        const defaultEnd = new Date(dateRange.max);
+        const defaultStart = new Date(defaultEnd);
+        defaultStart.setDate(defaultStart.getDate() - 30);
+        
+        startDateInput.value = defaultStart.toISOString().split('T')[0];
+        endDateInput.value = defaultEnd.toISOString().split('T')[0];
+      }
+    }
+
+    function applyDateFilter() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      const applyButton = document.getElementById('applyDateFilter');
+      
+      if (!startDate || !endDate) {
+        alert('Por favor selecciona ambas fechas para aplicar el filtro.');
+        return;
+      }
+      
+      if (startDate > endDate) {
+        alert('La fecha inicial no puede ser mayor que la fecha final.');
+        return;
+      }
+      
+      currentDateFilter = {
+        startDate,
+        endDate,
+        active: true
+      };
+      
+      // Actualizar UI
+      applyButton.classList.add('active-filter');
+      applyButton.innerHTML = '<i class="fas fa-filter"></i> Filtro Activo';
+      
+      // Aplicar filtros
+      autoRefreshChart();
+    }
+
+    function clearDateFilter() {
+      const startDateInput = document.getElementById('startDate');
+      const endDateInput = document.getElementById('endDate');
+      const applyButton = document.getElementById('applyDateFilter');
+      
+      // Restablecer a los valores por defecto (últimos 30 días)
+      if (window.dateRange) {
+        const defaultEnd = new Date(window.dateRange.max);
+        const defaultStart = new Date(defaultEnd);
+        defaultStart.setDate(defaultStart.getDate() - 30);
+        
+        startDateInput.value = defaultStart.toISOString().split('T')[0];
+        endDateInput.value = defaultEnd.toISOString().split('T')[0];
+      } else {
+        startDateInput.value = '';
+        endDateInput.value = '';
+      }
+      
+      currentDateFilter = {
+        startDate: null,
+        endDate: null,
+        active: false
+      };
+      
+      // Actualizar UI
+      applyButton.classList.remove('active-filter');
+      applyButton.innerHTML = '<i class="fas fa-check"></i> Aplicar';
+      
+      // Aplicar filtros
+      autoRefreshChart();
+    }
+
+    function filterByDateRange(rows, dateColumn) {
+      if (!currentDateFilter.active || !dateColumn) return rows;
+      
+      return rows.filter(row => {
+        const rowDateStr = row[dateColumn];
+        if (!rowDateStr) return false;
+        
+        const rowDate = new Date(rowDateStr).toISOString().split('T')[0];
+        return rowDate >= currentDateFilter.startDate && rowDate <= currentDateFilter.endDate;
       });
     }
 
@@ -1410,6 +1476,13 @@
       // store raw
       window.__RAW_DATA = data || [];
 
+      // Detectar columna de fecha y configurar filtro
+      window.dateColumn = detectDateColumn(data);
+      if (window.dateColumn) {
+        window.dateRange = extractDateRange(data, window.dateColumn);
+        initializeDateFilter(window.dateRange);
+      }
+
       // populate group filter
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
@@ -1484,7 +1557,7 @@
       const data = window.__RAW_DATA || [];
       let filtered = data.slice();
       
-      // Aplicar filtros
+      // Aplicar filtros demográficos
       if (filters.sexo && filters.sexo !== 'todos') {
         filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
       }
@@ -1493,8 +1566,8 @@
       }
       
       // Aplicar filtro de fecha si está activo
-      if (currentDateFilter.activo) {
-        filtered = filtrarPorFecha(filtered);
+      if (currentDateFilter.active && window.dateColumn) {
+        filtered = filterByDateRange(filtered, window.dateColumn);
       }
 
       updateSummaries(filtered);
@@ -1547,10 +1620,8 @@
       
       // Actualizar subtítulo con información del filtro de fecha
       let subtitle = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
-      if (currentDateFilter.activo) {
-        const fechaInicioFormateada = new Date(currentDateFilter.inicio).toLocaleDateString('es-ES');
-        const fechaFinFormateada = new Date(currentDateFilter.fin).toLocaleDateString('es-ES');
-        subtitle += ` • Período: ${fechaInicioFormateada} - ${fechaFinFormateada}`;
+      if (currentDateFilter.active) {
+        subtitle += ` • Período: ${currentDateFilter.startDate} a ${currentDateFilter.endDate}`;
       }
       document.getElementById('chartSubtitle').innerText = subtitle;
       
@@ -1591,7 +1662,7 @@
     }
 
     /**************************************************************************
-     * Auto-refresh function
+     * Auto-refresh function (incluye filtro de fecha)
      **************************************************************************/
     function autoRefreshChart() {
       const indicator = document.getElementById('selectIndicator').value;
@@ -1606,8 +1677,8 @@
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
-    document.getElementById('btnAplicarFecha').addEventListener('click', aplicarFiltroFecha);
-    document.getElementById('btnLimpiarFecha').addEventListener('click', limpiarFiltroFecha);
+    document.getElementById('applyDateFilter').addEventListener('click', applyDateFilter);
+    document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
