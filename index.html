@@ -224,26 +224,157 @@
       font-size: 0.7rem;
       font-weight: 600;
     }
-    /* Estilos personalizados para Simple-DataTables en español */
-    .dataTable-wrapper {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
+    
+    /* ==================== */
+    /* ESTILOS PROFESIONALES PARA LA TABLA */
+    /* ==================== */
+    
+    .table-container {
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+      border: 1px solid #e2e8f0;
       background: white;
     }
-    .dataTable-container {
+    
+    .table-header {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      padding: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .table-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+    
+    .table-subtitle {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+    
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .table-search-container {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+    
+    .table-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+    }
+    
+    .table-search-input {
+      width: 100%;
+      padding: 10px 10px 10px 40px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s ease;
       background: white;
+    }
+    
+    .table-search-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .table-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .table-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #475569;
+    }
+    
+    .table-action-btn:hover {
+      background: #f8fafc;
+      transform: translateY(-1px);
+    }
+    
+    .table-action-btn.primary {
+      background: linear-gradient(to right, #10b981, #059669);
+      color: white;
+      border: none;
+    }
+    
+    .table-action-btn.primary:hover {
+      background: linear-gradient(to right, #059669, #047857);
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    .table-stats {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    
+    .table-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .table-stat-badge {
+      background: #10b981;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .dataTable-wrapper {
+      border: none;
+      border-radius: 0;
+    }
+    
+    .dataTable-container {
       max-height: 600px;
       overflow: auto;
+      background: white;
     }
+    
     .dataTable-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 800px;
+      min-width: 1000px;
     }
+    
     .dataTable-table th {
       background: #f8fafc;
-      padding: 12px 16px;
+      padding: 14px 16px;
       text-align: left;
       font-weight: 600;
       color: #374151;
@@ -251,38 +382,75 @@
       position: sticky;
       top: 0;
       z-index: 10;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+    
+    .dataTable-table th.sortable {
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .dataTable-table th.sortable:hover {
+      background: #f1f5f9;
+    }
+    
     .dataTable-table td {
-      padding: 12px 16px;
+      padding: 14px 16px;
       border-bottom: 1px solid #f1f5f9;
-      white-space: nowrap;
+      font-size: 0.875rem;
+      color: #475569;
     }
+    
+    .dataTable-table tr {
+      transition: background 0.2s ease;
+    }
+    
     .dataTable-table tr:hover {
       background: #f8fafc;
     }
-    /* Estilos para la barra de búsqueda */
-    .dataTable-input {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin: 16px;
-      width: calc(100% - 32px);
-      font-size: 14px;
+    
+    .dataTable-table tr:nth-child(even) {
+      background: #fafafa;
     }
-    .dataTable-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    
+    .dataTable-table tr:nth-child(even):hover {
+      background: #f1f5f9;
     }
-    /* Estilos para la paginación */
+    
+    .table-cell-highlight {
+      background: #fef3c7 !important;
+    }
+    
+    .table-cell-numeric {
+      text-align: right;
+      font-family: 'Courier New', monospace;
+      font-weight: 500;
+    }
+    
+    .table-cell-center {
+      text-align: center;
+    }
+    
+    .table-cell-truncate {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
     .dataTable-pagination {
-      margin: 16px;
+      padding: 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 1rem;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
     }
+    
     .dataTable-pagination-list {
       display: flex;
       gap: 4px;
@@ -290,9 +458,11 @@
       margin: 0;
       padding: 0;
     }
+    
     .dataTable-pagination-list li {
       margin: 0;
     }
+    
     .dataTable-pagination-list li a {
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -301,29 +471,36 @@
       color: #374151;
       font-size: 14px;
       transition: all 0.2s ease;
+      min-width: 40px;
+      text-align: center;
+      display: block;
     }
+    
     .dataTable-pagination-list li a:hover {
       background: #f3f4f6;
     }
+    
     .dataTable-pagination-list li.active a {
       background: #10b981;
       border-color: #10b981;
       color: white;
     }
+    
     .dataTable-pagination-list li.disabled a {
       color: #9ca3af;
       cursor: not-allowed;
     }
+    
     .dataTable-pagination-list li.disabled a:hover {
       background: transparent;
     }
-    /* Información de la tabla */
+    
     .dataTable-info {
       margin: 0;
       color: #6b7280;
       font-size: 14px;
     }
-    /* Selector de registros por página */
+    
     .dataTable-selector {
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -331,58 +508,47 @@
       font-size: 14px;
       background: white;
     }
+    
     /* Scrollbar personalizado */
     .dataTable-container::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
+    
     .dataTable-container::-webkit-scrollbar-track {
       background: #f1f5f9;
       border-radius: 4px;
     }
+    
     .dataTable-container::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
+    
     .dataTable-container::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+    
     .summary-trend {
       font-size: 0.75rem;
       margin-top: 0.25rem;
     }
+    
     .trend-positive {
       color: #10b981;
     }
+    
     .trend-negative {
       color: #ef4444;
     }
-    .search-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    .table-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .table-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #0f172a;
-    }
+    
     .date-filter-container {
       display: flex;
       gap: 0.75rem;
       align-items: end;
       flex-wrap: wrap;
     }
+    
     .date-input-group {
       display: flex;
       flex-direction: column;
@@ -390,11 +556,13 @@
       flex: 1;
       min-width: 140px;
     }
+    
     .date-input-group label {
       font-size: 0.875rem;
       font-weight: 500;
       color: #374151;
     }
+    
     .date-input {
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -402,83 +570,76 @@
       font-size: 0.875rem;
       transition: all 0.2s ease;
     }
+    
     .date-input:focus {
       outline: none;
       border-color: #10b981;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
+    
     .filter-actions {
       display: flex;
       gap: 0.5rem;
       margin-top: 0.5rem;
     }
+    
     .active-filter {
       background: #10b981 !important;
       color: white !important;
       border-color: #10b981 !important;
     }
-    /* Estilos mejorados para la búsqueda */
-    .search-header {
+    
+    /* Estados de carga */
+    .table-loading {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      color: #64748b;
+    }
+    
+    .table-loading-spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #10b981;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
       margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
     }
-    .search-results-info {
-      background: #ecfdf5;
-      border: 1px solid #d1fae5;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      color: #065f46;
+    
+    .table-empty {
+      text-align: center;
+      padding: 3rem;
+      color: #64748b;
     }
-    .search-highlight {
-      background-color: #fef3c7;
-      padding: 0.1rem 0.2rem;
-      border-radius: 0.25rem;
+    
+    .table-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #d1d5db;
     }
-    .search-container {
-      position: relative;
-      flex: 1;
-      max-width: 500px;
-    }
-    .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #9ca3af;
-    }
-    .search-input {
-      width: 100%;
-      padding: 10px 10px 10px 40px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: all 0.2s ease;
-    }
-    .search-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    .clear-search {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #9ca3af;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-    }
-    .clear-search:hover {
-      background: #f3f4f6;
-      color: #6b7280;
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .table-search-container {
+        max-width: 100%;
+      }
+      
+      .table-actions {
+        justify-content: space-between;
+      }
+      
+      .dataTable-pagination {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
@@ -717,36 +878,46 @@
       </div>
     </div>
 
-    <!-- TABLA MEJORADA CON BÚSQUEDA Y EXPORTACIÓN -->
-    <div class="card p-6 mb-8">
-      <div class="table-actions">
-        <div>
-          <h3 class="table-title">Base de Datos Completa</h3>
-          <p class="text-sm text-slate-500 mt-1">Registros del estudio de comportamiento proambiental</p>
-        </div>
-        <div class="flex gap-3">
-          <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
-            <i class="fas fa-file-export text-sm"></i>
-            Exportar Dataset
-          </button>
-        </div>
+    <!-- TABLA PROFESIONAL MEJORADA -->
+    <div class="table-container mb-8">
+      <!-- Cabecera de la tabla -->
+      <div class="table-header">
+        <h3 class="table-title">Base de Datos Completa</h3>
+        <p class="table-subtitle">Registros del estudio de comportamiento proambiental</p>
       </div>
 
-      <!-- BÚSQUEDA MEJORADA -->
-      <div class="search-header">
-        <div class="search-container">
-          <i class="fas fa-search search-icon"></i>
+      <!-- Controles de la tabla -->
+      <div class="table-controls">
+        <div class="table-search-container">
+          <i class="fas fa-search table-search-icon"></i>
           <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
-                 class="search-input" aria-label="Buscar en la tabla">
-          <button id="clearSearch" class="clear-search hidden" aria-label="Limpiar búsqueda">
-            <i class="fas fa-times"></i>
-          </button>
+                 class="table-search-input" aria-label="Buscar en la tabla">
         </div>
-        <div id="searchResultsInfo" class="search-results-info hidden">
-          <!-- Información de resultados se mostrará aquí -->
+        
+        <div class="table-stats">
+          <div class="table-stat-item">
+            <span>Registros:</span>
+            <span id="tableTotalRecords" class="table-stat-badge">0</span>
+          </div>
+          <div class="table-stat-item">
+            <span>Filtrados:</span>
+            <span id="tableFilteredRecords" class="table-stat-badge">0</span>
+          </div>
+        </div>
+        
+        <div class="table-actions">
+          <button id="btnRefreshTable" class="table-action-btn">
+            <i class="fas fa-sync-alt"></i>
+            Actualizar
+          </button>
+          <button id="btnExportCSV" class="table-action-btn primary">
+            <i class="fas fa-file-export"></i>
+            Exportar CSV
+          </button>
         </div>
       </div>
 
+      <!-- Contenedor de la tabla -->
       <div class="dataTable-wrapper">
         <div class="dataTable-container">
           <table id="dataTable" class="dataTable-table">
@@ -756,6 +927,34 @@
             <tbody id="tableBody"></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- Estados de la tabla -->
+      <div id="tableLoading" class="table-loading hidden">
+        <div class="table-loading-spinner"></div>
+        <p>Cargando datos de la tabla...</p>
+      </div>
+      
+      <div id="tableEmpty" class="table-empty hidden">
+        <div class="table-empty-icon">
+          <i class="fas fa-database"></i>
+        </div>
+        <p class="text-lg font-medium text-slate-500">No se encontraron registros</p>
+        <p class="text-sm text-slate-400 mt-1">Ajusta los filtros o intenta actualizar los datos</p>
+      </div>
+
+      <!-- Paginación -->
+      <div class="dataTable-pagination">
+        <div class="dataTable-info" id="tableInfo"></div>
+        <ul class="dataTable-pagination-list" id="tablePagination"></ul>
+        <select class="dataTable-selector" id="tablePageSize">
+          <option value="5">5 registros</option>
+          <option value="10" selected>10 registros</option>
+          <option value="15">15 registros</option>
+          <option value="20">20 registros</option>
+          <option value="50">50 registros</option>
+          <option value="100">100 registros</option>
+        </select>
       </div>
     </div>
 
@@ -1454,7 +1653,7 @@
     }
 
     /**************************************************************************
-     * Table handling (Simple-DataTables) - MEJORADO CON BÚSQUEDA GLOBAL
+     * Table handling (Simple-DataTables) - PROFESIONAL MEJORADO
      **************************************************************************/
     function buildTableHeaders(columns) {
       const headerRow = document.getElementById('tableHeaderRow');
@@ -1468,6 +1667,7 @@
                             .replace('Desechos', 'Residuos')
                             .replace('Participaria', 'Disposición a Participar');
         th.innerText = prettyTitle;
+        th.className = 'sortable';
         headerRow.appendChild(th);
       });
     }
@@ -1475,20 +1675,46 @@
     function buildTableBody(rows, columns) {
       const tbody = document.getElementById('tableBody'); 
       tbody.innerHTML = '';
+      
+      if (!rows || rows.length === 0) {
+        document.getElementById('tableEmpty').classList.remove('hidden');
+        document.getElementById('tableTotalRecords').textContent = '0';
+        document.getElementById('tableFilteredRecords').textContent = '0';
+        return;
+      }
+      
+      document.getElementById('tableEmpty').classList.add('hidden');
+      
       rows.forEach(r => {
         const tr = document.createElement('tr');
         columns.forEach(col => {
           const td = document.createElement('td');
-          td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
+          const value = r[col] === null || r[col] === undefined ? '' : String(r[col]);
+          td.innerText = value;
+          
+          // Aplicar estilos especiales según el tipo de dato
+          if (col.includes('edad') || col.includes('ingreso')) {
+            td.className = 'table-cell-numeric';
+          } else if (col.includes('sexo') || col.includes('grupo')) {
+            td.className = 'table-cell-center';
+          } else if (value.length > 30) {
+            td.className = 'table-cell-truncate';
+            td.title = value;
+          }
+          
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
       });
       
+      // Actualizar estadísticas
+      document.getElementById('tableTotalRecords').textContent = rows.length;
+      document.getElementById('tableFilteredRecords').textContent = rows.length;
+      
       // Guardar datos para búsqueda
       allTableData = rows;
       
-      // Inicializar o reinicializar DataTable con configuración en español
+      // Inicializar o reinicializar DataTable con configuración profesional
       setTimeout(() => {
         try { 
           if (dataTable) dataTable.destroy(); 
@@ -1520,7 +1746,7 @@
             info: "dataTable-info",
             input: "dataTable-input",
             pagination: "dataTable-pagination",
-            paginationList: "dataTable-paginationList",
+            paginationList: "dataTable-pagination-list",
             selector: "dataTable-selector",
             table: "dataTable-table",
             tbody: "dataTable-tbody",
@@ -1531,55 +1757,41 @@
 
         // Conectar el input de búsqueda personalizado
         const searchInput = document.getElementById('tableSearch');
-        const clearSearchBtn = document.getElementById('clearSearch');
-        const searchResultsInfo = document.getElementById('searchResultsInfo');
-        
-        // Función para actualizar la información de resultados
-        function updateSearchInfo() {
-          const info = dataTable.data.info;
-          if (currentSearchTerm) {
-            const totalRows = allTableData.length;
-            const filteredRows = info.pageCount > 0 ? info.rows : 0;
-            
-            if (filteredRows === 0) {
-              searchResultsInfo.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>No se encontraron resultados para "${currentSearchTerm}"`;
-              searchResultsInfo.classList.remove('hidden');
-            } else {
-              searchResultsInfo.innerHTML = `<i class="fas fa-filter mr-2"></i>${filteredRows} de ${totalRows} registros coinciden con "${currentSearchTerm}"`;
-              searchResultsInfo.classList.remove('hidden');
-            }
-            
-            clearSearchBtn.classList.remove('hidden');
-          } else {
-            searchResultsInfo.classList.add('hidden');
-            clearSearchBtn.classList.add('hidden');
-          }
-        }
         
         // Búsqueda en tiempo real
         searchInput.addEventListener('input', (e) => {
           currentSearchTerm = e.target.value;
           dataTable.search(currentSearchTerm);
           
-          // Actualizar información después de un pequeño retraso
-          setTimeout(updateSearchInfo, 100);
+          // Actualizar estadísticas después de un pequeño retraso
+          setTimeout(updateTableStats, 100);
         });
         
-        // Limpiar búsqueda
-        clearSearchBtn.addEventListener('click', () => {
-          searchInput.value = '';
-          currentSearchTerm = '';
-          dataTable.search('');
-          searchResultsInfo.classList.add('hidden');
-          clearSearchBtn.classList.add('hidden');
-        });
+        // Actualizar estadísticas cuando cambie la página
+        dataTable.on('datatable.page', updateTableStats);
+        dataTable.on('datatable.sort', updateTableStats);
+        dataTable.on('datatable.perpage', updateTableStats);
         
-        // Actualizar información cuando cambie la página
-        dataTable.on('datatable.page', updateSearchInfo);
-        
-        // Actualizar información inicial
-        updateSearchInfo();
+        // Actualizar estadísticas iniciales
+        updateTableStats();
       }, 100);
+    }
+    
+    function updateTableStats() {
+      if (!dataTable) return;
+      
+      const info = dataTable.data.info;
+      const totalRows = allTableData.length;
+      const filteredRows = info.rows;
+      
+      document.getElementById('tableTotalRecords').textContent = totalRows;
+      document.getElementById('tableFilteredRecords').textContent = filteredRows;
+      
+      // Actualizar información de paginación
+      const tableInfo = document.querySelector('.dataTable-info');
+      if (tableInfo) {
+        tableInfo.textContent = `Mostrando ${info.start} a ${info.end} de ${filteredRows} registros`;
+      }
     }
 
     /**************************************************************************
@@ -1588,6 +1800,7 @@
     async function fetchAllAndRender() {
       // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
+      document.getElementById('tableLoading').classList.remove('hidden');
       
       // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
@@ -1595,6 +1808,7 @@
         console.error("Supabase error:", error); 
         alert("Error cargando datos desde Supabase. Revisar consola."); 
         document.getElementById('chartLoading').classList.add('hidden');
+        document.getElementById('tableLoading').classList.add('hidden');
         return; 
       }
       // store raw
@@ -1644,6 +1858,7 @@
       
       // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
+      document.getElementById('tableLoading').classList.add('hidden');
     }
 
     function updateSummaries(rows) {
@@ -1803,6 +2018,7 @@
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
     document.getElementById('applyDateFilter').addEventListener('click', applyDateFilter);
     document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
+    document.getElementById('btnRefreshTable').addEventListener('click', fetchAllAndRender);
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
