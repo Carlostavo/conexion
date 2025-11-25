@@ -224,157 +224,26 @@
       font-size: 0.7rem;
       font-weight: 600;
     }
-    
-    /* ==================== */
-    /* ESTILOS PROFESIONALES PARA LA TABLA */
-    /* ==================== */
-    
-    .table-container {
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(15,23,42,0.08);
-      border: 1px solid #e2e8f0;
-      background: white;
-    }
-    
-    .table-header {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      padding: 1.5rem;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    
-    .table-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 0.5rem;
-    }
-    
-    .table-subtitle {
-      color: #64748b;
-      font-size: 0.875rem;
-    }
-    
-    .table-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem;
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    
-    .table-search-container {
-      position: relative;
-      flex: 1;
-      max-width: 400px;
-    }
-    
-    .table-search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #64748b;
-    }
-    
-    .table-search-input {
-      width: 100%;
-      padding: 10px 10px 10px 40px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      background: white;
-    }
-    
-    .table-search-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    
-    .table-actions {
-      display: flex;
-      gap: 0.75rem;
-      align-items: center;
-    }
-    
-    .table-action-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      border: 1px solid #e2e8f0;
-      background: white;
-      color: #475569;
-    }
-    
-    .table-action-btn:hover {
-      background: #f8fafc;
-      transform: translateY(-1px);
-    }
-    
-    .table-action-btn.primary {
-      background: linear-gradient(to right, #10b981, #059669);
-      color: white;
-      border: none;
-    }
-    
-    .table-action-btn.primary:hover {
-      background: linear-gradient(to right, #059669, #047857);
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-    }
-    
-    .table-stats {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-      font-size: 0.875rem;
-      color: #64748b;
-    }
-    
-    .table-stat-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .table-stat-badge {
-      background: #10b981;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    
+    /* Estilos personalizados para Simple-DataTables en español */
     .dataTable-wrapper {
-      border: none;
-      border-radius: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
     }
-    
     .dataTable-container {
+      background: white;
       max-height: 600px;
       overflow: auto;
-      background: white;
     }
-    
     .dataTable-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1000px;
+      min-width: 800px;
     }
-    
     .dataTable-table th {
       background: #f8fafc;
-      padding: 14px 16px;
+      padding: 12px 16px;
       text-align: left;
       font-weight: 600;
       color: #374151;
@@ -382,75 +251,38 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      font-size: 0.875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-    
-    .dataTable-table th.sortable {
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    
-    .dataTable-table th.sortable:hover {
-      background: #f1f5f9;
-    }
-    
     .dataTable-table td {
-      padding: 14px 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid #f1f5f9;
-      font-size: 0.875rem;
-      color: #475569;
+      white-space: nowrap;
     }
-    
-    .dataTable-table tr {
-      transition: background 0.2s ease;
-    }
-    
     .dataTable-table tr:hover {
       background: #f8fafc;
     }
-    
-    .dataTable-table tr:nth-child(even) {
-      background: #fafafa;
+    /* Estilos para la barra de búsqueda */
+    .dataTable-input {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 16px;
+      width: calc(100% - 32px);
+      font-size: 14px;
     }
-    
-    .dataTable-table tr:nth-child(even):hover {
-      background: #f1f5f9;
+    .dataTable-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
-    
-    .table-cell-highlight {
-      background: #fef3c7 !important;
-    }
-    
-    .table-cell-numeric {
-      text-align: right;
-      font-family: 'Courier New', monospace;
-      font-weight: 500;
-    }
-    
-    .table-cell-center {
-      text-align: center;
-    }
-    
-    .table-cell-truncate {
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
+    /* Estilos para la paginación */
     .dataTable-pagination {
-      padding: 1.5rem;
+      margin: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 1rem;
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
+      gap: 10px;
     }
-    
     .dataTable-pagination-list {
       display: flex;
       gap: 4px;
@@ -458,11 +290,9 @@
       margin: 0;
       padding: 0;
     }
-    
     .dataTable-pagination-list li {
       margin: 0;
     }
-    
     .dataTable-pagination-list li a {
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -471,36 +301,29 @@
       color: #374151;
       font-size: 14px;
       transition: all 0.2s ease;
-      min-width: 40px;
-      text-align: center;
-      display: block;
     }
-    
     .dataTable-pagination-list li a:hover {
       background: #f3f4f6;
     }
-    
     .dataTable-pagination-list li.active a {
       background: #10b981;
       border-color: #10b981;
       color: white;
     }
-    
     .dataTable-pagination-list li.disabled a {
       color: #9ca3af;
       cursor: not-allowed;
     }
-    
     .dataTable-pagination-list li.disabled a:hover {
       background: transparent;
     }
-    
+    /* Información de la tabla */
     .dataTable-info {
       margin: 0;
       color: #6b7280;
       font-size: 14px;
     }
-    
+    /* Selector de registros por página */
     .dataTable-selector {
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -508,47 +331,58 @@
       font-size: 14px;
       background: white;
     }
-    
     /* Scrollbar personalizado */
     .dataTable-container::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
-    
     .dataTable-container::-webkit-scrollbar-track {
       background: #f1f5f9;
       border-radius: 4px;
     }
-    
     .dataTable-container::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
-    
     .dataTable-container::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
-    
     .summary-trend {
       font-size: 0.75rem;
       margin-top: 0.25rem;
     }
-    
     .trend-positive {
       color: #10b981;
     }
-    
     .trend-negative {
       color: #ef4444;
     }
-    
+    .search-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .table-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .table-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
     .date-filter-container {
       display: flex;
       gap: 0.75rem;
       align-items: end;
       flex-wrap: wrap;
     }
-    
     .date-input-group {
       display: flex;
       flex-direction: column;
@@ -556,13 +390,11 @@
       flex: 1;
       min-width: 140px;
     }
-    
     .date-input-group label {
       font-size: 0.875rem;
       font-weight: 500;
       color: #374151;
     }
-    
     .date-input {
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -570,76 +402,263 @@
       font-size: 0.875rem;
       transition: all 0.2s ease;
     }
-    
     .date-input:focus {
       outline: none;
       border-color: #10b981;
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
-    
     .filter-actions {
       display: flex;
       gap: 0.5rem;
       margin-top: 0.5rem;
     }
-    
     .active-filter {
       background: #10b981 !important;
       color: white !important;
       border-color: #10b981 !important;
     }
-    
-    /* Estados de carga */
-    .table-loading {
+    /* Estilos mejorados para la búsqueda */
+    .search-header {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .search-results-info {
+      background: #ecfdf5;
+      border: 1px solid #d1fae5;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: #065f46;
+    }
+    .search-highlight {
+      background-color: #fef3c7;
+      padding: 0.1rem 0.2rem;
+      border-radius: 0.25rem;
+    }
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 500px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 10px 10px 40px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .clear-search {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .clear-search:hover {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+    /* PAGINACIÓN PROFESIONAL MEJORADA */
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .pagination-info {
+      color: #64748b;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pagination-btn {
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 3rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+      color: #374151;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 36px;
+    }
+    .pagination-btn:hover:not(:disabled) {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+    }
+    .pagination-btn:disabled {
+      color: #9ca3af;
+      cursor: not-allowed;
+      background: #f9fafb;
+    }
+    .pagination-btn.active {
+      background: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+    .pagination-pages {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .pagination-jump {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pagination-input {
+      width: 60px;
+      padding: 0.375rem;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.875rem;
+    }
+    .pagination-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .pagination-select {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0.375rem 0.5rem;
+      font-size: 0.875rem;
+      background: white;
+    }
+    .table-loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
       color: #64748b;
     }
-    
-    .table-loading-spinner {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #10b981;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 1rem;
-    }
-    
     .table-empty {
       text-align: center;
-      padding: 3rem;
+      padding: 3rem 1rem;
       color: #64748b;
     }
-    
-    .table-empty-icon {
+    .table-empty i {
       font-size: 3rem;
       margin-bottom: 1rem;
       color: #d1d5db;
     }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .table-controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .table-search-container {
-        max-width: 100%;
-      }
-      
-      .table-actions {
-        justify-content: space-between;
-      }
-      
-      .dataTable-pagination {
-        flex-direction: column;
-        align-items: center;
-      }
+    .table-export-options {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .table-tools {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .column-visibility {
+      position: relative;
+    }
+    .column-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      color: #374151;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .column-toggle-btn:hover {
+      background: #f1f5f9;
+    }
+    .column-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      padding: 0.5rem;
+      z-index: 20;
+      min-width: 200px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+    .column-dropdown.show {
+      display: block;
+    }
+    .column-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .column-option:hover {
+      background: #f3f4f6;
+    }
+    .column-option input {
+      margin: 0;
+    }
+    .table-responsive-container {
+      position: relative;
+      overflow: hidden;
+    }
+    .table-scroll-indicator {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 20px;
+      background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .table-scroll-indicator.visible {
+      opacity: 1;
     }
   </style>
 </head>
@@ -878,83 +897,105 @@
       </div>
     </div>
 
-    <!-- TABLA PROFESIONAL MEJORADA -->
-    <div class="table-container mb-8">
-      <!-- Cabecera de la tabla -->
-      <div class="table-header">
-        <h3 class="table-title">Base de Datos Completa</h3>
-        <p class="table-subtitle">Registros del estudio de comportamiento proambiental</p>
+    <!-- TABLA MEJORADA CON PAGINACIÓN PROFESIONAL -->
+    <div class="card p-6 mb-8">
+      <div class="table-actions">
+        <div>
+          <h3 class="table-title">Base de Datos Completa</h3>
+          <p class="text-sm text-slate-500 mt-1">Registros del estudio de comportamiento proambiental</p>
+        </div>
+        <div class="table-tools">
+          <div class="table-export-options">
+            <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
+              <i class="fas fa-file-csv text-sm"></i>
+              CSV
+            </button>
+            <button id="btnExportExcel" class="btn-secondary flex items-center gap-2">
+              <i class="fas fa-file-excel text-sm"></i>
+              Excel
+            </button>
+          </div>
+          <div class="column-visibility">
+            <button id="columnToggle" class="column-toggle-btn">
+              <i class="fas fa-columns"></i>
+              Columnas
+              <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div id="columnDropdown" class="column-dropdown">
+              <!-- Las opciones de columnas se generarán dinámicamente -->
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Controles de la tabla -->
-      <div class="table-controls">
-        <div class="table-search-container">
-          <i class="fas fa-search table-search-icon"></i>
+      <!-- BÚSQUEDA MEJORADA -->
+      <div class="search-header">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
           <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
-                 class="table-search-input" aria-label="Buscar en la tabla">
-        </div>
-        
-        <div class="table-stats">
-          <div class="table-stat-item">
-            <span>Registros:</span>
-            <span id="tableTotalRecords" class="table-stat-badge">0</span>
-          </div>
-          <div class="table-stat-item">
-            <span>Filtrados:</span>
-            <span id="tableFilteredRecords" class="table-stat-badge">0</span>
-          </div>
-        </div>
-        
-        <div class="table-actions">
-          <button id="btnRefreshTable" class="table-action-btn">
-            <i class="fas fa-sync-alt"></i>
-            Actualizar
-          </button>
-          <button id="btnExportCSV" class="table-action-btn primary">
-            <i class="fas fa-file-export"></i>
-            Exportar CSV
+                 class="search-input" aria-label="Buscar en la tabla">
+          <button id="clearSearch" class="clear-search hidden" aria-label="Limpiar búsqueda">
+            <i class="fas fa-times"></i>
           </button>
         </div>
-      </div>
-
-      <!-- Contenedor de la tabla -->
-      <div class="dataTable-wrapper">
-        <div class="dataTable-container">
-          <table id="dataTable" class="dataTable-table">
-            <thead>
-              <tr id="tableHeaderRow"></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+        <div id="searchResultsInfo" class="search-results-info hidden">
+          <!-- Información de resultados se mostrará aquí -->
         </div>
       </div>
 
-      <!-- Estados de la tabla -->
-      <div id="tableLoading" class="table-loading hidden">
-        <div class="table-loading-spinner"></div>
-        <p>Cargando datos de la tabla...</p>
-      </div>
-      
-      <div id="tableEmpty" class="table-empty hidden">
-        <div class="table-empty-icon">
-          <i class="fas fa-database"></i>
+      <!-- CONTENEDOR DE TABLA RESPONSIVE -->
+      <div class="table-responsive-container">
+        <div class="dataTable-wrapper">
+          <div class="dataTable-container">
+            <table id="dataTable" class="dataTable-table">
+              <thead>
+                <tr id="tableHeaderRow"></tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
         </div>
-        <p class="text-lg font-medium text-slate-500">No se encontraron registros</p>
-        <p class="text-sm text-slate-400 mt-1">Ajusta los filtros o intenta actualizar los datos</p>
+        <div id="tableScrollIndicator" class="table-scroll-indicator">
+          <i class="fas fa-chevron-right"></i>
+        </div>
       </div>
 
-      <!-- Paginación -->
-      <div class="dataTable-pagination">
-        <div class="dataTable-info" id="tableInfo"></div>
-        <ul class="dataTable-pagination-list" id="tablePagination"></ul>
-        <select class="dataTable-selector" id="tablePageSize">
-          <option value="5">5 registros</option>
-          <option value="10" selected>10 registros</option>
-          <option value="15">15 registros</option>
-          <option value="20">20 registros</option>
-          <option value="50">50 registros</option>
-          <option value="100">100 registros</option>
-        </select>
+      <!-- PAGINACIÓN PROFESIONAL MEJORADA -->
+      <div id="paginationContainer" class="pagination-container">
+        <div class="pagination-info" id="paginationInfo">
+          Mostrando 0-0 de 0 registros
+        </div>
+        
+        <div class="pagination-controls">
+          <button id="firstPage" class="pagination-btn" title="Primera página">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button id="prevPage" class="pagination-btn" title="Página anterior">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          
+          <div class="pagination-pages" id="pageNumbers">
+            <!-- Los números de página se generarán aquí -->
+          </div>
+          
+          <button id="nextPage" class="pagination-btn" title="Página siguiente">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button id="lastPage" class="pagination-btn" title="Última página">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
+        
+        <div class="pagination-jump">
+          <span class="text-sm text-slate-600">Ir a:</span>
+          <input type="number" id="pageJump" class="pagination-input" min="1" value="1">
+          <select id="pageSize" class="pagination-select">
+            <option value="10">10 filas</option>
+            <option value="25">25 filas</option>
+            <option value="50">50 filas</option>
+            <option value="100">100 filas</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -987,6 +1028,12 @@
     let dataTable = null;
     let allTableData = [];
     let currentSearchTerm = '';
+    let tableColumns = [];
+    let visibleColumns = [];
+    let currentPage = 1;
+    let pageSize = 10;
+    let totalPages = 1;
+    let filteredData = [];
 
     /**************************************************************************
      * Indicadores con títulos mejorados
@@ -1022,44 +1069,318 @@
       return String(v).trim();
     }
 
-    function countCategorical(arr) {
-      const counts = {};
-      arr.forEach(v => {
-        const k = normalize(v) || "No especificado";
-        counts[k] = (counts[k] || 0) + 1;
-      });
-      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
-      return { 
-        labels: entries.map(e=>e[0]), 
-        values: entries.map(e=>e[1]),
-        counts: counts
-      };
-    }
-
-    function countLikert(arr) {
-      const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
-      const counts = LIKERT_LEVELS.map(()=>0);
-      arr.forEach(v => {
-        const s = normalize(v);
-        if (!s) return;
-        const idx = lower.indexOf(s.toLowerCase());
-        if (idx !== -1) counts[idx] += 1;
-        else {
-          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
-          for (let i=0;i<lower.length;i++){
-            if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
-          }
+    /**************************************************************************
+     * SISTEMA DE PAGINACIÓN PROFESIONAL
+     **************************************************************************/
+    function initializePagination() {
+      // Configurar eventos de paginación
+      document.getElementById('firstPage').addEventListener('click', () => goToPage(1));
+      document.getElementById('prevPage').addEventListener('click', () => goToPage(currentPage - 1));
+      document.getElementById('nextPage').addEventListener('click', () => goToPage(currentPage + 1));
+      document.getElementById('lastPage').addEventListener('click', () => goToPage(totalPages));
+      
+      document.getElementById('pageJump').addEventListener('change', (e) => {
+        const page = parseInt(e.target.value);
+        if (page >= 1 && page <= totalPages) {
+          goToPage(page);
+        } else {
+          e.target.value = currentPage;
         }
       });
-      const countsObj = {};
-      LIKERT_LEVELS.forEach((level, i) => {
-        countsObj[level] = counts[i];
+      
+      document.getElementById('pageSize').addEventListener('change', (e) => {
+        pageSize = parseInt(e.target.value);
+        currentPage = 1;
+        renderTablePage();
+        updatePagination();
       });
-      return { 
-        labels: LIKERT_LEVELS.slice(), 
-        values: counts,
-        counts: countsObj
-      };
+      
+      // Configurar visibilidad de columnas
+      document.getElementById('columnToggle').addEventListener('click', toggleColumnDropdown);
+      
+      // Cerrar dropdown al hacer clic fuera
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.column-visibility')) {
+          document.getElementById('columnDropdown').classList.remove('show');
+        }
+      });
+      
+      // Configurar indicador de scroll
+      const tableContainer = document.querySelector('.dataTable-container');
+      const scrollIndicator = document.getElementById('tableScrollIndicator');
+      
+      tableContainer.addEventListener('scroll', () => {
+        const { scrollLeft, scrollWidth, clientWidth } = tableContainer;
+        const isScrollable = scrollWidth > clientWidth;
+        const isAtEnd = scrollLeft + clientWidth >= scrollWidth - 10;
+        
+        if (isScrollable && !isAtEnd) {
+          scrollIndicator.classList.add('visible');
+        } else {
+          scrollIndicator.classList.remove('visible');
+        }
+      });
+    }
+
+    function toggleColumnDropdown() {
+      const dropdown = document.getElementById('columnDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function createColumnVisibilityOptions() {
+      const dropdown = document.getElementById('columnDropdown');
+      dropdown.innerHTML = '';
+      
+      tableColumns.forEach((column, index) => {
+        const isVisible = visibleColumns.includes(column);
+        const option = document.createElement('div');
+        option.className = 'column-option';
+        option.innerHTML = `
+          <input type="checkbox" id="col-${index}" ${isVisible ? 'checked' : ''}>
+          <label for="col-${index}" class="flex-1 cursor-pointer">${formatColumnName(column)}</label>
+        `;
+        
+        option.querySelector('input').addEventListener('change', (e) => {
+          if (e.target.checked) {
+            if (!visibleColumns.includes(column)) {
+              visibleColumns.push(column);
+            }
+          } else {
+            const colIndex = visibleColumns.indexOf(column);
+            if (colIndex > -1) {
+              visibleColumns.splice(colIndex, 1);
+            }
+          }
+          renderTableHeaders();
+          renderTablePage();
+        });
+        
+        dropdown.appendChild(option);
+      });
+    }
+
+    function formatColumnName(column) {
+      return column.replace(/_/g, ' ')
+                  .replace(/\b\w/g, l => l.toUpperCase())
+                  .replace('Jefe Hogar', 'Jefe de Hogar')
+                  .replace('Desechos', 'Residuos')
+                  .replace('Participaria', 'Disposición a Participar');
+    }
+
+    function updatePagination() {
+      const totalRecords = filteredData.length;
+      totalPages = Math.ceil(totalRecords / pageSize);
+      
+      // Actualizar información
+      const startRecord = (currentPage - 1) * pageSize + 1;
+      const endRecord = Math.min(currentPage * pageSize, totalRecords);
+      document.getElementById('paginationInfo').textContent = 
+        `Mostrando ${startRecord}-${endRecord} de ${totalRecords} registros`;
+      
+      // Actualizar botones de navegación
+      document.getElementById('firstPage').disabled = currentPage === 1;
+      document.getElementById('prevPage').disabled = currentPage === 1;
+      document.getElementById('nextPage').disabled = currentPage === totalPages;
+      document.getElementById('lastPage').disabled = currentPage === totalPages;
+      
+      // Actualizar entrada de página
+      document.getElementById('pageJump').value = currentPage;
+      document.getElementById('pageJump').max = totalPages;
+      
+      // Generar números de página
+      const pageNumbersContainer = document.getElementById('pageNumbers');
+      pageNumbersContainer.innerHTML = '';
+      
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      // Ajustar si estamos cerca del final
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      // Botón para primeras páginas si es necesario
+      if (startPage > 1) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'pagination-btn';
+        ellipsis.textContent = '...';
+        ellipsis.style.cursor = 'default';
+        pageNumbersContainer.appendChild(ellipsis);
+      }
+      
+      // Botones de páginas numeradas
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.addEventListener('click', () => goToPage(i));
+        pageNumbersContainer.appendChild(pageBtn);
+      }
+      
+      // Botón para últimas páginas si es necesario
+      if (endPage < totalPages) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'pagination-btn';
+        ellipsis.textContent = '...';
+        ellipsis.style.cursor = 'default';
+        pageNumbersContainer.appendChild(ellipsis);
+      }
+    }
+
+    function goToPage(page) {
+      if (page < 1 || page > totalPages || page === currentPage) return;
+      
+      currentPage = page;
+      renderTablePage();
+      updatePagination();
+      
+      // Scroll suave a la parte superior de la tabla
+      document.querySelector('.dataTable-container').scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    function renderTablePage() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+      const pageData = filteredData.slice(startIndex, endIndex);
+      
+      if (pageData.length === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+          <td colspan="${visibleColumns.length}" class="table-empty">
+            <i class="fas fa-inbox"></i>
+            <p>No se encontraron registros</p>
+          </td>
+        `;
+        tbody.appendChild(emptyRow);
+        return;
+      }
+      
+      pageData.forEach(row => {
+        const tr = document.createElement('tr');
+        visibleColumns.forEach(col => {
+          const td = document.createElement('td');
+          let value = row[col];
+          
+          if (value === null || value === undefined) {
+            value = '';
+          } else {
+            value = String(value);
+            
+            // Resaltar término de búsqueda si existe
+            if (currentSearchTerm && value.toLowerCase().includes(currentSearchTerm.toLowerCase())) {
+              const regex = new RegExp(`(${currentSearchTerm})`, 'gi');
+              value = value.replace(regex, '<mark class="search-highlight">$1</mark>');
+            }
+          }
+          
+          td.innerHTML = value;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    /**************************************************************************
+     * Table handling (Simple-DataTables) - MEJORADO CON PAGINACIÓN PROPIA
+     **************************************************************************/
+    function buildTableHeaders(columns) {
+      tableColumns = columns;
+      visibleColumns = [...columns]; // Mostrar todas las columnas por defecto
+      
+      renderTableHeaders();
+      createColumnVisibilityOptions();
+    }
+    
+    function renderTableHeaders() {
+      const headerRow = document.getElementById('tableHeaderRow');
+      headerRow.innerHTML = '';
+      
+      visibleColumns.forEach(col => {
+        const th = document.createElement('th');
+        th.innerText = formatColumnName(col);
+        headerRow.appendChild(th);
+      });
+    }
+    
+    function buildTableBody(rows, columns) {
+      // Guardar datos para búsqueda y paginación
+      allTableData = rows;
+      filteredData = [...rows];
+      
+      // Inicializar paginación
+      initializePagination();
+      renderTablePage();
+      updatePagination();
+      
+      // Configurar búsqueda
+      const searchInput = document.getElementById('tableSearch');
+      const clearSearchBtn = document.getElementById('clearSearch');
+      const searchResultsInfo = document.getElementById('searchResultsInfo');
+      
+      function performSearch() {
+        currentSearchTerm = searchInput.value.trim();
+        
+        if (currentSearchTerm) {
+          filteredData = allTableData.filter(row => {
+            return Object.values(row).some(value => 
+              value !== null && 
+              value !== undefined && 
+              String(value).toLowerCase().includes(currentSearchTerm.toLowerCase())
+            );
+          });
+          
+          clearSearchBtn.classList.remove('hidden');
+        } else {
+          filteredData = [...allTableData];
+          clearSearchBtn.classList.add('hidden');
+          searchResultsInfo.classList.add('hidden');
+        }
+        
+        currentPage = 1;
+        renderTablePage();
+        updatePagination();
+        updateSearchInfo();
+      }
+      
+      // Búsqueda en tiempo real con debounce
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 300);
+      });
+      
+      // Limpiar búsqueda
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        performSearch();
+      });
+      
+      function updateSearchInfo() {
+        if (currentSearchTerm) {
+          const totalRows = allTableData.length;
+          const filteredRows = filteredData.length;
+          
+          if (filteredRows === 0) {
+            searchResultsInfo.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>No se encontraron resultados para "${currentSearchTerm}"`;
+            searchResultsInfo.classList.remove('hidden');
+          } else {
+            searchResultsInfo.innerHTML = `<i class="fas fa-filter mr-2"></i>${filteredRows} de ${totalRows} registros coinciden con "${currentSearchTerm}"`;
+            searchResultsInfo.classList.remove('hidden');
+          }
+        } else {
+          searchResultsInfo.classList.add('hidden');
+        }
+      }
+      
+      // Actualizar información inicial
+      updateSearchInfo();
     }
 
     /**************************************************************************
@@ -1653,145 +1974,45 @@
     }
 
     /**************************************************************************
-     * Table handling (Simple-DataTables) - PROFESIONAL MEJORADO
+     * Export table as CSV
      **************************************************************************/
-    function buildTableHeaders(columns) {
-      const headerRow = document.getElementById('tableHeaderRow');
-      headerRow.innerHTML = '';
-      columns.forEach(c => {
-        const th = document.createElement('th');
-        // Mejorar los títulos de las columnas
-        const prettyTitle = c.replace(/_/g, ' ')
-                            .replace(/\b\w/g, l => l.toUpperCase())
-                            .replace('Jefe Hogar', 'Jefe de Hogar')
-                            .replace('Desechos', 'Residuos')
-                            .replace('Participaria', 'Disposición a Participar');
-        th.innerText = prettyTitle;
-        th.className = 'sortable';
-        headerRow.appendChild(th);
+    function exportTableCSV() {
+      const data = filteredData.length > 0 ? filteredData : allTableData;
+      if (!data.length) return alert("No hay datos para exportar.");
+      
+      const cols = visibleColumns.length > 0 ? visibleColumns : tableColumns;
+      const csvRows = [cols.map(c => formatColumnName(c)).join(",")];
+      
+      data.forEach(row => {
+        const vals = cols.map(c => {
+          let v = row[c];
+          if (v === null || v === undefined) return "";
+          // escape quotes
+          v = String(v).replace(/"/g, '""');
+          if (v.includes(",") || v.includes("\n")) return `"${v}"`;
+          return v;
+        });
+        csvRows.push(vals.join(","));
       });
+      
+      const csv = csvRows.join("\n");
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); 
+      a.href = url; 
+      a.download = `dataset_proambiental_${Date.now()}.csv`; 
+      a.click(); 
+      URL.revokeObjectURL(url);
     }
-    
-    function buildTableBody(rows, columns) {
-      const tbody = document.getElementById('tableBody'); 
-      tbody.innerHTML = '';
-      
-      if (!rows || rows.length === 0) {
-        document.getElementById('tableEmpty').classList.remove('hidden');
-        document.getElementById('tableTotalRecords').textContent = '0';
-        document.getElementById('tableFilteredRecords').textContent = '0';
-        return;
-      }
-      
-      document.getElementById('tableEmpty').classList.add('hidden');
-      
-      rows.forEach(r => {
-        const tr = document.createElement('tr');
-        columns.forEach(col => {
-          const td = document.createElement('td');
-          const value = r[col] === null || r[col] === undefined ? '' : String(r[col]);
-          td.innerText = value;
-          
-          // Aplicar estilos especiales según el tipo de dato
-          if (col.includes('edad') || col.includes('ingreso')) {
-            td.className = 'table-cell-numeric';
-          } else if (col.includes('sexo') || col.includes('grupo')) {
-            td.className = 'table-cell-center';
-          } else if (value.length > 30) {
-            td.className = 'table-cell-truncate';
-            td.title = value;
-          }
-          
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-      
-      // Actualizar estadísticas
-      document.getElementById('tableTotalRecords').textContent = rows.length;
-      document.getElementById('tableFilteredRecords').textContent = rows.length;
-      
-      // Guardar datos para búsqueda
-      allTableData = rows;
-      
-      // Inicializar o reinicializar DataTable con configuración profesional
-      setTimeout(() => {
-        try { 
-          if (dataTable) dataTable.destroy(); 
-        } catch(e){}
-        
-        dataTable = new simpleDatatables.DataTable("#dataTable", { 
-          searchable: true,
-          fixedHeight: false,
-          perPage: 10,
-          perPageSelect: [5, 10, 15, 20, 50, 100],
-          labels: {
-            placeholder: "Buscar en todos los registros...",
-            searchTitle: "Búsqueda en dataset",
-            pageTitle: "Página {page}",
-            perPage: "registros por página",
-            noRows: "No se encontraron registros",
-            noResults: "No hay resultados que coincidan con la búsqueda",
-            info: "Mostrando {start} a {end} de {rows} registros",
-            loading: "Cargando dataset...",
-            infoFiltered: "(Filtrado de {rows} registros totales)"
-          },
-          classes: {
-            active: "active",
-            container: "dataTable-container",
-            cursor: "dataTable-cursor",
-            disabled: "disabled",
-            dropdown: "dataTable-dropdown",
-            header: "dataTable-header",
-            info: "dataTable-info",
-            input: "dataTable-input",
-            pagination: "dataTable-pagination",
-            paginationList: "dataTable-pagination-list",
-            selector: "dataTable-selector",
-            table: "dataTable-table",
-            tbody: "dataTable-tbody",
-            thead: "dataTable-thead",
-            wrapper: "dataTable-wrapper"
-          }
-        });
 
-        // Conectar el input de búsqueda personalizado
-        const searchInput = document.getElementById('tableSearch');
-        
-        // Búsqueda en tiempo real
-        searchInput.addEventListener('input', (e) => {
-          currentSearchTerm = e.target.value;
-          dataTable.search(currentSearchTerm);
-          
-          // Actualizar estadísticas después de un pequeño retraso
-          setTimeout(updateTableStats, 100);
-        });
-        
-        // Actualizar estadísticas cuando cambie la página
-        dataTable.on('datatable.page', updateTableStats);
-        dataTable.on('datatable.sort', updateTableStats);
-        dataTable.on('datatable.perpage', updateTableStats);
-        
-        // Actualizar estadísticas iniciales
-        updateTableStats();
-      }, 100);
-    }
-    
-    function updateTableStats() {
-      if (!dataTable) return;
-      
-      const info = dataTable.data.info;
-      const totalRows = allTableData.length;
-      const filteredRows = info.rows;
-      
-      document.getElementById('tableTotalRecords').textContent = totalRows;
-      document.getElementById('tableFilteredRecords').textContent = filteredRows;
-      
-      // Actualizar información de paginación
-      const tableInfo = document.querySelector('.dataTable-info');
-      if (tableInfo) {
-        tableInfo.textContent = `Mostrando ${info.start} a ${info.end} de ${filteredRows} registros`;
-      }
+    /**************************************************************************
+     * Export table as Excel (simulado)
+     **************************************************************************/
+    function exportTableExcel() {
+      alert("La exportación a Excel se simularía aquí. En una implementación real, se usaría una biblioteca como SheetJS.");
+      // En una implementación real, aquí iría el código para exportar a Excel
+      // Por ahora, simplemente exportamos como CSV con extensión .xlsx
+      exportTableCSV();
     }
 
     /**************************************************************************
@@ -1800,7 +2021,6 @@
     async function fetchAllAndRender() {
       // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
-      document.getElementById('tableLoading').classList.remove('hidden');
       
       // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
@@ -1808,7 +2028,6 @@
         console.error("Supabase error:", error); 
         alert("Error cargando datos desde Supabase. Revisar consola."); 
         document.getElementById('chartLoading').classList.add('hidden');
-        document.getElementById('tableLoading').classList.add('hidden');
         return; 
       }
       // store raw
@@ -1858,7 +2077,6 @@
       
       // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
-      document.getElementById('tableLoading').classList.add('hidden');
     }
 
     function updateSummaries(rows) {
@@ -1972,35 +2190,6 @@
     }
 
     /**************************************************************************
-     * Export table as CSV
-     **************************************************************************/
-    function exportTableCSV() {
-      const data = window.__RAW_DATA || [];
-      if (!data.length) return alert("No hay datos para exportar.");
-      const cols = Object.keys(data[0]);
-      const csvRows = [cols.join(",")];
-      data.forEach(row => {
-        const vals = cols.map(c => {
-          let v = row[c];
-          if (v === null || v === undefined) return "";
-          // escape quotes
-          v = String(v).replace(/"/g, '""');
-          if (v.includes(",") || v.includes("\n")) return `"${v}"`;
-          return v;
-        });
-        csvRows.push(vals.join(","));
-      });
-      const csv = csvRows.join("\n");
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `dataset_proambiental_${Date.now()}.csv`; 
-      a.click(); 
-      URL.revokeObjectURL(url);
-    }
-
-    /**************************************************************************
      * Auto-refresh function (incluye filtro de fecha)
      **************************************************************************/
     function autoRefreshChart() {
@@ -2015,10 +2204,10 @@
      * Init UI & events
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
+    document.getElementById('btnExportExcel').addEventListener('click', exportTableExcel);
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
     document.getElementById('applyDateFilter').addEventListener('click', applyDateFilter);
     document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
-    document.getElementById('btnRefreshTable').addEventListener('click', fetchAllAndRender);
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
