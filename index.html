@@ -92,19 +92,6 @@
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
     }
-    .btn-tertiary {
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      font-size: 0.875rem;
-    }
-    .btn-tertiary:hover {
-      background: #fecaca;
-    }
     .summary-card {
       text-align: center;
       padding: 1.5rem 1rem;
@@ -377,39 +364,6 @@
       font-weight: 600;
       color: #0f172a;
     }
-    .date-filter-container {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .date-input-group {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-    .date-input {
-      flex: 1;
-      border: 1px solid #e2e8f0;
-      padding: 0.5rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.875rem;
-    }
-    .date-clear-btn {
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-      padding: 0.5rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .date-clear-btn:hover {
-      background: #fecaca;
-    }
-    .filter-active {
-      border-color: #10b981;
-      background: #f0fdf4;
-    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -480,24 +434,17 @@
         <p class="text-xs muted mt-3">Filtra por características demográficas.</p>
       </div>
 
-      <!-- FILTRO DE FECHA MEJORADO -->
       <div class="card p-5">
         <label class="block text-sm font-medium text-slate-700 mb-3">
           <i class="fas fa-calendar-alt mr-2 text-amber-600"></i>
           Filtro por Fecha
         </label>
-        <div class="date-filter-container">
-          <div class="date-input-group">
-            <input type="date" id="filterFechaInicio" class="date-input" placeholder="Fecha inicio">
-            <span class="text-slate-400 text-sm">a</span>
-            <input type="date" id="filterFechaFin" class="date-input" placeholder="Fecha fin">
-          </div>
-          <button id="clearDateFilter" class="btn-tertiary flex items-center justify-center gap-2 w-full">
-            <i class="fas fa-times"></i>
-            Limpiar Filtro de Fechas
-          </button>
+        <div class="flex flex-col gap-3">
+          <select id="filterFecha" class="w-full control">
+            <option value="todos">Período: Todos</option>
+          </select>
         </div>
-        <p class="text-xs muted mt-3">Filtra por rango temporal específico.</p>
+        <p class="text-xs muted mt-3">Filtra por rango temporal de los datos.</p>
       </div>
     </div>
 
@@ -653,7 +600,7 @@
       <div class="search-box">
         <div class="flex items-center gap-3">
           <i class="fas fa-search text-slate-400"></i>
-          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros (texto, números, fechas)..." 
+          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
                  class="flex-1 border-0 bg-transparent focus:outline-none focus:ring-0">
         </div>
       </div>
@@ -703,15 +650,16 @@
     ];
 
     /**************************************************************************
-     * Variables globales
+     * Likert defaults (para las preguntas tipo Likert)
      **************************************************************************/
-    let dataTable = null;
-    let chartInstance = null;
-    let dateColumns = [];
+    const LIKERT_LEVELS = [
+      "Totalmente en desacuerdo",
+      "En desacuerdo",
+      "Indiferente",
+      "De acuerdo",
+      "Totalmente de acuerdo"
+    ];
 
-    /**************************************************************************
-     * Funciones de utilidad
-     **************************************************************************/
     function normalize(v) {
       if (v === null || v === undefined) return null;
       return String(v).trim();
@@ -740,6 +688,7 @@
         const idx = lower.indexOf(s.toLowerCase());
         if (idx !== -1) counts[idx] += 1;
         else {
+          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
           for (let i=0;i<lower.length;i++){
             if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
           }
@@ -754,67 +703,6 @@
         values: counts,
         counts: countsObj
       };
-    }
-
-    /**************************************************************************
-     * Funciones para filtros de fecha
-     **************************************************************************/
-    function extractDateColumns(rows) {
-      // Buscar columnas que puedan contener fechas
-      const possibleDateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp', 'fecha_creacion'];
-      dateColumns = [];
-      
-      if (rows[0]) {
-        possibleDateColumns.forEach(col => {
-          if (rows[0][col] && String(rows[0][col]).match(/\d{4}-\d{2}-\d{2}/)) {
-            dateColumns.push(col);
-          }
-        });
-      }
-      return dateColumns;
-    }
-
-    function parseDate(dateStr) {
-      if (!dateStr) return null;
-      // Intentar parsear diferentes formatos de fecha
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? null : date;
-    }
-
-    function isDateInRange(row, startDate, endDate) {
-      if (!startDate && !endDate) return true;
-      
-      for (let col of dateColumns) {
-        const dateValue = parseDate(row[col]);
-        if (dateValue) {
-          const rowDate = new Date(dateValue.toDateString());
-          const start = startDate ? new Date(startDate) : null;
-          const end = endDate ? new Date(endDate) : null;
-          
-          if (start && end) {
-            if (rowDate >= start && rowDate <= end) return true;
-          } else if (start && !end) {
-            if (rowDate >= start) return true;
-          } else if (!start && end) {
-            if (rowDate <= end) return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    function updateDateFilterUI() {
-      const startInput = document.getElementById('filterFechaInicio');
-      const endInput = document.getElementById('filterFechaFin');
-      const hasFilter = startInput.value || endInput.value;
-      
-      if (hasFilter) {
-        startInput.classList.add('filter-active');
-        endInput.classList.add('filter-active');
-      } else {
-        startInput.classList.remove('filter-active');
-        endInput.classList.remove('filter-active');
-      }
     }
 
     /**************************************************************************
@@ -838,6 +726,7 @@
     }
 
     function calculateEnvironmentalAwareness(rows) {
+      // Combinar múltiples indicadores de conciencia ambiental
       const awarenessIndicators = [
         'conoce_desechos_solidos',
         'clasificacion_correcta_desechos', 
@@ -878,6 +767,7 @@
     function calculateAdvancedStatistics(values, labels, total) {
       if (!values.length || !total) return null;
       
+      // Estadísticas básicas
       const maxValue = Math.max(...values);
       const maxIndex = values.indexOf(maxValue);
       const maxLabel = labels[maxIndex];
@@ -888,6 +778,7 @@
       const minLabel = labels[minIndex];
       const minPercentage = ((minValue / total) * 100).toFixed(1);
       
+      // Calcular diversidad (índice de Shannon)
       let diversity = 0;
       values.forEach(value => {
         if (value > 0) {
@@ -897,6 +788,7 @@
       });
       diversity = diversity.toFixed(3);
       
+      // Calcular índice de concentración (Herfindahl-Hirschman)
       let concentration = 0;
       values.forEach(value => {
         const p = value / total;
@@ -904,20 +796,25 @@
       });
       concentration = concentration.toFixed(3);
       
+      // Calcular moda
       const modeValue = maxValue;
       const modeLabel = maxLabel;
       
+      // Calcular desviación estándar
       const mean = total / values.length;
       const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
       const stdDev = Math.sqrt(variance).toFixed(2);
       
+      // Calcular coeficiente de variación
       const cv = ((stdDev / mean) * 100).toFixed(1);
       
+      // Calcular percentiles
       const sortedValues = [...values].sort((a, b) => a - b);
       const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
       const median = sortedValues[Math.floor(sortedValues.length * 0.5)];
       const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
       
+      // Calcular asimetría (skewness)
       const skewness = values.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0) / values.length;
       
       return {
@@ -938,6 +835,7 @@
     function generateInsights(stats, labels, values, indicatorKey) {
       const insights = [];
       
+      // Insight sobre concentración
       if (stats.concentration > 0.5) {
         insights.push("• Distribución concentrada en categorías específicas");
       } else if (stats.concentration < 0.2) {
@@ -946,16 +844,19 @@
         insights.push("• Distribución moderadamente concentrada");
       }
       
+      // Insight sobre diversidad
       if (stats.diversity > 1.5) {
         insights.push("• Alta diversidad en las respuestas");
       } else if (stats.diversity < 0.5) {
         insights.push("• Baja diversidad, respuestas concentradas");
       }
       
+      // Insight sobre moda
       if (stats.max.percentage > 60) {
         insights.push(`• La categoría "${stats.max.label}" representa el ${stats.max.percentage}%`);
       }
       
+      // Insight específico por tipo de indicador
       if (indicatorKey.includes('ingreso')) {
         insights.push("• Variable económica: distribución de ingresos");
       }
@@ -972,11 +873,13 @@
     }
 
     function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
+      // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
       document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
       document.getElementById('statDiversity').textContent = stats.diversity;
       document.getElementById('statConcentration').textContent = stats.concentration;
       
+      // Renderizar distribución detallada
       const distributionContainer = document.getElementById('distributionDetails');
       distributionContainer.innerHTML = labels.map((label, index) => {
         const value = values[index];
@@ -1004,6 +907,7 @@
         `;
       }).join('');
       
+      // Renderizar insights
       const insightsContainer = document.getElementById('insightsContent');
       const insights = generateInsights(stats, labels, values, indicatorKey);
       insightsContainer.innerHTML = insights.map(insight => `
@@ -1013,6 +917,7 @@
         </p>
       `).join('');
       
+      // Renderizar métricas avanzadas
       const metricsContainer = document.getElementById('advancedMetrics');
       metricsContainer.innerHTML = `
         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -1051,12 +956,14 @@
         </div>
       `;
       
+      // Mostrar sección de estadísticas
       document.getElementById('statisticsSection').classList.remove('hidden');
     }
 
     /**************************************************************************
      * Chart handling con exportación mejorada
      **************************************************************************/
+    let chartInstance = null;
     function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
 
     function renderChart(type, labels, values, title) {
@@ -1064,6 +971,7 @@
       const ctx = canvas.getContext('2d');
       destroyChart();
 
+      // Ajustar tamaño del canvas para gráficos circulares
       if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
         canvas.style.width = '100%';
         canvas.style.maxWidth = '500px';
@@ -1074,9 +982,11 @@
         canvas.style.height = '400px';
       }
 
+      // default chart types
       const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
       const bg = palette.slice(0, labels.length);
       
+      // Configuración común para todos los gráficos
       const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1119,6 +1029,7 @@
         }
       };
 
+      // Opciones específicas por tipo de gráfico
       let chartOptions = { ...commonOptions };
       
       if (type === 'bar') {
@@ -1163,6 +1074,7 @@
           }
         };
       } else if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
+        // Opciones específicas para gráficos circulares
         chartOptions.plugins.legend.position = 'right';
         chartOptions.layout.padding = {
           top: 20,
@@ -1189,24 +1101,31 @@
       });
     }
 
+    /**************************************************************************
+     * Función mejorada para exportar gráfico con porcentajes
+     **************************************************************************/
     function exportChartWithPercentages() {
       if (!chartInstance) return alert("No hay visualización para exportar.");
       
+      // Crear un canvas temporal para el gráfico con porcentajes
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
       tempCanvas.width = 1200;
       tempCanvas.height = 800;
       
+      // Copiar el gráfico original
       tempCtx.fillStyle = 'white';
       tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
       tempCtx.drawImage(document.getElementById('mainChart'), 50, 50, 1100, 700);
       
+      // Agregar título y porcentajes si es un gráfico circular
       if (chartInstance.config.type === 'pie' || chartInstance.config.type === 'doughnut') {
         tempCtx.font = 'bold 24px Arial';
         tempCtx.fillStyle = '#0f172a';
         tempCtx.textAlign = 'center';
         tempCtx.fillText(document.getElementById('chartTitle').textContent, tempCanvas.width / 2, 30);
         
+        // Agregar porcentajes en el gráfico
         const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
         chartInstance.data.datasets[0].data.forEach((value, index) => {
           const percentage = ((value / total) * 100).toFixed(1);
@@ -1216,6 +1135,7 @@
         });
       }
       
+      // Exportar la imagen
       const url = tempCanvas.toDataURL('image/png', 1);
       const a = document.createElement('a'); 
       a.href = url; 
@@ -1226,11 +1146,13 @@
     /**************************************************************************
      * Table handling (Simple-DataTables) - MEJORADO
      **************************************************************************/
+    let dataTable = null;
     function buildTableHeaders(columns) {
       const headerRow = document.getElementById('tableHeaderRow');
       headerRow.innerHTML = '';
       columns.forEach(c => {
         const th = document.createElement('th');
+        // Mejorar los títulos de las columnas
         const prettyTitle = c.replace(/_/g, ' ')
                             .replace(/\b\w/g, l => l.toUpperCase())
                             .replace('Jefe Hogar', 'Jefe de Hogar')
@@ -1254,6 +1176,7 @@
         tbody.appendChild(tr);
       });
       
+      // Inicializar o reinicializar DataTable con configuración en español
       setTimeout(() => {
         try { 
           if (dataTable) dataTable.destroy(); 
@@ -1263,7 +1186,7 @@
           searchable: true,
           fixedHeight: false,
           perPage: 10,
-          perPageSelect: [5, 10, 15, 20, 50], // Más opciones de paginación
+          perPageSelect: [5, 10, 15, 20],
           labels: {
             placeholder: "Buscar en todos los registros...",
             searchTitle: "Búsqueda en dataset",
@@ -1303,11 +1226,37 @@
     }
 
     /**************************************************************************
-     * Fetch data from Supabase and render all
+     * Función para extraer fechas únicas del dataset
+     **************************************************************************/
+    function extractUniqueDates(rows) {
+      // Buscar columnas que puedan contener fechas
+      const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
+      let dates = new Set();
+      
+      dateColumns.forEach(col => {
+        if (rows[0] && rows[0][col]) {
+          rows.forEach(row => {
+            if (row[col]) {
+              const dateStr = String(row[col]).split('T')[0]; // Tomar solo la parte de la fecha
+              if (dateStr.match(/\d{4}-\d{2}-\d{2}/)) {
+                dates.add(dateStr);
+              }
+            }
+          });
+        }
+      });
+      
+      return Array.from(dates).sort();
+    }
+
+    /**************************************************************************
+     * Fetch data from Supabase and render all (chart + table + summaries)
      **************************************************************************/
     async function fetchAllAndRender() {
+      // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
+      // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
       if (error) { 
         console.error("Supabase error:", error); 
@@ -1315,10 +1264,10 @@
         document.getElementById('chartLoading').classList.add('hidden');
         return; 
       }
-      
+      // store raw
       window.__RAW_DATA = data || [];
-      extractDateColumns(data);
 
+      // populate group filter
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
       filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
@@ -1329,6 +1278,18 @@
         filterGrupo.appendChild(opt); 
       });
 
+      // populate date filter
+      const dates = extractUniqueDates(data);
+      const filterFecha = document.getElementById('filterFecha');
+      filterFecha.innerHTML = '<option value="todos">Período: Todos</option>';
+      dates.forEach(date => { 
+        const opt = document.createElement('option'); 
+        opt.value = date; 
+        opt.textContent = new Date(date).toLocaleDateString('es-ES'); 
+        filterFecha.appendChild(opt); 
+      });
+
+      // populate indicator selector (once)
       const sel = document.getElementById('selectIndicator');
       if (!sel.options.length) {
         INDICATORS.forEach(i => {
@@ -1339,31 +1300,39 @@
         });
       }
 
+      // build table headers & body
       const columns = Object.keys(data[0] || { id: 'id' });
       buildTableHeaders(columns);
       buildTableBody(data, columns);
 
+      // update summaries
       updateSummaries(data);
 
+      // initial render: first indicator
       const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
       const chartType = document.getElementById('selectChartType').value || 'bar';
-      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
+      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos', fecha: 'todos' });
       
+      // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
     }
 
     function updateSummaries(rows) {
+      // Total de encuestas
       document.getElementById('totalSurveys').innerText = rows.length;
       
+      // Edad promedio
       const ages = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
       const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
       document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg}`;
       
+      // Nivel educativo más frecuente
       const education = calculateEducationLevel(rows);
       document.getElementById('educationLevel').innerText = education.level;
       document.getElementById('trendEducation').textContent = education.percentage !== 'Sin datos' ? 
         `${education.percentage}%` : 'Sin datos';
       
+      // Conciencia ambiental
       const awareness = calculateEnvironmentalAwareness(rows);
       document.getElementById('environmentalAwareness').innerText = awareness.percentage;
       document.getElementById('trendAwareness').textContent = awareness.level;
@@ -1376,36 +1345,46 @@
     /**************************************************************************
      * Render indicator with filters (incluyendo fecha)
      **************************************************************************/
-    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
+    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos', fecha:'todos' }) {
+      // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
       const data = window.__RAW_DATA || [];
       let filtered = data.slice();
       
-      // Aplicar filtros básicos
+      // Aplicar filtros
       if (filters.sexo && filters.sexo !== 'todos') {
         filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
       }
       if (filters.grupo && filters.grupo !== 'todos') {
         filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
       }
-      
-      // Aplicar filtro de fecha por intervalo
-      const startDate = document.getElementById('filterFechaInicio').value;
-      const endDate = document.getElementById('filterFechaFin').value;
-      if (startDate || endDate) {
-        filtered = filtered.filter(row => isDateInRange(row, startDate, endDate));
+      if (filters.fecha && filters.fecha !== 'todos') {
+        // Buscar en columnas de fecha
+        filtered = filtered.filter(r => {
+          const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
+          for (let col of dateColumns) {
+            if (r[col] && String(r[col]).includes(filters.fecha)) {
+              return true;
+            }
+          }
+          return false;
+        });
       }
 
       updateSummaries(filtered);
 
+      // find label
       const indObj = INDICATORS.find(i=> i.value === indicatorKey);
       const title = indObj ? indObj.label : indicatorKey;
 
+      // prepare labels/values
       let labels = [], values = [], counts = {};
       
+      // Get the data for the selected indicator
       const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
 
+      // if arr empty -> show no data
       if (!arr.length) {
         document.getElementById('noDataMsg').classList.remove('hidden');
         document.getElementById('statisticsSection').classList.add('hidden');
@@ -1416,9 +1395,10 @@
         document.getElementById('noDataMsg').classList.add('hidden');
       }
 
+      // decide processing: if many arr elements match likert options => likert
       const lowerLikert = LIKERT_LEVELS.map(l => l.toLowerCase());
       const matchCount = arr.reduce((acc, v) => lowerLikert.includes(String(v).toLowerCase()) ? acc+1 : acc, 0);
-      const isLikert = (matchCount / arr.length) >= 0.25;
+      const isLikert = (matchCount / arr.length) >= 0.25; // threshold 25%
 
       if (isLikert) {
         const res = countLikert(arr);
@@ -1426,20 +1406,24 @@
         values = res.values;
         counts = res.counts;
       } else {
+        // categorical
         const res = countCategorical(arr);
         labels = res.labels; 
         values = res.values;
         counts = res.counts;
       }
 
+      // Calcular estadísticas avanzadas
       const total = values.reduce((sum, val) => sum + val, 0);
       const stats = calculateAdvancedStatistics(values, labels, total);
       
+      // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
       document.getElementById('chartSubtitle').innerText = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
       renderChart(chartType, labels, values, title);
       renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
+      // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
     }
 
@@ -1455,6 +1439,7 @@
         const vals = cols.map(c => {
           let v = row[c];
           if (v === null || v === undefined) return "";
+          // escape quotes
           v = String(v).replace(/"/g, '""');
           if (v.includes(",") || v.includes("\n")) return `"${v}"`;
           return v;
@@ -1479,17 +1464,8 @@
       const chartType = document.getElementById('selectChartType').value;
       const sexo = document.getElementById('filterSexo').value;
       const grupo = document.getElementById('filterGrupo').value;
-      renderIndicator(indicator, chartType, { sexo, grupo });
-    }
-
-    /**************************************************************************
-     * Clear date filter function
-     **************************************************************************/
-    function clearDateFilter() {
-      document.getElementById('filterFechaInicio').value = '';
-      document.getElementById('filterFechaFin').value = '';
-      updateDateFilterUI();
-      autoRefreshChart();
+      const fecha = document.getElementById('filterFecha').value;
+      renderIndicator(indicator, chartType, { sexo, grupo, fecha });
     }
 
     /**************************************************************************
@@ -1497,26 +1473,17 @@
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
-    document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
 
-    // Event listeners para filtros
+    // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
     document.getElementById('selectChartType').addEventListener('change', autoRefreshChart);
     document.getElementById('filterSexo').addEventListener('change', autoRefreshChart);
     document.getElementById('filterGrupo').addEventListener('change', autoRefreshChart);
-
-    // Event listeners para filtros de fecha
-    document.getElementById('filterFechaInicio').addEventListener('change', function() {
-      updateDateFilterUI();
-      autoRefreshChart();
-    });
-    document.getElementById('filterFechaFin').addEventListener('change', function() {
-      updateDateFilterUI();
-      autoRefreshChart();
-    });
+    document.getElementById('filterFecha').addEventListener('change', autoRefreshChart);
 
     // initial load
     (async function init(){
+      // populate indicator dropdown quickly (in case fetch slow)
       const sel = document.getElementById('selectIndicator');
       INDICATORS.forEach(i => { 
         const opt = document.createElement('option'); 
@@ -1526,6 +1493,9 @@
       });
 
       await fetchAllAndRender();
+
+      // optional: auto-refresh every 60s (uncomment if desired)
+      // setInterval(async ()=> { await fetchAllAndRender(); }, 60000);
     })();
   </script>
 </body>
