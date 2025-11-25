@@ -364,6 +364,28 @@
       font-weight: 600;
       color: #0f172a;
     }
+    .date-range-container {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .date-input {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+      flex: 1;
+    }
+    .date-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+    }
+    .filter-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -437,14 +459,26 @@
       <div class="card p-5">
         <label class="block text-sm font-medium text-slate-700 mb-3">
           <i class="fas fa-calendar-alt mr-2 text-amber-600"></i>
-          Filtro por Fecha
+          Rango de Fechas
         </label>
         <div class="flex flex-col gap-3">
-          <select id="filterFecha" class="w-full control">
-            <option value="todos">Período: Todos</option>
-          </select>
+          <div class="date-range-container">
+            <input type="date" id="filterFechaInicio" class="date-input" placeholder="Fecha inicio">
+            <span class="text-slate-400">-</span>
+            <input type="date" id="filterFechaFin" class="date-input" placeholder="Fecha fin">
+          </div>
+          <div class="filter-actions">
+            <button id="btnAplicarFecha" class="btn-primary flex-1 text-sm py-2">
+              <i class="fas fa-check mr-1"></i>
+              Aplicar
+            </button>
+            <button id="btnLimpiarFecha" class="btn-secondary flex-1 text-sm py-2">
+              <i class="fas fa-times mr-1"></i>
+              Limpiar
+            </button>
+          </div>
         </div>
-        <p class="text-xs muted mt-3">Filtra por rango temporal de los datos.</p>
+        <p class="text-xs muted mt-3">Filtra por intervalo temporal específico.</p>
       </div>
     </div>
 
@@ -600,7 +634,7 @@
       <div class="search-box">
         <div class="flex items-center gap-3">
           <i class="fas fa-search text-slate-400"></i>
-          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
+          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros (texto, números, fechas)..." 
                  class="flex-1 border-0 bg-transparent focus:outline-none focus:ring-0">
         </div>
       </div>
@@ -630,6 +664,11 @@
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
     const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    /**************************************************************************
+     * Variables globales
+     **************************************************************************/
+    let currentDateFilter = { inicio: null, fin: null };
 
     /**************************************************************************
      * Indicadores con títulos mejorados
@@ -703,6 +742,75 @@
         values: counts,
         counts: countsObj
       };
+    }
+
+    /**************************************************************************
+     * Funciones para el filtro de fecha por intervalo
+     **************************************************************************/
+    function applyDateFilter() {
+      const inicio = document.getElementById('filterFechaInicio').value;
+      const fin = document.getElementById('filterFechaFin').value;
+      
+      if (!inicio && !fin) {
+        currentDateFilter = { inicio: null, fin: null };
+        autoRefreshChart();
+        return;
+      }
+      
+      if (inicio && fin && new Date(inicio) > new Date(fin)) {
+        alert('La fecha de inicio no puede ser mayor que la fecha de fin');
+        return;
+      }
+      
+      currentDateFilter = { inicio, fin };
+      autoRefreshChart();
+    }
+
+    function clearDateFilter() {
+      document.getElementById('filterFechaInicio').value = '';
+      document.getElementById('filterFechaFin').value = '';
+      currentDateFilter = { inicio: null, fin: null };
+      autoRefreshChart();
+    }
+
+    function filterByDateRange(rows) {
+      if (!currentDateFilter.inicio && !currentDateFilter.fin) {
+        return rows;
+      }
+      
+      return rows.filter(row => {
+        const rowDate = findDateInRow(row);
+        if (!rowDate) return false;
+        
+        const date = new Date(rowDate);
+        const inicio = currentDateFilter.inicio ? new Date(currentDateFilter.inicio) : null;
+        const fin = currentDateFilter.fin ? new Date(currentDateFilter.fin) : null;
+        
+        if (inicio && fin) {
+          return date >= inicio && date <= fin;
+        } else if (inicio) {
+          return date >= inicio;
+        } else if (fin) {
+          return date <= fin;
+        }
+        
+        return true;
+      });
+    }
+
+    function findDateInRow(row) {
+      // Buscar en columnas que puedan contener fechas
+      const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp', 'fecha_creacion'];
+      
+      for (let col of dateColumns) {
+        if (row[col]) {
+          const dateStr = String(row[col]).split('T')[0];
+          if (dateStr.match(/\d{4}-\d{2}-\d{2}/)) {
+            return dateStr;
+          }
+        }
+      }
+      return null;
     }
 
     /**************************************************************************
@@ -1186,7 +1294,7 @@
           searchable: true,
           fixedHeight: false,
           perPage: 10,
-          perPageSelect: [5, 10, 15, 20],
+          perPageSelect: [5, 10, 15, 20, 50, 100],
           labels: {
             placeholder: "Buscar en todos los registros...",
             searchTitle: "Búsqueda en dataset",
@@ -1226,30 +1334,6 @@
     }
 
     /**************************************************************************
-     * Función para extraer fechas únicas del dataset
-     **************************************************************************/
-    function extractUniqueDates(rows) {
-      // Buscar columnas que puedan contener fechas
-      const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
-      let dates = new Set();
-      
-      dateColumns.forEach(col => {
-        if (rows[0] && rows[0][col]) {
-          rows.forEach(row => {
-            if (row[col]) {
-              const dateStr = String(row[col]).split('T')[0]; // Tomar solo la parte de la fecha
-              if (dateStr.match(/\d{4}-\d{2}-\d{2}/)) {
-                dates.add(dateStr);
-              }
-            }
-          });
-        }
-      });
-      
-      return Array.from(dates).sort();
-    }
-
-    /**************************************************************************
      * Fetch data from Supabase and render all (chart + table + summaries)
      **************************************************************************/
     async function fetchAllAndRender() {
@@ -1278,17 +1362,6 @@
         filterGrupo.appendChild(opt); 
       });
 
-      // populate date filter
-      const dates = extractUniqueDates(data);
-      const filterFecha = document.getElementById('filterFecha');
-      filterFecha.innerHTML = '<option value="todos">Período: Todos</option>';
-      dates.forEach(date => { 
-        const opt = document.createElement('option'); 
-        opt.value = date; 
-        opt.textContent = new Date(date).toLocaleDateString('es-ES'); 
-        filterFecha.appendChild(opt); 
-      });
-
       // populate indicator selector (once)
       const sel = document.getElementById('selectIndicator');
       if (!sel.options.length) {
@@ -1311,7 +1384,7 @@
       // initial render: first indicator
       const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
       const chartType = document.getElementById('selectChartType').value || 'bar';
-      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos', fecha: 'todos' });
+      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
       
       // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
@@ -1343,34 +1416,25 @@
     }
 
     /**************************************************************************
-     * Render indicator with filters (incluyendo fecha)
+     * Render indicator with filters (incluyendo fecha por intervalo)
      **************************************************************************/
-    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos', fecha:'todos' }) {
+    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
       // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
       const data = window.__RAW_DATA || [];
       let filtered = data.slice();
       
-      // Aplicar filtros
+      // Aplicar filtros básicos
       if (filters.sexo && filters.sexo !== 'todos') {
         filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
       }
       if (filters.grupo && filters.grupo !== 'todos') {
         filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
       }
-      if (filters.fecha && filters.fecha !== 'todos') {
-        // Buscar en columnas de fecha
-        filtered = filtered.filter(r => {
-          const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
-          for (let col of dateColumns) {
-            if (r[col] && String(r[col]).includes(filters.fecha)) {
-              return true;
-            }
-          }
-          return false;
-        });
-      }
+      
+      // Aplicar filtro de fecha por intervalo
+      filtered = filterByDateRange(filtered);
 
       updateSummaries(filtered);
 
@@ -1419,7 +1483,16 @@
       
       // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
-      document.getElementById('chartSubtitle').innerText = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
+      
+      // Construir subtítulo con información de filtros aplicados
+      let subtitle = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
+      if (currentDateFilter.inicio || currentDateFilter.fin) {
+        const inicio = currentDateFilter.inicio ? new Date(currentDateFilter.inicio).toLocaleDateString('es-ES') : '';
+        const fin = currentDateFilter.fin ? new Date(currentDateFilter.fin).toLocaleDateString('es-ES') : '';
+        subtitle += ` • Período: ${inicio} - ${fin}`;
+      }
+      
+      document.getElementById('chartSubtitle').innerText = subtitle;
       renderChart(chartType, labels, values, title);
       renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
@@ -1457,15 +1530,14 @@
     }
 
     /**************************************************************************
-     * Auto-refresh function (incluye filtro de fecha)
+     * Auto-refresh function
      **************************************************************************/
     function autoRefreshChart() {
       const indicator = document.getElementById('selectIndicator').value;
       const chartType = document.getElementById('selectChartType').value;
       const sexo = document.getElementById('filterSexo').value;
       const grupo = document.getElementById('filterGrupo').value;
-      const fecha = document.getElementById('filterFecha').value;
-      renderIndicator(indicator, chartType, { sexo, grupo, fecha });
+      renderIndicator(indicator, chartType, { sexo, grupo });
     }
 
     /**************************************************************************
@@ -1473,13 +1545,14 @@
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
+    document.getElementById('btnAplicarFecha').addEventListener('click', applyDateFilter);
+    document.getElementById('btnLimpiarFecha').addEventListener('click', clearDateFilter);
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
     document.getElementById('selectChartType').addEventListener('change', autoRefreshChart);
     document.getElementById('filterSexo').addEventListener('change', autoRefreshChart);
     document.getElementById('filterGrupo').addEventListener('change', autoRefreshChart);
-    document.getElementById('filterFecha').addEventListener('change', autoRefreshChart);
 
     // initial load
     (async function init(){
