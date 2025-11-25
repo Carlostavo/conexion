@@ -601,28 +601,6 @@
       box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
     /* Nuevos estilos para análisis mejorado */
-    .correlation-matrix {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    .correlation-item {
-      background: #f8fafc;
-      padding: 1rem;
-      border-radius: 8px;
-      border-left: 4px solid #3b82f6;
-    }
-    .correlation-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1d4ed8;
-    }
-    .correlation-label {
-      font-size: 0.875rem;
-      color: #64748b;
-      margin-top: 0.25rem;
-    }
     .stat-card {
       background: white;
       border-radius: 8px;
@@ -648,28 +626,6 @@
       padding: 0.75rem;
       margin-top: 1rem;
     }
-    .stat-test-result {
-      background: #ecfdf5;
-      border: 1px solid #10b981;
-      border-radius: 6px;
-      padding: 0.75rem;
-      margin-top: 1rem;
-    }
-    .data-quality-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .quality-good {
-      color: #10b981;
-    }
-    .quality-warning {
-      color: #f59e0b;
-    }
-    .quality-poor {
-      color: #ef4444;
-    }
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .pagination-container {
@@ -681,9 +637,6 @@
       }
       .rows-per-page-selector {
         justify-content: center;
-      }
-      .correlation-matrix {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -879,28 +832,6 @@
           <div class="stat-item">
             <div class="stat-value" id="statConcentration">—</div>
             <div class="stat-label">Índice de Concentración</div>
-          </div>
-        </div>
-
-        <!-- ANÁLISIS DE CALIDAD DE DATOS -->
-        <div class="card p-4 mb-4">
-          <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-database text-blue-600 mr-2"></i>
-            Calidad de Datos
-          </h4>
-          <div id="dataQuality" class="space-y-3">
-            <!-- La calidad de datos se generará aquí -->
-          </div>
-        </div>
-
-        <!-- ANÁLISIS DE CORRELACIONES MEJORADO -->
-        <div class="card p-4 mb-4">
-          <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-project-diagram text-purple-600 mr-2"></i>
-            Análisis de Correlaciones
-          </h4>
-          <div id="correlationAnalysis" class="correlation-matrix">
-            <!-- Las correlaciones se generarán aquí -->
           </div>
         </div>
 
@@ -1182,96 +1113,6 @@
         mean: mean,
         marginOfError: marginOfError
       };
-    }
-
-    // Función para calcular correlaciones entre variables
-    function calculateCorrelations(data, targetVariable) {
-      const correlations = [];
-      const numericColumns = Object.keys(data[0] || {}).filter(key => {
-        const sample = data[0][key];
-        return !isNaN(sample) && sample !== null && sample !== '';
-      });
-      
-      // Obtener valores de la variable objetivo
-      const targetValues = data.map(row => safeNumber(row[targetVariable])).filter(v => v !== null);
-      
-      numericColumns.forEach(column => {
-        if (column === targetVariable) return;
-        
-        const columnValues = data.map(row => safeNumber(row[column])).filter(v => v !== null);
-        
-        // Solo calcular correlación si hay suficientes datos
-        if (columnValues.length > 5 && targetValues.length > 5) {
-          const minLength = Math.min(columnValues.length, targetValues.length);
-          const colSlice = columnValues.slice(0, minLength);
-          const targetSlice = targetValues.slice(0, minLength);
-          
-          const correlation = calculatePearsonCorrelation(colSlice, targetSlice);
-          
-          if (!isNaN(correlation) && Math.abs(correlation) > 0.1) {
-            correlations.push({
-              variable: column,
-              correlation: correlation,
-              strength: getCorrelationStrength(correlation)
-            });
-          }
-        }
-      });
-      
-      return correlations.sort((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation));
-    }
-
-    // Función para calcular correlación de Pearson
-    function calculatePearsonCorrelation(x, y) {
-      const n = x.length;
-      const sumX = x.reduce((a, b) => a + b, 0);
-      const sumY = y.reduce((a, b) => a + b, 0);
-      const sumXY = x.reduce((acc, val, i) => acc + val * y[i], 0);
-      const sumX2 = x.reduce((acc, val) => acc + val * val, 0);
-      const sumY2 = y.reduce((acc, val) => acc + val * val, 0);
-      
-      const numerator = n * sumXY - sumX * sumY;
-      const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-      
-      return denominator === 0 ? 0 : numerator / denominator;
-    }
-
-    function getCorrelationStrength(correlation) {
-      const absCorr = Math.abs(correlation);
-      if (absCorr >= 0.8) return 'Muy fuerte';
-      if (absCorr >= 0.6) return 'Fuerte';
-      if (absCorr >= 0.4) return 'Moderada';
-      if (absCorr >= 0.2) return 'Débil';
-      return 'Muy débil';
-    }
-
-    // Función para evaluar calidad de datos
-    function assessDataQuality(data, currentVariable) {
-      const totalRows = data.length;
-      const variableData = data.map(row => row[currentVariable]);
-      const nonNullData = variableData.filter(v => v !== null && v !== '');
-      const nullCount = totalRows - nonNullData.length;
-      const completeness = (nonNullData.length / totalRows) * 100;
-      
-      // Evaluar diversidad
-      const uniqueValues = new Set(nonNullData.map(normalize)).size;
-      const diversity = (uniqueValues / nonNullData.length) * 100;
-      
-      return {
-        completeness: completeness,
-        nullCount: nullCount,
-        totalRows: totalRows,
-        uniqueValues: uniqueValues,
-        diversity: diversity,
-        quality: getQualityLevel(completeness, diversity)
-      };
-    }
-
-    function getQualityLevel(completeness, diversity) {
-      if (completeness >= 95 && diversity >= 30) return 'Excelente';
-      if (completeness >= 85 && diversity >= 20) return 'Buena';
-      if (completeness >= 70) return 'Aceptable';
-      return 'Necesita mejora';
     }
 
     /**************************************************************************
@@ -1558,12 +1399,8 @@
       };
     }
 
-    function generateInsights(stats, labels, values, indicatorKey, dataQuality) {
+    function generateInsights(stats, labels, values, indicatorKey) {
       const insights = [];
-      
-      // Insight sobre calidad de datos
-      insights.push(`• Calidad de datos: ${dataQuality.quality}`);
-      insights.push(`• Completitud: ${dataQuality.completeness.toFixed(1)}% (${dataQuality.totalRows - dataQuality.nullCount}/${dataQuality.totalRows} registros)`);
       
       // Insight sobre concentración
       if (stats.concentration > 0.5) {
@@ -1614,20 +1451,12 @@
       return insights;
     }
 
-    function renderAdvancedStatistics(stats, labels, values, indicatorKey, filteredData) {
+    function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
       // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
       document.getElementById('statMode').textContent = `${stats.mode.value}`;
       document.getElementById('statDiversity').textContent = stats.diversity;
       document.getElementById('statConcentration').textContent = stats.concentration;
-      
-      // Evaluar calidad de datos
-      const dataQuality = assessDataQuality(filteredData, indicatorKey);
-      renderDataQuality(dataQuality);
-      
-      // Calcular y renderizar correlaciones
-      const correlations = calculateCorrelations(filteredData, indicatorKey);
-      renderCorrelationAnalysis(correlations);
       
       // Renderizar distribución detallada
       const distributionContainer = document.getElementById('distributionDetails');
@@ -1659,7 +1488,7 @@
       
       // Renderizar insights
       const insightsContainer = document.getElementById('insightsContent');
-      const insights = generateInsights(stats, labels, values, indicatorKey, dataQuality);
+      const insights = generateInsights(stats, labels, values, indicatorKey);
       insightsContainer.innerHTML = insights.map(insight => `
         <p class="flex items-start gap-2">
           <i class="fas fa-chevron-right text-emerald-500 mt-1 text-xs"></i>
@@ -1730,75 +1559,6 @@
       
       // Mostrar sección de estadísticas
       document.getElementById('statisticsSection').classList.remove('hidden');
-    }
-
-    // Nueva función para renderizar calidad de datos
-    function renderDataQuality(dataQuality) {
-      const container = document.getElementById('dataQuality');
-      const qualityClass = dataQuality.quality === 'Excelente' ? 'quality-good' : 
-                          dataQuality.quality === 'Buena' ? 'quality-good' :
-                          dataQuality.quality === 'Aceptable' ? 'quality-warning' : 'quality-poor';
-      
-      container.innerHTML = `
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-sm font-medium text-slate-700">Completitud</div>
-            <div class="data-quality-indicator">
-              <i class="fas ${dataQuality.completeness >= 90 ? 'fa-check-circle' : 
-                           dataQuality.completeness >= 70 ? 'fa-exclamation-circle' : 'fa-times-circle'} ${qualityClass}"></i>
-              <span class="text-sm ${qualityClass}">${dataQuality.completeness.toFixed(1)}%</span>
-              <span class="text-xs text-slate-500">(${dataQuality.totalRows - dataQuality.nullCount}/${dataQuality.totalRows} registros)</span>
-            </div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-slate-700">Diversidad</div>
-            <div class="data-quality-indicator">
-              <i class="fas ${dataQuality.diversity >= 30 ? 'fa-check-circle' : 
-                           dataQuality.diversity >= 20 ? 'fa-exclamation-circle' : 'fa-times-circle'} ${qualityClass}"></i>
-              <span class="text-sm ${qualityClass}">${dataQuality.uniqueValues} valores únicos</span>
-            </div>
-          </div>
-          <div>
-            <div class="text-sm font-medium text-slate-700">Calificación General</div>
-            <div class="text-lg font-bold ${qualityClass}">${dataQuality.quality}</div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Nueva función para renderizar análisis de correlaciones
-    function renderCorrelationAnalysis(correlations) {
-      const container = document.getElementById('correlationAnalysis');
-      
-      if (correlations.length === 0) {
-        container.innerHTML = `
-          <div class="text-center text-slate-500 py-4">
-            <i class="fas fa-info-circle text-2xl mb-2"></i>
-            <p>No se encontraron correlaciones significativas</p>
-          </div>
-        `;
-        return;
-      }
-      
-      container.innerHTML = correlations.slice(0, 6).map(corr => {
-        const correlationColor = corr.correlation > 0 ? 'text-green-600' : 'text-red-600';
-        const correlationIcon = corr.correlation > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
-        
-        return `
-          <div class="correlation-item">
-            <div class="correlation-value ${correlationColor}">
-              ${corr.correlation > 0 ? '+' : ''}${corr.correlation.toFixed(3)}
-            </div>
-            <div class="correlation-label">
-              <i class="fas ${correlationIcon} ${correlationColor} mr-1"></i>
-              ${corr.strength}
-            </div>
-            <div class="text-xs text-slate-600 mt-1 truncate">
-              ${corr.variable.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-            </div>
-          </div>
-        `;
-      }).join('');
     }
 
     /**************************************************************************
@@ -2430,7 +2190,7 @@
       document.getElementById('chartSubtitle').innerText = subtitle;
       
       renderChart(chartType, labels, values, title);
-      renderAdvancedStatistics(stats, labels, values, indicatorKey, filtered);
+      renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
       // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
