@@ -480,36 +480,43 @@
       background: #f3f4f6;
       color: #6b7280;
     }
-    /* Estilos mejorados para la paginación profesional */
+    /* PAGINACIÓN MEJORADA */
     .pagination-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem;
-      border-top: 1px solid #e2e8f0;
       background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
       flex-wrap: wrap;
       gap: 1rem;
     }
     .pagination-info {
-      font-size: 0.875rem;
       color: #64748b;
+      font-size: 0.875rem;
+      font-weight: 500;
     }
     .pagination-controls {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
+    .pagination-buttons {
+      display: flex;
+      gap: 0.25rem;
+    }
     .pagination-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0.5rem 0.75rem;
+      width: 36px;
+      height: 36px;
       border: 1px solid #d1d5db;
       border-radius: 6px;
       background: white;
       color: #374151;
       font-size: 0.875rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -518,21 +525,27 @@
       border-color: #9ca3af;
     }
     .pagination-btn:disabled {
-      opacity: 0.5;
+      color: #9ca3af;
       cursor: not-allowed;
+      background: #f9fafb;
     }
     .pagination-btn.active {
       background: #10b981;
-      color: white;
       border-color: #10b981;
+      color: white;
     }
     .pagination-pages {
       display: flex;
       gap: 0.25rem;
+      margin: 0 0.5rem;
     }
-    .pagination-page {
-      min-width: 2.5rem;
-      height: 2.5rem;
+    .page-numbers {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .page-number {
+      min-width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -541,130 +554,64 @@
       background: white;
       color: #374151;
       font-size: 0.875rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    .pagination-page:hover {
+    .page-number:hover {
       background: #f3f4f6;
       border-color: #9ca3af;
     }
-    .pagination-page.active {
+    .page-number.active {
       background: #10b981;
-      color: white;
       border-color: #10b981;
+      color: white;
     }
-    .pagination-ellipsis {
-      min-width: 2.5rem;
-      height: 2.5rem;
+    .page-ellipsis {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #9ca3af;
+      width: 36px;
+      height: 36px;
+      color: #6b7280;
+      font-size: 0.875rem;
     }
-    .rows-per-page {
+    .rows-per-page-selector {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.875rem;
+    }
+    .rows-per-page-label {
       color: #64748b;
-    }
-    .rows-select {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 0.375rem 0.5rem;
-      background: white;
       font-size: 0.875rem;
+      font-weight: 500;
     }
-    /* Estilos para tabla responsiva */
-    .table-responsive {
-      overflow-x: auto;
-      border-radius: 8px;
-    }
-    .table-wrapper {
-      position: relative;
-    }
-    .table-loading {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      border-radius: 8px;
-    }
-    .table-summary {
-      background: #f8fafc;
-      border-radius: 8px 8px 0 0;
-      padding: 1rem;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .table-summary-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .table-export-options {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .export-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
+    .rows-per-page-select {
       border: 1px solid #d1d5db;
       border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.875rem;
       background: white;
       color: #374151;
-      font-size: 0.875rem;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
-    .export-btn:hover {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-    }
-    .export-btn.primary {
-      background: #10b981;
-      color: white;
+    .rows-per-page-select:focus {
+      outline: none;
       border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
-    .export-btn.primary:hover {
-      background: #059669;
-      border-color: #047857;
-    }
-    /* Estilos para columnas específicas */
-    .numeric-column {
-      text-align: right;
-      font-family: 'Courier New', monospace;
-    }
-    .text-truncate {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 200px;
-    }
-    .sortable-header {
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.2s ease;
-    }
-    .sortable-header:hover {
-      background-color: #f1f5f9 !important;
-    }
-    .sort-indicator {
-      margin-left: 0.5rem;
-      opacity: 0.5;
-    }
-    .sortable-header.sorted-asc .sort-indicator,
-    .sortable-header.sorted-desc .sort-indicator {
-      opacity: 1;
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .pagination-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .pagination-controls {
+        justify-content: center;
+      }
+      .rows-per-page-selector {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -903,55 +850,38 @@
       </div>
     </div>
 
-    <!-- TABLA PROFESIONAL CON PAGINACIÓN AVANZADA -->
-    <div class="card overflow-hidden mb-8">
-      <!-- Encabezado de la tabla -->
-      <div class="table-summary">
-        <div class="table-summary-content">
-          <div>
-            <h3 class="table-title">Base de Datos Completa</h3>
-            <p class="text-sm text-slate-500 mt-1">Registros del estudio de comportamiento proambiental</p>
-          </div>
-          <div class="table-export-options">
-            <button id="btnExportCurrent" class="export-btn">
-              <i class="fas fa-file-export text-sm"></i>
-              Exportar Vista Actual
-            </button>
-            <button id="btnExportCSV" class="export-btn primary">
-              <i class="fas fa-file-csv text-sm"></i>
-              Exportar Dataset Completo
-            </button>
-          </div>
+    <!-- TABLA MEJORADA CON BÚSQUEDA Y EXPORTACIÓN -->
+    <div class="card p-6 mb-8">
+      <div class="table-actions">
+        <div>
+          <h3 class="table-title">Base de Datos Completa</h3>
+          <p class="text-sm text-slate-500 mt-1">Registros del estudio de comportamiento proambiental</p>
+        </div>
+        <div class="flex gap-3">
+          <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
+            <i class="fas fa-file-export text-sm"></i>
+            Exportar Dataset
+          </button>
         </div>
       </div>
 
-      <!-- Búsqueda y Filtros -->
-      <div class="p-4 border-b border-slate-200">
-        <div class="search-header">
-          <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
-                   class="search-input" aria-label="Buscar en la tabla">
-            <button id="clearSearch" class="clear-search hidden" aria-label="Limpiar búsqueda">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-          <div id="searchResultsInfo" class="search-results-info hidden">
-            <!-- Información de resultados se mostrará aquí -->
-          </div>
+      <!-- BÚSQUEDA MEJORADA -->
+      <div class="search-header">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
+                 class="search-input" aria-label="Buscar en la tabla">
+          <button id="clearSearch" class="clear-search hidden" aria-label="Limpiar búsqueda">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="searchResultsInfo" class="search-results-info hidden">
+          <!-- Información de resultados se mostrará aquí -->
         </div>
       </div>
 
-      <!-- Contenedor de tabla responsiva -->
-      <div class="table-wrapper">
-        <div id="tableLoading" class="table-loading hidden">
-          <div class="flex flex-col items-center gap-3">
-            <div class="loading-spinner"></div>
-            <p class="text-slate-500">Cargando datos...</p>
-          </div>
-        </div>
-        
-        <div class="table-responsive">
+      <div class="dataTable-wrapper">
+        <div class="dataTable-container">
           <table id="dataTable" class="dataTable-table">
             <thead>
               <tr id="tableHeaderRow"></tr>
@@ -961,40 +891,47 @@
         </div>
       </div>
 
-      <!-- Paginación profesional -->
+      <!-- PAGINACIÓN MEJORADA -->
       <div class="pagination-container">
         <div class="pagination-info" id="paginationInfo">
-          Mostrando 0 de 0 registros
+          Mostrando 1-10 de 0 registros
         </div>
         
         <div class="pagination-controls">
-          <div class="rows-per-page">
-            <span>Filas por página:</span>
-            <select id="rowsPerPage" class="rows-select">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-              <option value="250">250</option>
-            </select>
+          <div class="pagination-buttons">
+            <button id="firstPage" class="pagination-btn" title="Primera página" disabled>
+              <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button id="prevPage" class="pagination-btn" title="Página anterior" disabled>
+              <i class="fas fa-angle-left"></i>
+            </button>
           </div>
           
-          <div class="pagination-pages" id="paginationPages">
-            <!-- Los botones de paginación se generarán aquí -->
+          <div class="pagination-pages">
+            <div class="page-numbers" id="pageNumbers">
+              <!-- Los números de página se generarán aquí dinámicamente -->
+            </div>
           </div>
           
-          <button id="firstPage" class="pagination-btn" disabled>
-            <i class="fas fa-angle-double-left"></i>
-          </button>
-          <button id="prevPage" class="pagination-btn" disabled>
-            <i class="fas fa-angle-left"></i>
-          </button>
-          <button id="nextPage" class="pagination-btn" disabled>
-            <i class="fas fa-angle-right"></i>
-          </button>
-          <button id="lastPage" class="pagination-btn" disabled>
-            <i class="fas fa-angle-double-right"></i>
-          </button>
+          <div class="pagination-buttons">
+            <button id="nextPage" class="pagination-btn" title="Página siguiente" disabled>
+              <i class="fas fa-angle-right"></i>
+            </button>
+            <button id="lastPage" class="pagination-btn" title="Última página" disabled>
+              <i class="fas fa-angle-double-right"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="rows-per-page-selector">
+          <span class="rows-per-page-label">Filas por página:</span>
+          <select id="rowsPerPage" class="rows-per-page-select">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="250">250</option>
+          </select>
         </div>
       </div>
     </div>
@@ -1023,17 +960,14 @@
     };
 
     /**************************************************************************
-     * Variables globales para la tabla y paginación
+     * Variables globales para la tabla y búsqueda
      **************************************************************************/
     let dataTable = null;
     let allTableData = [];
     let currentSearchTerm = '';
     let currentPage = 1;
-    let rowsPerPage = 25;
+    let rowsPerPage = 10;
     let totalPages = 1;
-    let filteredData = [];
-    let sortColumn = null;
-    let sortDirection = 'asc';
 
     /**************************************************************************
      * Indicadores con títulos mejorados
@@ -1069,256 +1003,68 @@
       return String(v).trim();
     }
 
-    /**************************************************************************
-     * Sistema de paginación profesional
-     **************************************************************************/
-    function updatePagination() {
-      const totalRows = filteredData.length;
-      totalPages = Math.ceil(totalRows / rowsPerPage);
-      
-      // Asegurar que currentPage esté dentro del rango válido
-      if (currentPage > totalPages) {
-        currentPage = totalPages || 1;
-      }
-      
-      // Actualizar información de paginación
-      const startRow = (currentPage - 1) * rowsPerPage + 1;
-      const endRow = Math.min(currentPage * rowsPerPage, totalRows);
-      
-      document.getElementById('paginationInfo').textContent = 
-        totalRows > 0 
-          ? `Mostrando ${startRow} a ${endRow} de ${totalRows} registros`
-          : 'No hay registros para mostrar';
-      
-      // Actualizar botones de paginación
-      document.getElementById('firstPage').disabled = currentPage === 1;
-      document.getElementById('prevPage').disabled = currentPage === 1;
-      document.getElementById('nextPage').disabled = currentPage === totalPages;
-      document.getElementById('lastPage').disabled = currentPage === totalPages;
-      
-      // Generar botones de páginas
-      generatePageButtons();
-      
-      // Renderizar la página actual
-      renderCurrentPage();
-    }
-
-    function generatePageButtons() {
-      const container = document.getElementById('paginationPages');
-      container.innerHTML = '';
-      
-      if (totalPages <= 1) return;
-      
-      // Siempre mostrar primera página
-      addPageButton(container, 1);
-      
-      // Mostrar elipsis si hay páginas antes del rango actual
-      if (currentPage > 3) {
-        const ellipsis = document.createElement('div');
-        ellipsis.className = 'pagination-ellipsis';
-        ellipsis.textContent = '...';
-        container.appendChild(ellipsis);
-      }
-      
-      // Calcular rango de páginas a mostrar
-      let startPage = Math.max(2, currentPage - 1);
-      let endPage = Math.min(totalPages - 1, currentPage + 1);
-      
-      // Ajustar para mostrar siempre 5 páginas si es posible
-      if (endPage - startPage < 4 && totalPages > 5) {
-        if (currentPage < 3) {
-          endPage = Math.min(totalPages - 1, 4);
-        } else if (currentPage > totalPages - 2) {
-          startPage = Math.max(2, totalPages - 3);
-        }
-      }
-      
-      // Mostrar páginas en el rango
-      for (let i = startPage; i <= endPage; i++) {
-        addPageButton(container, i);
-      }
-      
-      // Mostrar elipsis si hay páginas después del rango actual
-      if (currentPage < totalPages - 2) {
-        const ellipsis = document.createElement('div');
-        ellipsis.className = 'pagination-ellipsis';
-        ellipsis.textContent = '...';
-        container.appendChild(ellipsis);
-      }
-      
-      // Siempre mostrar última página si hay más de una página
-      if (totalPages > 1) {
-        addPageButton(container, totalPages);
-      }
-    }
-
-    function addPageButton(container, pageNumber) {
-      const pageBtn = document.createElement('div');
-      pageBtn.className = `pagination-page ${pageNumber === currentPage ? 'active' : ''}`;
-      pageBtn.textContent = pageNumber;
-      pageBtn.addEventListener('click', () => {
-        currentPage = pageNumber;
-        updatePagination();
+    function countCategorical(arr) {
+      const counts = {};
+      arr.forEach(v => {
+        const k = normalize(v) || "No especificado";
+        counts[k] = (counts[k] || 0) + 1;
       });
-      container.appendChild(pageBtn);
+      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
+      return { 
+        labels: entries.map(e=>e[0]), 
+        values: entries.map(e=>e[1]),
+        counts: counts
+      };
     }
 
-    function renderCurrentPage() {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-      
-      const startIndex = (currentPage - 1) * rowsPerPage;
-      const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
-      
-      const pageData = filteredData.slice(startIndex, endIndex);
-      
-      pageData.forEach(row => {
-        const tr = document.createElement('tr');
-        Object.values(row).forEach(value => {
-          const td = document.createElement('td');
-          td.textContent = value === null || value === undefined ? '' : String(value);
-          
-          // Aplicar clases especiales para columnas numéricas
-          if (typeof value === 'number' && !isNaN(value)) {
-            td.className = 'numeric-column';
+    function countLikert(arr) {
+      const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
+      const counts = LIKERT_LEVELS.map(()=>0);
+      arr.forEach(v => {
+        const s = normalize(v);
+        if (!s) return;
+        const idx = lower.indexOf(s.toLowerCase());
+        if (idx !== -1) counts[idx] += 1;
+        else {
+          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
+          for (let i=0;i<lower.length;i++){
+            if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
           }
-          
-          // Truncar texto largo
-          if (String(value).length > 50) {
-            td.className = 'text-truncate';
-            td.title = String(value);
-          }
-          
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-      
-      // Si no hay datos, mostrar mensaje
-      if (pageData.length === 0) {
-        const tr = document.createElement('tr');
-        const td = document.createElement('td');
-        td.colSpan = Object.keys(allTableData[0] || {}).length;
-        td.className = 'text-center py-8 text-slate-500';
-        td.textContent = 'No se encontraron registros';
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-      }
-    }
-
-    function sortData(columnIndex) {
-      const columnName = Object.keys(allTableData[0] || {})[columnIndex];
-      
-      // Si ya estamos ordenando por esta columna, invertir la dirección
-      if (sortColumn === columnIndex) {
-        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-      } else {
-        sortColumn = columnIndex;
-        sortDirection = 'asc';
-      }
-      
-      // Actualizar indicadores visuales
-      updateSortIndicators();
-      
-      // Ordenar los datos
-      filteredData.sort((a, b) => {
-        const valA = a[columnName];
-        const valB = b[columnName];
-        
-        // Manejar valores nulos
-        if (valA === null || valA === undefined) return 1;
-        if (valB === null || valB === undefined) return -1;
-        
-        // Comparar según el tipo de dato
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          return sortDirection === 'asc' ? valA - valB : valB - valA;
-        } else {
-          const strA = String(valA).toLowerCase();
-          const strB = String(valB).toLowerCase();
-          return sortDirection === 'asc' 
-            ? strA.localeCompare(strB) 
-            : strB.localeCompare(strA);
         }
       });
-      
-      // Volver a la primera página y actualizar
-      currentPage = 1;
-      updatePagination();
-    }
-
-    function updateSortIndicators() {
-      // Remover todas las clases de ordenamiento
-      document.querySelectorAll('.sortable-header').forEach(header => {
-        header.classList.remove('sorted-asc', 'sorted-desc');
+      const countsObj = {};
+      LIKERT_LEVELS.forEach((level, i) => {
+        countsObj[level] = counts[i];
       });
-      
-      // Aplicar clase al header actualmente ordenado
-      if (sortColumn !== null) {
-        const headers = document.querySelectorAll('.sortable-header');
-        if (headers[sortColumn]) {
-          headers[sortColumn].classList.add(
-            sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc'
-          );
-        }
-      }
-    }
-
-    function searchTable(term) {
-      currentSearchTerm = term.toLowerCase();
-      
-      if (!currentSearchTerm) {
-        filteredData = [...allTableData];
-      } else {
-        filteredData = allTableData.filter(row => {
-          return Object.values(row).some(value => 
-            value !== null && 
-            value !== undefined && 
-            String(value).toLowerCase().includes(currentSearchTerm)
-          );
-        });
-      }
-      
-      // Actualizar información de búsqueda
-      const searchInfo = document.getElementById('searchResultsInfo');
-      const clearSearchBtn = document.getElementById('clearSearch');
-      
-      if (currentSearchTerm) {
-        if (filteredData.length === 0) {
-          searchInfo.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>No se encontraron resultados para "${currentSearchTerm}"`;
-        } else {
-          searchInfo.innerHTML = `<i class="fas fa-filter mr-2"></i>${filteredData.length} de ${allTableData.length} registros coinciden con "${currentSearchTerm}"`;
-        }
-        searchInfo.classList.remove('hidden');
-        clearSearchBtn.classList.remove('hidden');
-      } else {
-        searchInfo.classList.add('hidden');
-        clearSearchBtn.classList.add('hidden');
-      }
-      
-      // Reiniciar a la primera página y actualizar
-      currentPage = 1;
-      updatePagination();
+      return { 
+        labels: LIKERT_LEVELS.slice(), 
+        values: counts,
+        counts: countsObj
+      };
     }
 
     /**************************************************************************
      * Funciones para el filtro de fecha profesional
      **************************************************************************/
     function detectDateColumn(rows) {
+      // Buscar columnas que contengan fechas en el dataset
       const dateColumnCandidates = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp', 'fecha_registro'];
       
       for (let col of dateColumnCandidates) {
         if (rows[0] && rows[0][col]) {
           const sampleValue = rows[0][col];
+          // Verificar si el valor parece una fecha
           if (typeof sampleValue === 'string' && (
             sampleValue.match(/\d{4}-\d{2}-\d{2}/) || 
-            sampleValue.includes('T')
+            sampleValue.includes('T') // formato ISO
           )) {
             return col;
           }
         }
       }
       
-      for (let row of rows.slice(0, 10)) {
+      // Si no se encuentra una columna específica, buscar cualquier campo que contenga fechas
+      for (let row of rows.slice(0, 10)) { // Revisar las primeras 10 filas
         for (let key in row) {
           if (row[key] && typeof row[key] === 'string') {
             if (row[key].match(/\d{4}-\d{2}-\d{2}/)) {
@@ -1338,6 +1084,8 @@
         .map(row => {
           const dateStr = row[dateColumn];
           if (!dateStr) return null;
+          
+          // Convertir a objeto Date
           const date = new Date(dateStr);
           return isNaN(date.getTime()) ? null : date;
         })
@@ -1364,6 +1112,7 @@
         endDateInput.min = dateRange.min;
         endDateInput.max = dateRange.max;
         
+        // Establecer valores por defecto (últimos 30 días)
         const defaultEnd = new Date(dateRange.max);
         const defaultStart = new Date(defaultEnd);
         defaultStart.setDate(defaultStart.getDate() - 30);
@@ -1394,9 +1143,11 @@
         active: true
       };
       
+      // Actualizar UI
       applyButton.classList.add('active-filter');
       applyButton.innerHTML = '<i class="fas fa-filter"></i> Filtro Activo';
       
+      // Aplicar filtros
       autoRefreshChart();
     }
 
@@ -1405,6 +1156,7 @@
       const endDateInput = document.getElementById('endDate');
       const applyButton = document.getElementById('applyDateFilter');
       
+      // Restablecer a los valores por defecto (últimos 30 días)
       if (window.dateRange) {
         const defaultEnd = new Date(window.dateRange.max);
         const defaultStart = new Date(defaultEnd);
@@ -1423,9 +1175,11 @@
         active: false
       };
       
+      // Actualizar UI
       applyButton.classList.remove('active-filter');
       applyButton.innerHTML = '<i class="fas fa-check"></i> Aplicar';
       
+      // Aplicar filtros
       autoRefreshChart();
     }
 
@@ -1462,6 +1216,7 @@
     }
 
     function calculateEnvironmentalAwareness(rows) {
+      // Combinar múltiples indicadores de conciencia ambiental
       const awarenessIndicators = [
         'conoce_desechos_solidos',
         'clasificacion_correcta_desechos', 
@@ -1502,6 +1257,7 @@
     function calculateAdvancedStatistics(values, labels, total) {
       if (!values.length || !total) return null;
       
+      // Estadísticas básicas
       const maxValue = Math.max(...values);
       const maxIndex = values.indexOf(maxValue);
       const maxLabel = labels[maxIndex];
@@ -1512,6 +1268,7 @@
       const minLabel = labels[minIndex];
       const minPercentage = ((minValue / total) * 100).toFixed(1);
       
+      // Calcular diversidad (índice de Shannon)
       let diversity = 0;
       values.forEach(value => {
         if (value > 0) {
@@ -1521,6 +1278,7 @@
       });
       diversity = diversity.toFixed(3);
       
+      // Calcular índice de concentración (Herfindahl-Hirschman)
       let concentration = 0;
       values.forEach(value => {
         const p = value / total;
@@ -1528,20 +1286,25 @@
       });
       concentration = concentration.toFixed(3);
       
+      // Calcular moda
       const modeValue = maxValue;
       const modeLabel = maxLabel;
       
+      // Calcular desviación estándar
       const mean = total / values.length;
       const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
       const stdDev = Math.sqrt(variance).toFixed(2);
       
+      // Calcular coeficiente de variación
       const cv = ((stdDev / mean) * 100).toFixed(1);
       
+      // Calcular percentiles
       const sortedValues = [...values].sort((a, b) => a - b);
       const q1 = sortedValues[Math.floor(sortedValues.length * 0.25)];
       const median = sortedValues[Math.floor(sortedValues.length * 0.5)];
       const q3 = sortedValues[Math.floor(sortedValues.length * 0.75)];
       
+      // Calcular asimetría (skewness)
       const skewness = values.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0) / values.length;
       
       return {
@@ -1562,6 +1325,7 @@
     function generateInsights(stats, labels, values, indicatorKey) {
       const insights = [];
       
+      // Insight sobre concentración
       if (stats.concentration > 0.5) {
         insights.push("• Distribución concentrada en categorías específicas");
       } else if (stats.concentration < 0.2) {
@@ -1570,16 +1334,19 @@
         insights.push("• Distribución moderadamente concentrada");
       }
       
+      // Insight sobre diversidad
       if (stats.diversity > 1.5) {
         insights.push("• Alta diversidad en las respuestas");
       } else if (stats.diversity < 0.5) {
         insights.push("• Baja diversidad, respuestas concentradas");
       }
       
+      // Insight sobre moda
       if (stats.max.percentage > 60) {
         insights.push(`• La categoría "${stats.max.label}" representa el ${stats.max.percentage}%`);
       }
       
+      // Insight específico por tipo de indicador
       if (indicatorKey.includes('ingreso')) {
         insights.push("• Variable económica: distribución de ingresos");
       }
@@ -1596,11 +1363,13 @@
     }
 
     function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
+      // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
       document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
       document.getElementById('statDiversity').textContent = stats.diversity;
       document.getElementById('statConcentration').textContent = stats.concentration;
       
+      // Renderizar distribución detallada
       const distributionContainer = document.getElementById('distributionDetails');
       distributionContainer.innerHTML = labels.map((label, index) => {
         const value = values[index];
@@ -1628,6 +1397,7 @@
         `;
       }).join('');
       
+      // Renderizar insights
       const insightsContainer = document.getElementById('insightsContent');
       const insights = generateInsights(stats, labels, values, indicatorKey);
       insightsContainer.innerHTML = insights.map(insight => `
@@ -1637,6 +1407,7 @@
         </p>
       `).join('');
       
+      // Renderizar métricas avanzadas
       const metricsContainer = document.getElementById('advancedMetrics');
       metricsContainer.innerHTML = `
         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -1675,6 +1446,7 @@
         </div>
       `;
       
+      // Mostrar sección de estadísticas
       document.getElementById('statisticsSection').classList.remove('hidden');
     }
 
@@ -1689,6 +1461,7 @@
       const ctx = canvas.getContext('2d');
       destroyChart();
 
+      // Ajustar tamaño del canvas para gráficos circulares
       if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
         canvas.style.width = '100%';
         canvas.style.maxWidth = '500px';
@@ -1699,9 +1472,11 @@
         canvas.style.height = '400px';
       }
 
+      // default chart types
       const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
       const bg = palette.slice(0, labels.length);
       
+      // Configuración común para todos los gráficos
       const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1744,6 +1519,7 @@
         }
       };
 
+      // Opciones específicas por tipo de gráfico
       let chartOptions = { ...commonOptions };
       
       if (type === 'bar') {
@@ -1788,6 +1564,7 @@
           }
         };
       } else if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
+        // Opciones específicas para gráficos circulares
         chartOptions.plugins.legend.position = 'right';
         chartOptions.layout.padding = {
           top: 20,
@@ -1814,24 +1591,31 @@
       });
     }
 
+    /**************************************************************************
+     * Función mejorada para exportar gráfico con porcentajes
+     **************************************************************************/
     function exportChartWithPercentages() {
       if (!chartInstance) return alert("No hay visualización para exportar.");
       
+      // Crear un canvas temporal para el gráfico con porcentajes
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
       tempCanvas.width = 1200;
       tempCanvas.height = 800;
       
+      // Copiar el gráfico original
       tempCtx.fillStyle = 'white';
       tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
       tempCtx.drawImage(document.getElementById('mainChart'), 50, 50, 1100, 700);
       
+      // Agregar título y porcentajes si es un gráfico circular
       if (chartInstance.config.type === 'pie' || chartInstance.config.type === 'doughnut') {
         tempCtx.font = 'bold 24px Arial';
         tempCtx.fillStyle = '#0f172a';
         tempCtx.textAlign = 'center';
         tempCtx.fillText(document.getElementById('chartTitle').textContent, tempCanvas.width / 2, 30);
         
+        // Agregar porcentajes en el gráfico
         const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
         chartInstance.data.datasets[0].data.forEach((value, index) => {
           const percentage = ((value / total) * 100).toFixed(1);
@@ -1841,6 +1625,7 @@
         });
       }
       
+      // Exportar la imagen
       const url = tempCanvas.toDataURL('image/png', 1);
       const a = document.createElement('a'); 
       a.href = url; 
@@ -1849,114 +1634,306 @@
     }
 
     /**************************************************************************
-     * Table handling profesional
+     * Table handling (Simple-DataTables) - MEJORADO CON PAGINACIÓN AVANZADA
      **************************************************************************/
     function buildTableHeaders(columns) {
       const headerRow = document.getElementById('tableHeaderRow');
       headerRow.innerHTML = '';
-      columns.forEach((c, index) => {
+      columns.forEach(c => {
         const th = document.createElement('th');
+        // Mejorar los títulos de las columnas
         const prettyTitle = c.replace(/_/g, ' ')
                             .replace(/\b\w/g, l => l.toUpperCase())
                             .replace('Jefe Hogar', 'Jefe de Hogar')
                             .replace('Desechos', 'Residuos')
                             .replace('Participaria', 'Disposición a Participar');
-        th.innerHTML = `
-          <div class="sortable-header flex items-center justify-between cursor-pointer" data-column="${index}">
-            <span>${prettyTitle}</span>
-            <span class="sort-indicator">
-              <i class="fas fa-sort"></i>
-            </span>
-          </div>
-        `;
-        
-        // Agregar evento de clic para ordenar
-        th.querySelector('.sortable-header').addEventListener('click', () => {
-          sortData(index);
-        });
-        
+        th.innerText = prettyTitle;
         headerRow.appendChild(th);
       });
     }
     
     function buildTableBody(rows, columns) {
-      // Guardar datos para paginación
+      const tbody = document.getElementById('tableBody'); 
+      tbody.innerHTML = '';
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        columns.forEach(col => {
+          const td = document.createElement('td');
+          td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      
+      // Guardar datos para búsqueda
       allTableData = rows;
-      filteredData = [...rows];
       
-      // Inicializar paginación
-      updatePagination();
-      
-      // Configurar eventos de paginación
-      document.getElementById('firstPage').addEventListener('click', () => {
-        currentPage = 1;
-        updatePagination();
-      });
-      
-      document.getElementById('prevPage').addEventListener('click', () => {
-        if (currentPage > 1) {
-          currentPage--;
-          updatePagination();
+      // Inicializar o reinicializar DataTable con configuración en español
+      setTimeout(() => {
+        try { 
+          if (dataTable) dataTable.destroy(); 
+        } catch(e){}
+        
+        dataTable = new simpleDatatables.DataTable("#dataTable", { 
+          searchable: true,
+          fixedHeight: false,
+          perPage: rowsPerPage,
+          perPageSelect: [10, 25, 50, 100, 250],
+          labels: {
+            placeholder: "Buscar en todos los registros...",
+            searchTitle: "Búsqueda en dataset",
+            pageTitle: "Página {page}",
+            perPage: "registros por página",
+            noRows: "No se encontraron registros",
+            noResults: "No hay resultados que coincidan con la búsqueda",
+            info: "Mostrando {start} a {end} de {rows} registros",
+            loading: "Cargando dataset...",
+            infoFiltered: "(Filtrado de {rows} registros totales)"
+          },
+          classes: {
+            active: "active",
+            container: "dataTable-container",
+            cursor: "dataTable-cursor",
+            disabled: "disabled",
+            dropdown: "dataTable-dropdown",
+            header: "dataTable-header",
+            info: "dataTable-info",
+            input: "dataTable-input",
+            pagination: "dataTable-pagination",
+            paginationList: "dataTable-paginationList",
+            selector: "dataTable-selector",
+            table: "dataTable-table",
+            tbody: "dataTable-tbody",
+            thead: "dataTable-thead",
+            wrapper: "dataTable-wrapper"
+          }
+        });
+
+        // Conectar el input de búsqueda personalizado
+        const searchInput = document.getElementById('tableSearch');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const searchResultsInfo = document.getElementById('searchResultsInfo');
+        
+        // Función para actualizar la información de resultados
+        function updateSearchInfo() {
+          const info = dataTable.data.info;
+          if (currentSearchTerm) {
+            const totalRows = allTableData.length;
+            const filteredRows = info.pageCount > 0 ? info.rows : 0;
+            
+            if (filteredRows === 0) {
+              searchResultsInfo.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>No se encontraron resultados para "${currentSearchTerm}"`;
+              searchResultsInfo.classList.remove('hidden');
+            } else {
+              searchResultsInfo.innerHTML = `<i class="fas fa-filter mr-2"></i>${filteredRows} de ${totalRows} registros coinciden con "${currentSearchTerm}"`;
+              searchResultsInfo.classList.remove('hidden');
+            }
+            
+            clearSearchBtn.classList.remove('hidden');
+          } else {
+            searchResultsInfo.classList.add('hidden');
+            clearSearchBtn.classList.add('hidden');
+          }
         }
-      });
-      
-      document.getElementById('nextPage').addEventListener('click', () => {
-        if (currentPage < totalPages) {
-          currentPage++;
-          updatePagination();
-        }
-      });
-      
-      document.getElementById('lastPage').addEventListener('click', () => {
-        currentPage = totalPages;
-        updatePagination();
-      });
-      
-      // Configurar cambio de filas por página
-      document.getElementById('rowsPerPage').addEventListener('change', (e) => {
-        rowsPerPage = parseInt(e.target.value);
-        currentPage = 1;
-        updatePagination();
-      });
-      
-      // Configurar búsqueda
-      const searchInput = document.getElementById('tableSearch');
-      const clearSearchBtn = document.getElementById('clearSearch');
-      
-      searchInput.addEventListener('input', (e) => {
-        searchTable(e.target.value);
-      });
-      
-      clearSearchBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        searchTable('');
-      });
+        
+        // Búsqueda en tiempo real
+        searchInput.addEventListener('input', (e) => {
+          currentSearchTerm = e.target.value;
+          dataTable.search(currentSearchTerm);
+          
+          // Actualizar información después de un pequeño retraso
+          setTimeout(updateSearchInfo, 100);
+        });
+        
+        // Limpiar búsqueda
+        clearSearchBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          currentSearchTerm = '';
+          dataTable.search('');
+          searchResultsInfo.classList.add('hidden');
+          clearSearchBtn.classList.add('hidden');
+        });
+        
+        // Actualizar información cuando cambie la página
+        dataTable.on('datatable.page', updateSearchInfo);
+        
+        // Actualizar información inicial
+        updateSearchInfo();
+        
+        // Configurar paginación personalizada
+        setupCustomPagination();
+      }, 100);
     }
 
     /**************************************************************************
-     * Fetch data from Supabase and render all
+     * PAGINACIÓN PERSONALIZADA MEJORADA
+     **************************************************************************/
+    function setupCustomPagination() {
+      const rowsPerPageSelect = document.getElementById('rowsPerPage');
+      const firstPageBtn = document.getElementById('firstPage');
+      const prevPageBtn = document.getElementById('prevPage');
+      const nextPageBtn = document.getElementById('nextPage');
+      const lastPageBtn = document.getElementById('lastPage');
+      const pageNumbersContainer = document.getElementById('pageNumbers');
+      const paginationInfo = document.getElementById('paginationInfo');
+      
+      // Configurar selector de filas por página
+      rowsPerPageSelect.value = rowsPerPage;
+      rowsPerPageSelect.addEventListener('change', (e) => {
+        rowsPerPage = parseInt(e.target.value);
+        dataTable.rowsPerPage = rowsPerPage;
+        dataTable.setPage(1);
+        updatePagination();
+      });
+      
+      // Configurar botones de navegación
+      firstPageBtn.addEventListener('click', () => {
+        dataTable.setPage(1);
+        updatePagination();
+      });
+      
+      prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          dataTable.setPage(currentPage - 1);
+          updatePagination();
+        }
+      });
+      
+      nextPageBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          dataTable.setPage(currentPage + 1);
+          updatePagination();
+        }
+      });
+      
+      lastPageBtn.addEventListener('click', () => {
+        dataTable.setPage(totalPages);
+        updatePagination();
+      });
+      
+      // Actualizar paginación cuando cambie la página en DataTable
+      dataTable.on('datatable.page', updatePagination);
+      
+      // Actualizar paginación inicial
+      updatePagination();
+    }
+    
+    function updatePagination() {
+      const info = dataTable.data.info;
+      currentPage = info.page;
+      totalPages = info.pageCount;
+      
+      // Actualizar información de paginación
+      const start = (currentPage - 1) * rowsPerPage + 1;
+      const end = Math.min(currentPage * rowsPerPage, info.rows);
+      const total = info.rows;
+      
+      document.getElementById('paginationInfo').textContent = 
+        `Mostrando ${start}-${end} de ${total} registros`;
+      
+      // Actualizar estado de botones de navegación
+      document.getElementById('firstPage').disabled = currentPage === 1;
+      document.getElementById('prevPage').disabled = currentPage === 1;
+      document.getElementById('nextPage').disabled = currentPage === totalPages;
+      document.getElementById('lastPage').disabled = currentPage === totalPages;
+      
+      // Generar números de página
+      generatePageNumbers();
+    }
+    
+    function generatePageNumbers() {
+      const pageNumbersContainer = document.getElementById('pageNumbers');
+      pageNumbersContainer.innerHTML = '';
+      
+      // Mostrar máximo 7 números de página (3 a cada lado de la página actual)
+      const maxVisiblePages = 7;
+      let startPage = Math.max(1, currentPage - 3);
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      // Ajustar si estamos cerca del final
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      // Agregar botón para primera página si es necesario
+      if (startPage > 1) {
+        const firstPageNumber = document.createElement('div');
+        firstPageNumber.className = 'page-number';
+        firstPageNumber.textContent = '1';
+        firstPageNumber.addEventListener('click', () => {
+          dataTable.setPage(1);
+          updatePagination();
+        });
+        pageNumbersContainer.appendChild(firstPageNumber);
+        
+        // Agregar puntos suspensivos si hay más páginas antes
+        if (startPage > 2) {
+          const ellipsis = document.createElement('div');
+          ellipsis.className = 'page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+      }
+      
+      // Agregar números de página
+      for (let i = startPage; i <= endPage; i++) {
+        const pageNumber = document.createElement('div');
+        pageNumber.className = i === currentPage ? 'page-number active' : 'page-number';
+        pageNumber.textContent = i;
+        pageNumber.addEventListener('click', () => {
+          dataTable.setPage(i);
+          updatePagination();
+        });
+        pageNumbersContainer.appendChild(pageNumber);
+      }
+      
+      // Agregar botón para última página si es necesario
+      if (endPage < totalPages) {
+        // Agregar puntos suspensivos si hay más páginas después
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('div');
+          ellipsis.className = 'page-ellipsis';
+          ellipsis.textContent = '...';
+          pageNumbersContainer.appendChild(ellipsis);
+        }
+        
+        const lastPageNumber = document.createElement('div');
+        lastPageNumber.className = 'page-number';
+        lastPageNumber.textContent = totalPages;
+        lastPageNumber.addEventListener('click', () => {
+          dataTable.setPage(totalPages);
+          updatePagination();
+        });
+        pageNumbersContainer.appendChild(lastPageNumber);
+      }
+    }
+
+    /**************************************************************************
+     * Fetch data from Supabase and render all (chart + table + summaries)
      **************************************************************************/
     async function fetchAllAndRender() {
+      // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
-      document.getElementById('tableLoading').classList.remove('hidden');
       
+      // fetch
       const { data, error } = await supabase.from(TABLE).select("*");
       if (error) { 
         console.error("Supabase error:", error); 
         alert("Error cargando datos desde Supabase. Revisar consola."); 
         document.getElementById('chartLoading').classList.add('hidden');
-        document.getElementById('tableLoading').classList.add('hidden');
         return; 
       }
-      
+      // store raw
       window.__RAW_DATA = data || [];
 
+      // Detectar columna de fecha y configurar filtro
       window.dateColumn = detectDateColumn(data);
       if (window.dateColumn) {
         window.dateRange = extractDateRange(data, window.dateColumn);
         initializeDateFilter(window.dateRange);
       }
 
+      // populate group filter
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
       filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
@@ -1967,6 +1944,7 @@
         filterGrupo.appendChild(opt); 
       });
 
+      // populate indicator selector (once)
       const sel = document.getElementById('selectIndicator');
       if (!sel.options.length) {
         INDICATORS.forEach(i => {
@@ -1977,32 +1955,39 @@
         });
       }
 
+      // build table headers & body
       const columns = Object.keys(data[0] || { id: 'id' });
       buildTableHeaders(columns);
       buildTableBody(data, columns);
 
+      // update summaries
       updateSummaries(data);
 
+      // initial render: first indicator
       const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
       const chartType = document.getElementById('selectChartType').value || 'bar';
       await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
       
+      // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
-      document.getElementById('tableLoading').classList.add('hidden');
     }
 
     function updateSummaries(rows) {
+      // Total de encuestas
       document.getElementById('totalSurveys').innerText = rows.length;
       
+      // Edad promedio
       const ages = rows.map(r => Number(r.edad)).filter(n => !isNaN(n));
       const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
       document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg}`;
       
+      // Nivel educativo más frecuente
       const education = calculateEducationLevel(rows);
       document.getElementById('educationLevel').innerText = education.level;
       document.getElementById('trendEducation').textContent = education.percentage !== 'Sin datos' ? 
         `${education.percentage}%` : 'Sin datos';
       
+      // Conciencia ambiental
       const awareness = calculateEnvironmentalAwareness(rows);
       document.getElementById('environmentalAwareness').innerText = awareness.percentage;
       document.getElementById('trendAwareness').textContent = awareness.level;
@@ -2013,14 +1998,16 @@
     }
 
     /**************************************************************************
-     * Render indicator with filters
+     * Render indicator with filters (incluyendo fecha)
      **************************************************************************/
     async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
+      // Mostrar loading
       document.getElementById('chartLoading').classList.remove('hidden');
       
       const data = window.__RAW_DATA || [];
       let filtered = data.slice();
       
+      // Aplicar filtros demográficos
       if (filters.sexo && filters.sexo !== 'todos') {
         filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
       }
@@ -2028,19 +2015,24 @@
         filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
       }
       
+      // Aplicar filtro de fecha si está activo
       if (currentDateFilter.active && window.dateColumn) {
         filtered = filterByDateRange(filtered, window.dateColumn);
       }
 
       updateSummaries(filtered);
 
+      // find label
       const indObj = INDICATORS.find(i=> i.value === indicatorKey);
       const title = indObj ? indObj.label : indicatorKey;
 
+      // prepare labels/values
       let labels = [], values = [], counts = {};
       
+      // Get the data for the selected indicator
       const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
 
+      // if arr empty -> show no data
       if (!arr.length) {
         document.getElementById('noDataMsg').classList.remove('hidden');
         document.getElementById('statisticsSection').classList.add('hidden');
@@ -2051,9 +2043,10 @@
         document.getElementById('noDataMsg').classList.add('hidden');
       }
 
+      // decide processing: if many arr elements match likert options => likert
       const lowerLikert = LIKERT_LEVELS.map(l => l.toLowerCase());
       const matchCount = arr.reduce((acc, v) => lowerLikert.includes(String(v).toLowerCase()) ? acc+1 : acc, 0);
-      const isLikert = (matchCount / arr.length) >= 0.25;
+      const isLikert = (matchCount / arr.length) >= 0.25; // threshold 25%
 
       if (isLikert) {
         const res = countLikert(arr);
@@ -2061,17 +2054,21 @@
         values = res.values;
         counts = res.counts;
       } else {
+        // categorical
         const res = countCategorical(arr);
         labels = res.labels; 
         values = res.values;
         counts = res.counts;
       }
 
+      // Calcular estadísticas avanzadas
       const total = values.reduce((sum, val) => sum + val, 0);
       const stats = calculateAdvancedStatistics(values, labels, total);
       
+      // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
       
+      // Actualizar subtítulo con información del filtro de fecha
       let subtitle = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
       if (currentDateFilter.active) {
         subtitle += ` • Período: ${currentDateFilter.startDate} a ${currentDateFilter.endDate}`;
@@ -2081,11 +2078,12 @@
       renderChart(chartType, labels, values, title);
       renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
+      // Ocultar loading
       document.getElementById('chartLoading').classList.add('hidden');
     }
 
     /**************************************************************************
-     * Export functions
+     * Export table as CSV
      **************************************************************************/
     function exportTableCSV() {
       const data = window.__RAW_DATA || [];
@@ -2096,6 +2094,7 @@
         const vals = cols.map(c => {
           let v = row[c];
           if (v === null || v === undefined) return "";
+          // escape quotes
           v = String(v).replace(/"/g, '""');
           if (v.includes(",") || v.includes("\n")) return `"${v}"`;
           return v;
@@ -2112,32 +2111,8 @@
       URL.revokeObjectURL(url);
     }
 
-    function exportCurrentView() {
-      if (filteredData.length === 0) return alert("No hay datos para exportar.");
-      const cols = Object.keys(filteredData[0] || {});
-      const csvRows = [cols.join(",")];
-      filteredData.forEach(row => {
-        const vals = cols.map(c => {
-          let v = row[c];
-          if (v === null || v === undefined) return "";
-          v = String(v).replace(/"/g, '""');
-          if (v.includes(",") || v.includes("\n")) return `"${v}"`;
-          return v;
-        });
-        csvRows.push(vals.join(","));
-      });
-      const csv = csvRows.join("\n");
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `vista_actual_proambiental_${Date.now()}.csv`; 
-      a.click(); 
-      URL.revokeObjectURL(url);
-    }
-
     /**************************************************************************
-     * Auto-refresh function
+     * Auto-refresh function (incluye filtro de fecha)
      **************************************************************************/
     function autoRefreshChart() {
       const indicator = document.getElementById('selectIndicator').value;
@@ -2151,11 +2126,11 @@
      * Init UI & events
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
-    document.getElementById('btnExportCurrent').addEventListener('click', exportCurrentView);
     document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
     document.getElementById('applyDateFilter').addEventListener('click', applyDateFilter);
     document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
 
+    // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
     document.getElementById('selectChartType').addEventListener('change', autoRefreshChart);
     document.getElementById('filterSexo').addEventListener('change', autoRefreshChart);
@@ -2163,6 +2138,7 @@
 
     // initial load
     (async function init(){
+      // populate indicator dropdown quickly (in case fetch slow)
       const sel = document.getElementById('selectIndicator');
       INDICATORS.forEach(i => { 
         const opt = document.createElement('option'); 
@@ -2172,6 +2148,9 @@
       });
 
       await fetchAllAndRender();
+
+      // optional: auto-refresh every 60s (uncomment if desired)
+      // setInterval(async ()=> { await fetchAllAndRender(); }, 60000);
     })();
   </script>
 </body>
