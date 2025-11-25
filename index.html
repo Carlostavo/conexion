@@ -417,6 +417,69 @@
       color: white !important;
       border-color: #10b981 !important;
     }
+    /* Estilos mejorados para la búsqueda */
+    .search-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .search-results-info {
+      background: #ecfdf5;
+      border: 1px solid #d1fae5;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: #065f46;
+    }
+    .search-highlight {
+      background-color: #fef3c7;
+      padding: 0.1rem 0.2rem;
+      border-radius: 0.25rem;
+    }
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 500px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 10px 10px 40px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .clear-search {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .clear-search:hover {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased text-slate-800">
@@ -669,11 +732,18 @@
         </div>
       </div>
 
-      <div class="search-box">
-        <div class="flex items-center gap-3">
-          <i class="fas fa-search text-slate-400"></i>
+      <!-- BÚSQUEDA MEJORADA -->
+      <div class="search-header">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
           <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
-                 class="flex-1 border-0 bg-transparent focus:outline-none focus:ring-0">
+                 class="search-input" aria-label="Buscar en la tabla">
+          <button id="clearSearch" class="clear-search hidden" aria-label="Limpiar búsqueda">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="searchResultsInfo" class="search-results-info hidden">
+          <!-- Información de resultados se mostrará aquí -->
         </div>
       </div>
 
@@ -711,6 +781,13 @@
       endDate: null,
       active: false
     };
+
+    /**************************************************************************
+     * Variables globales para la tabla y búsqueda
+     **************************************************************************/
+    let dataTable = null;
+    let allTableData = [];
+    let currentSearchTerm = '';
 
     /**************************************************************************
      * Indicadores con títulos mejorados
@@ -1377,9 +1454,8 @@
     }
 
     /**************************************************************************
-     * Table handling (Simple-DataTables) - MEJORADO
+     * Table handling (Simple-DataTables) - MEJORADO CON BÚSQUEDA GLOBAL
      **************************************************************************/
-    let dataTable = null;
     function buildTableHeaders(columns) {
       const headerRow = document.getElementById('tableHeaderRow');
       headerRow.innerHTML = '';
@@ -1409,6 +1485,9 @@
         tbody.appendChild(tr);
       });
       
+      // Guardar datos para búsqueda
+      allTableData = rows;
+      
       // Inicializar o reinicializar DataTable con configuración en español
       setTimeout(() => {
         try { 
@@ -1419,7 +1498,7 @@
           searchable: true,
           fixedHeight: false,
           perPage: 10,
-          perPageSelect: [5, 10, 15, 20],
+          perPageSelect: [5, 10, 15, 20, 50, 100],
           labels: {
             placeholder: "Buscar en todos los registros...",
             searchTitle: "Búsqueda en dataset",
@@ -1441,7 +1520,7 @@
             info: "dataTable-info",
             input: "dataTable-input",
             pagination: "dataTable-pagination",
-            paginationList: "dataTable-pagination-list",
+            paginationList: "dataTable-paginationList",
             selector: "dataTable-selector",
             table: "dataTable-table",
             tbody: "dataTable-tbody",
@@ -1452,10 +1531,55 @@
 
         // Conectar el input de búsqueda personalizado
         const searchInput = document.getElementById('tableSearch');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const searchResultsInfo = document.getElementById('searchResultsInfo');
+        
+        // Función para actualizar la información de resultados
+        function updateSearchInfo() {
+          const info = dataTable.data.info;
+          if (currentSearchTerm) {
+            const totalRows = allTableData.length;
+            const filteredRows = info.pageCount > 0 ? info.rows : 0;
+            
+            if (filteredRows === 0) {
+              searchResultsInfo.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>No se encontraron resultados para "${currentSearchTerm}"`;
+              searchResultsInfo.classList.remove('hidden');
+            } else {
+              searchResultsInfo.innerHTML = `<i class="fas fa-filter mr-2"></i>${filteredRows} de ${totalRows} registros coinciden con "${currentSearchTerm}"`;
+              searchResultsInfo.classList.remove('hidden');
+            }
+            
+            clearSearchBtn.classList.remove('hidden');
+          } else {
+            searchResultsInfo.classList.add('hidden');
+            clearSearchBtn.classList.add('hidden');
+          }
+        }
+        
+        // Búsqueda en tiempo real
         searchInput.addEventListener('input', (e) => {
-          dataTable.search(e.target.value);
+          currentSearchTerm = e.target.value;
+          dataTable.search(currentSearchTerm);
+          
+          // Actualizar información después de un pequeño retraso
+          setTimeout(updateSearchInfo, 100);
         });
-      }, 60);
+        
+        // Limpiar búsqueda
+        clearSearchBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          currentSearchTerm = '';
+          dataTable.search('');
+          searchResultsInfo.classList.add('hidden');
+          clearSearchBtn.classList.add('hidden');
+        });
+        
+        // Actualizar información cuando cambie la página
+        dataTable.on('datatable.page', updateSearchInfo);
+        
+        // Actualizar información inicial
+        updateSearchInfo();
+      }, 100);
     }
 
     /**************************************************************************
