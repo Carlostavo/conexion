@@ -344,29 +344,25 @@
     .trend-negative {
       color: #ef4444;
     }
+    .search-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
     .table-actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 1rem;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 1rem;
     }
-    .search-box {
-      position: relative;
-      flex: 1;
-      max-width: 400px;
-    }
-    .search-box i {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #64748b;
-    }
-    .search-box input {
-      padding-left: 40px;
-      width: 100%;
+    .table-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0f172a;
     }
   </style>
 </head>
@@ -401,12 +397,12 @@
           Variable de Análisis
         </label>
         <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
-        <p class="text-xs muted mt-3">Selecciona la variable categórica para análisis estadístico</p>
+        <p class="text-xs muted mt-3">Selecciona la variable para el análisis estadístico.</p>
       </div>
 
       <div class="card p-5">
         <label class="block text-sm font-medium text-slate-700 mb-3">
-          <i class="fas fa-chart-line mr-2 text-blue-600"></i>
+          <i class="fas fa-chart-pie mr-2 text-blue-600"></i>
           Tipo de Visualización
         </label>
         <select id="selectChartType" class="w-full control">
@@ -417,7 +413,7 @@
           <option value="radar">Gráfico Radar</option>
           <option value="polarArea">Área Polar</option>
         </select>
-        <p class="text-xs muted mt-3">Selecciona el método de visualización de datos</p>
+        <p class="text-xs muted mt-3">Selecciona el tipo de representación gráfica.</p>
       </div>
 
       <div class="card p-5">
@@ -427,47 +423,40 @@
         </label>
         <div class="flex flex-col gap-3">
           <select id="filterSexo" class="w-full control">
-            <option value="todos">Género: Total de la Muestra</option>
+            <option value="todos">Género: Todos</option>
             <option value="masculino">Masculino</option>
             <option value="femenino">Femenino</option>
           </select>
           <select id="filterGrupo" class="w-full control">
-            <option value="todos">Grupo: Total de la Muestra</option>
+            <option value="todos">Grupo: Todos</option>
           </select>
         </div>
-        <p class="text-xs muted mt-3">Segmentación por características demográficas</p>
+        <p class="text-xs muted mt-3">Filtra por características demográficas.</p>
       </div>
 
       <div class="card p-5">
         <label class="block text-sm font-medium text-slate-700 mb-3">
           <i class="fas fa-calendar-alt mr-2 text-amber-600"></i>
-          Periodo de Tiempo
+          Filtro por Fecha
         </label>
         <div class="flex flex-col gap-3">
           <select id="filterFecha" class="w-full control">
-            <option value="todos">Rango Temporal: Completo</option>
-            <option value="ultimo_mes">Último Mes</option>
-            <option value="ultimos_3_meses">Últimos 3 Meses</option>
-            <option value="ultimo_ano">Último Año</option>
+            <option value="todos">Período: Todos</option>
           </select>
-          <div class="text-xs muted text-center">
-            <i class="fas fa-info-circle mr-1"></i>
-            Filtro temporal disponible
-          </div>
         </div>
-        <p class="text-xs muted mt-3">Análisis temporal de los datos</p>
+        <p class="text-xs muted mt-3">Filtra por rango temporal de los datos.</p>
       </div>
     </div>
 
-    <!-- RESUMEN ESTADÍSTICO -->
+    <!-- RESUMEN MEJORADO -->
     <div class="grid md:grid-cols-4 gap-5 mb-8">
       <div class="card summary-card">
         <div class="summary-label">
           <i class="fas fa-users text-emerald-600"></i>
-          Tamaño Muestral
+          Muestra Total
         </div>
         <div id="totalSurveys" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendSurveys">Muestra representativa</div>
+        <div class="summary-trend trend-positive" id="trendSurveys">Dataset cargado</div>
       </div>
       
       <div class="card summary-card">
@@ -494,19 +483,19 @@
           Conciencia Ambiental
         </div>
         <div id="environmentalAwareness" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendAwareness">Nivel de conciencia</div>
+        <div class="summary-trend trend-positive" id="trendAwareness">Nivel compuesto</div>
       </div>
     </div>
 
-    <!-- ANÁLISIS GRÁFICO -->
+    <!-- GRAFICO Y ESTADÍSTICAS -->
     <div class="card p-6 mb-8">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
-          <h2 id="chartTitle" class="chart-title">Distribución de Variables</h2>
-          <p id="chartSubtitle" class="chart-subtitle mt-1">Visualización estadística de la variable seleccionada</p>
+          <h2 id="chartTitle" class="chart-title">Análisis de Variable</h2>
+          <p id="chartSubtitle" class="chart-subtitle mt-1">Selecciona una variable para iniciar el análisis estadístico.</p>
         </div>
         <div class="flex gap-3">
-          <button id="btnExportChart" class="btn-primary flex items-center gap-2">
+          <button id="btnExportChart" class="btn-secondary flex items-center gap-2">
             <i class="fas fa-download text-sm"></i>
             Exportar Visualización
           </button>
@@ -516,7 +505,7 @@
       <!-- Loading State -->
       <div id="chartLoading" class="hidden">
         <div class="loading-spinner mb-4"></div>
-        <p class="text-center text-slate-500">Procesando análisis estadístico...</p>
+        <p class="text-center text-slate-500">Procesando datos estadísticos...</p>
       </div>
       
       <div class="chart-container">
@@ -528,15 +517,15 @@
       <!-- ESTADÍSTICAS DETALLADAS -->
       <div id="statisticsSection" class="mt-8 hidden">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">
-          <i class="fas fa-chart-bar mr-2 text-emerald-600"></i>
-          Análisis Estadístico Descriptivo
+          <i class="fas fa-chart-line text-emerald-600 mr-2"></i>
+          Análisis Estadístico Detallado
         </h3>
         
         <!-- Estadísticas Principales -->
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div class="stat-item">
             <div class="stat-value" id="statTotal">—</div>
-            <div class="stat-label">Observaciones Válidas</div>
+            <div class="stat-label">Tamaño de Muestra</div>
           </div>
           <div class="stat-item">
             <div class="stat-value" id="statMode">—</div>
@@ -555,7 +544,7 @@
         <!-- Distribución Detallada -->
         <div class="card p-4 mb-4">
           <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-table mr-2 text-blue-600"></i>
+            <i class="fas fa-chart-bar text-emerald-600 mr-2"></i>
             Distribución de Frecuencias
           </h4>
           <div id="distributionDetails" class="space-y-2">
@@ -567,8 +556,8 @@
         <div class="grid md:grid-cols-2 gap-4">
           <div class="card p-4 insight-card">
             <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-lightbulb mr-2 text-amber-500"></i>
-              Interpretación de Resultados
+              <i class="fas fa-lightbulb text-amber-500 mr-2"></i>
+              Hallazgos del Análisis
             </h4>
             <div id="insightsContent" class="text-sm text-slate-600 space-y-1">
               <!-- Los insights se generarán aquí -->
@@ -576,7 +565,7 @@
           </div>
           <div class="card p-4">
             <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-calculator mr-2 text-blue-500"></i>
+              <i class="fas fa-calculator text-blue-500 mr-2"></i>
               Métricas Estadísticas
             </h4>
             <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
@@ -588,38 +577,31 @@
       
       <div id="noDataMsg" class="text-center py-8 muted hidden">
         <i class="fas fa-database text-slate-300 text-4xl mb-3"></i>
-        <p class="text-lg font-medium text-slate-500">No se encontraron datos para el criterio seleccionado</p>
-        <p class="text-sm text-slate-400 mt-1">Modifique los filtros o seleccione otra variable de análisis</p>
+        <p class="text-lg font-medium text-slate-500">No se encontraron datos para los criterios seleccionados</p>
+        <p class="text-sm text-slate-400 mt-1">Ajusta los filtros o selecciona otra variable de análisis</p>
       </div>
     </div>
 
-    <!-- BASE DE DATOS COMPLETA -->
+    <!-- TABLA MEJORADA CON BÚSQUEDA Y EXPORTACIÓN -->
     <div class="card p-6 mb-8">
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+      <div class="table-actions">
         <div>
-          <h3 class="text-xl font-semibold text-slate-800">
-            <i class="fas fa-database mr-2 text-emerald-600"></i>
-            Base de Datos Completa
-          </h3>
-          <p class="text-sm text-slate-500 mt-1">Dataset completo para análisis detallado y exportación</p>
+          <h3 class="table-title">Base de Datos Completa</h3>
+          <p class="text-sm text-slate-500 mt-1">Registros del estudio de comportamiento proambiental</p>
         </div>
         <div class="flex gap-3">
           <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
-            <i class="fas fa-file-csv text-sm"></i>
-            Exportar Dataset (CSV)
+            <i class="fas fa-file-export text-sm"></i>
+            Exportar Dataset
           </button>
         </div>
       </div>
 
-      <!-- Barra de búsqueda personalizada -->
-      <div class="table-actions">
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" id="customSearch" placeholder="Buscar en toda la base de datos..." class="dataTable-input">
-        </div>
-        <div class="text-sm text-slate-500">
-          <i class="fas fa-info-circle mr-1"></i>
-          Use la búsqueda para filtrar registros específicos
+      <div class="search-box">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-search text-slate-400"></i>
+          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
+                 class="flex-1 border-0 bg-transparent focus:outline-none focus:ring-0">
         </div>
       </div>
 
@@ -636,14 +618,7 @@
     </div>
 
     <footer class="text-center text-sm text-slate-500 mb-8 py-6 border-t border-slate-200">
-      <p>
-        <i class="fas fa-university mr-2"></i>
-        © 2025 Proyecto de Investigación Proambiental — 
-        <span class="font-medium">Plataforma de Análisis Estadístico</span>
-      </p>
-      <p class="text-xs mt-2">
-        Desarrollado con Supabase & Chart.js | Metodología de Investigación Cuantitativa
-      </p>
+      <p>© 2025 Proyecto Proambiental — Plataforma de Análisis Estadístico | Desarrollado con Supabase & Chart.js</p>
     </footer>
   </main>
 
@@ -657,18 +632,18 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     /**************************************************************************
-     * Indicadores con títulos académicos mejorados
+     * Indicadores con títulos mejorados
      **************************************************************************/
     const INDICATORS = [
       { value: 'sexo', label: 'Distribución por Género' },
-      { value: 'estado_civil', label: 'Estado Civil de los Participantes' },
+      { value: 'estado_civil', label: 'Estado Civil' },
       { value: 'educacion_jefe_hogar', label: 'Nivel Educativo del Jefe de Hogar' },
-      { value: 'situacion_laboral_jefe_hogar', label: 'Situación Laboral del Jefe de Hogar' },
+      { value: 'situacion_laboral_jefe_hogar', label: 'Situación Laboral' },
       { value: 'ingreso_mensual_jefe_hogar', label: 'Distribución de Ingresos Mensuales' },
       { value: 'conoce_desechos_solidos', label: 'Conocimiento sobre Desechos Sólidos' },
       { value: 'clasificacion_correcta_desechos', label: 'Clasificación Correcta de Desechos' },
       { value: 'separar_desechos_por_origen', label: 'Práctica de Separación de Desechos' },
-      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Tiempo Dedicado a Prácticas Sustentables' },
+      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Tiempo Dedicado a Prácticas Ambientales' },
       { value: 'desechos_hogar_reutilizados', label: 'Reutilización de Desechos en el Hogar' },
       { value: 'participaria_talleres_buenas_practicas', label: 'Disposición a Participar en Talleres' },
       { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Percepción del Impacto Ambiental' }
@@ -866,32 +841,32 @@
       } else if (stats.concentration < 0.2) {
         insights.push("• Distribución equilibrada entre categorías");
       } else {
-        insights.push("• Distribución moderadamente diversificada");
+        insights.push("• Distribución moderadamente concentrada");
       }
       
       // Insight sobre diversidad
       if (stats.diversity > 1.5) {
-        insights.push("• Alta heterogeneidad en las respuestas");
+        insights.push("• Alta diversidad en las respuestas");
       } else if (stats.diversity < 0.5) {
-        insights.push("• Baja diversidad, respuestas homogéneas");
+        insights.push("• Baja diversidad, respuestas concentradas");
       }
       
       // Insight sobre moda
       if (stats.max.percentage > 60) {
-        insights.push(`• Tendencia dominante: "${stats.max.label}" (${stats.max.percentage}%)`);
+        insights.push(`• La categoría "${stats.max.label}" representa el ${stats.max.percentage}%`);
       }
       
       // Insight específico por tipo de indicador
       if (indicatorKey.includes('ingreso')) {
-        insights.push("• Análisis socioeconómico: distribución de recursos");
+        insights.push("• Variable económica: distribución de ingresos");
       }
       
       if (indicatorKey.includes('talleres') || indicatorKey.includes('participaria')) {
-        insights.push("• Potencial de participación ciudadana en iniciativas ambientales");
+        insights.push("• Variable de disposición: potencial de participación");
       }
       
       if (indicatorKey.includes('desechos') || indicatorKey.includes('reciclar')) {
-        insights.push("• Indicador clave para políticas de gestión ambiental");
+        insights.push("• Variable ambiental: relevancia para políticas sostenibles");
       }
       
       return insights;
@@ -900,7 +875,7 @@
     function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
       // Actualizar estadísticas principales
       document.getElementById('statTotal').textContent = stats.total;
-      document.getElementById('statMode').textContent = `${stats.max.percentage}%`;
+      document.getElementById('statMode').textContent = `${stats.max.percentage}% (${stats.max.label})`;
       document.getElementById('statDiversity').textContent = stats.diversity;
       document.getElementById('statConcentration').textContent = stats.concentration;
       
@@ -917,8 +892,8 @@
             <div class="flex items-center gap-3 flex-1">
               <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : isMin ? 'text-red-700' : 'text-slate-700'} truncate max-w-[200px]">
                 ${label}
-                ${isMax ? '<span class="badge-max ml-2">PREDOMINANTE</span>' : ''}
-                ${isMin ? '<span class="badge-min ml-2">MENOR FRECUENCIA</span>' : ''}
+                ${isMax ? '<span class="badge-max ml-2">MAYOR</span>' : ''}
+                ${isMin ? '<span class="badge-min ml-2">MENOR</span>' : ''}
               </span>
             </div>
             <div class="flex items-center gap-3">
@@ -951,7 +926,7 @@
             <span>${stats.stdDev}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Coeficiente de Variación:</span>
+            <span class="font-medium">Coef. Variación:</span>
             <span>${stats.cv}%</span>
           </div>
           <div class="flex justify-between">
@@ -959,23 +934,23 @@
             <span>${stats.mean}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Asimetría Estadística:</span>
+            <span class="font-medium">Asimetría:</span>
             <span>${stats.skewness}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Primer Cuartil (Q1):</span>
+            <span class="font-medium">Q1 (25%):</span>
             <span>${stats.percentiles.q1}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Mediana (Q2):</span>
+            <span class="font-medium">Mediana:</span>
             <span>${stats.percentiles.median}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Tercer Cuartil (Q3):</span>
+            <span class="font-medium">Q3 (75%):</span>
             <span>${stats.percentiles.q3}</span>
           </div>
           <div class="flex justify-between">
-            <span class="font-medium">Rango Estadístico:</span>
+            <span class="font-medium">Rango:</span>
             <span>${stats.max.value - stats.min.value}</span>
           </div>
         </div>
@@ -986,7 +961,7 @@
     }
 
     /**************************************************************************
-     * Chart handling - MEJORADO para exportación con porcentajes
+     * Chart handling con exportación mejorada
      **************************************************************************/
     let chartInstance = null;
     function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
@@ -1064,7 +1039,7 @@
             grid: { color: 'rgba(0,0,0,0.05)' },
             title: {
               display: true,
-              text: 'Frecuencia Absoluta'
+              text: 'Frecuencia'
             }
           },
           x: {
@@ -1127,7 +1102,49 @@
     }
 
     /**************************************************************************
-     * Table handling (Simple-DataTables) - MEJORADO con búsqueda personalizada
+     * Función mejorada para exportar gráfico con porcentajes
+     **************************************************************************/
+    function exportChartWithPercentages() {
+      if (!chartInstance) return alert("No hay visualización para exportar.");
+      
+      // Crear un canvas temporal para el gráfico con porcentajes
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCanvas.width = 1200;
+      tempCanvas.height = 800;
+      
+      // Copiar el gráfico original
+      tempCtx.fillStyle = 'white';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      tempCtx.drawImage(document.getElementById('mainChart'), 50, 50, 1100, 700);
+      
+      // Agregar título y porcentajes si es un gráfico circular
+      if (chartInstance.config.type === 'pie' || chartInstance.config.type === 'doughnut') {
+        tempCtx.font = 'bold 24px Arial';
+        tempCtx.fillStyle = '#0f172a';
+        tempCtx.textAlign = 'center';
+        tempCtx.fillText(document.getElementById('chartTitle').textContent, tempCanvas.width / 2, 30);
+        
+        // Agregar porcentajes en el gráfico
+        const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
+        chartInstance.data.datasets[0].data.forEach((value, index) => {
+          const percentage = ((value / total) * 100).toFixed(1);
+          tempCtx.font = 'bold 16px Arial';
+          tempCtx.fillStyle = '#374151';
+          tempCtx.fillText(`${percentage}%`, tempCanvas.width / 2, 750 + (index * 20));
+        });
+      }
+      
+      // Exportar la imagen
+      const url = tempCanvas.toDataURL('image/png', 1);
+      const a = document.createElement('a'); 
+      a.href = url; 
+      a.download = `analisis_${document.getElementById('chartTitle').textContent.replace(/\s+/g, '_')}_${Date.now()}.png`; 
+      a.click();
+    }
+
+    /**************************************************************************
+     * Table handling (Simple-DataTables) - MEJORADO
      **************************************************************************/
     let dataTable = null;
     function buildTableHeaders(columns) {
@@ -1135,12 +1152,12 @@
       headerRow.innerHTML = '';
       columns.forEach(c => {
         const th = document.createElement('th');
-        // Mejorar títulos de columnas
+        // Mejorar los títulos de las columnas
         const prettyTitle = c.replace(/_/g, ' ')
                             .replace(/\b\w/g, l => l.toUpperCase())
                             .replace('Jefe Hogar', 'Jefe de Hogar')
                             .replace('Desechos', 'Residuos')
-                            .replace('Manejo Adecuado', 'Gestión Adecuada');
+                            .replace('Participaria', 'Disposición a Participar');
         th.innerText = prettyTitle;
         headerRow.appendChild(th);
       });
@@ -1153,7 +1170,7 @@
         const tr = document.createElement('tr');
         columns.forEach(col => {
           const td = document.createElement('td');
-          td.innerText = r[col] === null || r[col] === undefined ? 'No especificado' : String(r[col]);
+          td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -1171,14 +1188,14 @@
           perPage: 10,
           perPageSelect: [5, 10, 15, 20],
           labels: {
-            placeholder: "Buscar en toda la base de datos...",
+            placeholder: "Buscar en todos los registros...",
             searchTitle: "Búsqueda en dataset",
             pageTitle: "Página {page}",
             perPage: "registros por página",
-            noRows: "No se encontraron registros coincidentes",
-            noResults: "No hay resultados que coincidan con el criterio de búsqueda",
+            noRows: "No se encontraron registros",
+            noResults: "No hay resultados que coincidan con la búsqueda",
             info: "Mostrando {start} a {end} de {rows} registros",
-            loading: "Cargando base de datos...",
+            loading: "Cargando dataset...",
             infoFiltered: "(Filtrado de {rows} registros totales)"
           },
           classes: {
@@ -1200,14 +1217,36 @@
           }
         });
 
-        // Conectar búsqueda personalizada
-        const customSearch = document.getElementById('customSearch');
-        if (customSearch) {
-          customSearch.addEventListener('input', (e) => {
-            dataTable.search(e.target.value);
+        // Conectar el input de búsqueda personalizado
+        const searchInput = document.getElementById('tableSearch');
+        searchInput.addEventListener('input', (e) => {
+          dataTable.search(e.target.value);
+        });
+      }, 60);
+    }
+
+    /**************************************************************************
+     * Función para extraer fechas únicas del dataset
+     **************************************************************************/
+    function extractUniqueDates(rows) {
+      // Buscar columnas que puedan contener fechas
+      const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
+      let dates = new Set();
+      
+      dateColumns.forEach(col => {
+        if (rows[0] && rows[0][col]) {
+          rows.forEach(row => {
+            if (row[col]) {
+              const dateStr = String(row[col]).split('T')[0]; // Tomar solo la parte de la fecha
+              if (dateStr.match(/\d{4}-\d{2}-\d{2}/)) {
+                dates.add(dateStr);
+              }
+            }
           });
         }
-      }, 60);
+      });
+      
+      return Array.from(dates).sort();
     }
 
     /**************************************************************************
@@ -1221,7 +1260,7 @@
       const { data, error } = await supabase.from(TABLE).select("*");
       if (error) { 
         console.error("Supabase error:", error); 
-        alert("Error en la conexión con la base de datos. Verifique la consola para detalles."); 
+        alert("Error cargando datos desde Supabase. Revisar consola."); 
         document.getElementById('chartLoading').classList.add('hidden');
         return; 
       }
@@ -1231,12 +1270,23 @@
       // populate group filter
       const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
       const filterGrupo = document.getElementById('filterGrupo');
-      filterGrupo.innerHTML = '<option value="todos">Grupo: Total de la Muestra</option>';
+      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
       groups.forEach(g => { 
         const opt = document.createElement('option'); 
         opt.value = g; 
         opt.textContent = g; 
         filterGrupo.appendChild(opt); 
+      });
+
+      // populate date filter
+      const dates = extractUniqueDates(data);
+      const filterFecha = document.getElementById('filterFecha');
+      filterFecha.innerHTML = '<option value="todos">Período: Todos</option>';
+      dates.forEach(date => { 
+        const opt = document.createElement('option'); 
+        opt.value = date; 
+        opt.textContent = new Date(date).toLocaleDateString('es-ES'); 
+        filterFecha.appendChild(opt); 
       });
 
       // populate indicator selector (once)
@@ -1293,7 +1343,7 @@
     }
 
     /**************************************************************************
-     * Render indicator with filters - ACTUALIZADO con filtro de fecha
+     * Render indicator with filters (incluyendo fecha)
      **************************************************************************/
     async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos', fecha:'todos' }) {
       // Mostrar loading
@@ -1309,12 +1359,17 @@
       if (filters.grupo && filters.grupo !== 'todos') {
         filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
       }
-      
-      // Filtro de fecha (simulado - en un caso real usarías campos de fecha reales)
       if (filters.fecha && filters.fecha !== 'todos') {
-        // Simulación de filtro por fecha - en implementación real usarías campos de fecha
-        console.log(`Aplicando filtro temporal: ${filters.fecha}`);
-        // Aquí iría la lógica real de filtrado por fecha
+        // Buscar en columnas de fecha
+        filtered = filtered.filter(r => {
+          const dateColumns = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp'];
+          for (let col of dateColumns) {
+            if (r[col] && String(r[col]).includes(filters.fecha)) {
+              return true;
+            }
+          }
+          return false;
+        });
       }
 
       updateSummaries(filtered);
@@ -1364,7 +1419,7 @@
       
       // Renderizar gráfico y estadísticas
       document.getElementById('chartTitle').innerText = title;
-      document.getElementById('chartSubtitle').innerText = `Visualización: ${chartType} • Muestra: ${filtered.length} observaciones`;
+      document.getElementById('chartSubtitle').innerText = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
       renderChart(chartType, labels, values, title);
       renderAdvancedStatistics(stats, labels, values, indicatorKey);
       
@@ -1373,11 +1428,11 @@
     }
 
     /**************************************************************************
-     * Export table as CSV - MEJORADO ubicación
+     * Export table as CSV
      **************************************************************************/
     function exportTableCSV() {
       const data = window.__RAW_DATA || [];
-      if (!data.length) return alert("No hay datos disponibles para exportar.");
+      if (!data.length) return alert("No hay datos para exportar.");
       const cols = Object.keys(data[0]);
       const csvRows = [cols.join(",")];
       data.forEach(row => {
@@ -1396,53 +1451,13 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); 
       a.href = url; 
-      a.download = `dataset_ambiental_${new Date().toISOString().split('T')[0]}.csv`; 
+      a.download = `dataset_proambiental_${Date.now()}.csv`; 
       a.click(); 
       URL.revokeObjectURL(url);
     }
 
     /**************************************************************************
-     * Export chart image - MEJORADO para incluir porcentajes
-     **************************************************************************/
-    function exportChartImage() {
-      if (!chartInstance) return alert("No hay visualización disponible para exportar.");
-      
-      // Crear un canvas temporal para la exportación
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      const originalCanvas = document.getElementById('mainChart');
-      
-      // Configurar el tamaño del canvas temporal
-      tempCanvas.width = originalCanvas.width * 2;
-      tempCanvas.height = originalCanvas.height * 2;
-      
-      // Copiar el contenido del gráfico original
-      tempCtx.drawImage(originalCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
-      
-      // Agregar título y metadatos
-      tempCtx.font = 'bold 24px Arial';
-      tempCtx.fillStyle = '#0f172a';
-      tempCtx.textAlign = 'center';
-      tempCtx.fillText(document.getElementById('chartTitle').innerText, tempCanvas.width / 2, 40);
-      
-      tempCtx.font = '14px Arial';
-      tempCtx.fillStyle = '#64748b';
-      tempCtx.fillText(document.getElementById('chartSubtitle').innerText, tempCanvas.width / 2, 70);
-      
-      tempCtx.font = '12px Arial';
-      tempCtx.fillStyle = '#94a3b8';
-      tempCtx.fillText(`Exportado: ${new Date().toLocaleString()}`, tempCanvas.width / 2, tempCanvas.height - 20);
-      
-      // Exportar la imagen mejorada
-      const url = tempCanvas.toDataURL('image/png', 1.0);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `analisis_ambiental_${new Date().toISOString().split('T')[0]}.png`; 
-      a.click();
-    }
-
-    /**************************************************************************
-     * Auto-refresh function - ACTUALIZADO con filtro de fecha
+     * Auto-refresh function (incluye filtro de fecha)
      **************************************************************************/
     function autoRefreshChart() {
       const indicator = document.getElementById('selectIndicator').value;
@@ -1457,7 +1472,7 @@
      * Init UI & events
      **************************************************************************/
     document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
-    document.getElementById('btnExportChart').addEventListener('click', exportChartImage);
+    document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
 
     // Add event listeners for auto-refresh
     document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
