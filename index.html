@@ -3,2269 +3,1744 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Proambiental — Análisis de Indicadores</title>
+  <title>Análisis de Comportamiento Proambiental</title>
 
-  <!-- Tailwind (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Supabase JS v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-
-  <!-- Simple-DataTables (para tabla profesional) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
-
-  <!-- Font Awesome para iconos -->
+  <!-- Supabase (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Chart.js con plugins avanzados -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <!-- Iconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body { 
-      background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); 
-      font-family: 'Segoe UI', system-ui, sans-serif;
+    :root {
+      --primary: #0f766e;
+      --primary-light: #14b8a6;
+      --primary-dark: #0d5d57;
+      --secondary: #2d4cc8;
+      --accent: #7c3aed;
+      --bg1: #f8fafc;
+      --bg2: #f0fdfa;
+      --card: #ffffff;
+      --muted: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #e2e8f0;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+      --radius: 12px;
+      --header-height: 80px;
     }
-    .card { 
-      background: white; 
-      border-radius: 12px; 
-      box-shadow: 0 4px 12px rgba(15,23,42,0.08); 
-      border: 1px solid #f1f5f9;
-      transition: all 0.3s ease;
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .card:hover {
-      box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+    
+    body {
+      font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: #1e293b;
+      line-height: 1.6;
+      min-height: 100vh;
     }
-    .muted { color: #64748b; }
-    .accent { color: #065f46; }
-    .control { 
-      border: 1px solid #e2e8f0; 
-      padding: 0.6rem 0.75rem; 
-      border-radius: 8px; 
-      background: white;
-      transition: all 0.2s ease;
+    
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 0 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .control:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    /* responsive chart container */
-    .chart-container {
-      max-height: 520px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-    }
-    .chart-wrapper {
-      width: 100%;
-      max-width: 600px;
+    
+    .header-content {
+      max-width: 1200px;
       margin: 0 auto;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: var(--header-height);
     }
-    .btn-primary {
-      background: linear-gradient(to right, #10b981, #059669);
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo i {
+      font-size: 32px;
+    }
+    
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.2;
+    }
+    
+    .subtitle {
+      opacity: 0.9;
+      font-size: 14px;
+      margin-top: 2px;
+      font-weight: 400;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .card-title {
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .control-group label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .filter-info {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-style: italic;
+    }
+    
+    select {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: white;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230f766e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      appearance: none;
+      padding-right: 40px;
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+    }
+    
+    button {
+      background: var(--primary);
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
+      cursor: pointer;
       font-weight: 500;
-      transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(to right, #059669, #047857);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
-    .btn-secondary {
-      background: #f8fafc;
-      color: #475569;
-      border: 1px solid #e2e8f0;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-    .btn-secondary:hover {
-      background: #f1f5f9;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
-    }
-    .btn-tertiary {
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-    .btn-tertiary:hover {
-      background: #fecaca;
-      transform: translateY(-1px);
-    }
-    .summary-card {
-      text-align: center;
-      padding: 1.5rem 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .summary-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(to right, #10b981, #059669);
-    }
-    .summary-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-top: 0.5rem;
-      color: #0f766e;
-    }
-    .summary-label {
-      font-size: 0.875rem;
-      color: #64748b;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 6px;
+      transition: all 0.2s;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
     }
-    .chart-title {
-      font-size: 1.25rem;
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    button.secondary {
+      background: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    
+    button.secondary:hover {
+      background: var(--bg1);
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .summary-card {
+      background: linear-gradient(135deg, #fff, #f7fffb);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #eef7f4;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .summary-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .summary-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+    
+    .summary-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    
+    .summary-subtitle {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .positive {
+      color: var(--success);
+    }
+    
+    .negative {
+      color: var(--danger);
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 500px;
+      margin-top: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
       font-weight: 600;
-      color: #0f172a;
+      color: var(--muted);
+      font-size: 14px;
+      background-color: #f8fafc;
     }
-    .chart-subtitle {
-      font-size: 0.875rem;
-      color: #64748b;
+    
+    tr:hover {
+      background-color: #f8fafc;
     }
-    .header-gradient {
-      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    
+    .total-row {
+      background-color: #f0f9ff;
+      font-weight: 600;
     }
-    .indicator-highlight {
-      background: linear-gradient(120deg, #d1fae5 0%, #a7f3d0 100%);
-      border-left: 4px solid #10b981;
+    
+    .total-row td {
+      border-top: 2px solid var(--primary);
     }
+    
+    .statistics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .stat-card h4 {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .stats-section {
+      margin-top: 24px;
+    }
+    
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 1.5rem;
+      gap: 16px;
+      margin-top: 16px;
     }
+    
     .stat-item {
       background: #f8fafc;
-      padding: 1rem;
       border-radius: 8px;
-      border-left: 4px solid #10b981;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s;
     }
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0f766e;
+    
+    .stat-item:hover {
+      transform: translateY(-2px);
     }
+    
     .stat-label {
-      font-size: 0.875rem;
-      color: #64748b;
-      margin-top: 0.25rem;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
     }
-    .progress-bar {
-      height: 6px;
-      background: #e2e8f0;
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 0.5rem;
+    
+    .stat-number {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary);
     }
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(to right, #10b981, #059669);
-      border-radius: 3px;
-      transition: width 0.5s ease;
+    
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 24px 0;
+      padding: 16px;
+      border-top: 1px solid var(--border);
     }
-    .trend-up {
-      color: #10b981;
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      flex-direction: column;
+      gap: 12px;
     }
-    .trend-down {
-      color: #ef4444;
-    }
-    .insight-card {
-      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-      border: 1px solid #bbf7d0;
-    }
-    .loading-spinner {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #10b981;
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(15, 118, 110, 0.2);
+      border-left: 4px solid var(--primary);
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
       animation: spin 1s linear infinite;
-      margin: 0 auto;
     }
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .badge-max {
-      background: #10b981;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    .badge-min {
-      background: #ef4444;
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    /* Estilos personalizados para Simple-DataTables en español */
-    .dataTable-wrapper {
-      border: 1px solid #e2e8f0;
+    
+    .export-options {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 40px;
+      background: white;
       border-radius: 8px;
-      overflow: hidden;
-      background: white;
-    }
-    .dataTable-container {
-      background: white;
-      max-height: 600px;
-      overflow: auto;
-    }
-    .dataTable-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 800px;
-    }
-    .dataTable-table th {
-      background: #f8fafc;
-      padding: 12px 16px;
-      text-align: left;
-      font-weight: 600;
-      color: #374151;
-      border-bottom: 1px solid #e2e8f0;
-      position: sticky;
-      top: 0;
+      box-shadow: var(--shadow);
+      padding: 8px;
       z-index: 10;
+      min-width: 150px;
     }
-    .dataTable-table td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #f1f5f9;
-      white-space: nowrap;
+    
+    .export-options.show {
+      display: block;
     }
-    .dataTable-table tr:hover {
-      background: #f8fafc;
-    }
-    /* Estilos para la barra de búsqueda */
-    .dataTable-input {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
+    
+    .export-option {
       padding: 8px 12px;
-      margin: 16px;
-      width: calc(100% - 32px);
+      cursor: pointer;
+      border-radius: 4px;
       font-size: 14px;
-    }
-    .dataTable-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    /* Estilos para la paginación */
-    .dataTable-pagination {
-      margin: 16px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
-    .dataTable-pagination-list {
+    
+    .export-option:hover {
+      background: var(--bg1);
+    }
+    
+    .chart-type-selector {
       display: flex;
-      gap: 4px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      align-items: center;
     }
-    .dataTable-pagination-list li {
-      margin: 0;
-    }
-    .dataTable-pagination-list li a {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
+    
+    .chart-type-btn {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--muted);
       padding: 8px 12px;
-      text-decoration: none;
-      color: #374151;
-      font-size: 14px;
-      transition: all 0.2s ease;
-    }
-    .dataTable-pagination-list li a:hover {
-      background: #f3f4f6;
-    }
-    .dataTable-pagination-list li.active a {
-      background: #10b981;
-      border-color: #10b981;
-      color: white;
-    }
-    .dataTable-pagination-list li.disabled a {
-      color: #9ca3af;
-      cursor: not-allowed;
-    }
-    .dataTable-pagination-list li.disabled a:hover {
-      background: transparent;
-    }
-    /* Información de la tabla */
-    .dataTable-info {
-      margin: 0;
-      color: #6b7280;
-      font-size: 14px;
-    }
-    /* Selector de registros por página */
-    .dataTable-selector {
-      border: 1px solid #d1d5db;
       border-radius: 6px;
-      padding: 6px 8px;
-      font-size: 14px;
-      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    /* Scrollbar personalizado */
-    .dataTable-container::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    
+    .chart-type-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
     }
-    .dataTable-container::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 4px;
+    
+    .chart-type-btn:hover:not(.active) {
+      background: var(--bg1);
+      border-color: var(--primary-light);
     }
-    .dataTable-container::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-    .dataTable-container::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-    .summary-trend {
-      font-size: 0.75rem;
-      margin-top: 0.25rem;
-    }
-    .trend-positive {
-      color: #10b981;
-    }
-    .trend-negative {
-      color: #ef4444;
-    }
-    .search-box {
+    
+    .regression-info {
       background: #f8fafc;
-      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      padding: 16px;
+      margin-top: 16px;
+      border-left: 4px solid var(--primary);
     }
-    .table-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
+    
+    .regression-info h4 {
+      color: var(--primary);
+      margin-bottom: 8px;
+      font-size: 16px;
     }
-    .table-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #0f172a;
-    }
-    .date-filter-container {
-      display: flex;
-      gap: 0.75rem;
-      align-items: end;
-      flex-wrap: wrap;
-    }
-    .date-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-      min-width: 140px;
-    }
-    .date-input-group label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #374151;
-    }
-    .date-input {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      transition: all 0.2s ease;
-    }
-    .date-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    .filter-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .active-filter {
-      background: #10b981 !important;
-      color: white !important;
-      border-color: #10b981 !important;
-    }
-    /* Estilos mejorados para la búsqueda */
-    .search-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .search-results-info {
-      background: #ecfdf5;
-      border: 1px solid #d1fae5;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      color: #065f46;
-    }
-    .search-highlight {
-      background-color: #fef3c7;
-      padding: 0.1rem 0.2rem;
-      border-radius: 0.25rem;
-    }
-    .search-container {
-      position: relative;
-      flex: 1;
-      max-width: 500px;
-    }
-    .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #9ca3af;
-    }
-    .search-input {
-      width: 100%;
-      padding: 10px 10px 10px 40px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
+    
+    .regression-info p {
+      margin: 4px 0;
       font-size: 14px;
-      transition: all 0.2s ease;
     }
-    .search-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    .clear-search {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #9ca3af;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-    }
-    .clear-search:hover {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-    /* PAGINACIÓN MEJORADA */
-    .pagination-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      background: #f8fafc;
-      border-top: 1px solid #e2e8f0;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .pagination-info {
-      color: #64748b;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .pagination-buttons {
-      display: flex;
-      gap: 0.25rem;
-    }
-    .pagination-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      background: white;
-      color: #374151;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .pagination-btn:hover:not(:disabled) {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-    }
-    .pagination-btn:disabled {
-      color: #9ca3af;
-      cursor: not-allowed;
-      background: #f9fafb;
-    }
-    .pagination-btn.active {
-      background: #10b981;
-      border-color: #10b981;
-      color: white;
-    }
-    .pagination-pages {
-      display: flex;
-      gap: 0.25rem;
-      margin: 0 0.5rem;
-    }
-    .page-numbers {
-      display: flex;
-      gap: 0.25rem;
-    }
-    .page-number {
-      min-width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      background: white;
-      color: #374151;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .page-number:hover {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-    }
-    .page-number.active {
-      background: #10b981;
-      border-color: #10b981;
-      color: white;
-    }
-    .page-ellipsis {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      color: #6b7280;
-      font-size: 0.875rem;
-    }
-    .rows-per-page-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .rows-per-page-label {
-      color: #64748b;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-    .rows-per-page-select {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 6px 8px;
-      font-size: 0.875rem;
-      background: white;
-      color: #374151;
-      cursor: pointer;
-    }
-    .rows-per-page-select:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    /* Nuevos estilos para análisis mejorado */
-    .stat-card {
-      background: white;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border: 1px solid #e2e8f0;
-    }
-    .stat-card-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-    }
-    .stat-card-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #0f766e;
-    }
-    .confidence-interval {
-      background: #fef3c7;
-      border: 1px solid #f59e0b;
-      border-radius: 6px;
-      padding: 0.75rem;
-      margin-top: 1rem;
-    }
-    /* Responsive adjustments */
+    
     @media (max-width: 768px) {
-      .pagination-container {
+      .header-content {
         flex-direction: column;
-        align-items: stretch;
+        gap: 12px;
+        height: auto;
+        padding: 16px 0;
       }
-      .pagination-controls {
+      
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      
+      .action-buttons {
         justify-content: center;
       }
-      .rows-per-page-selector {
+      
+      .chart-container {
+        height: 400px;
+      }
+      
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-type-selector {
         justify-content: center;
       }
     }
   </style>
 </head>
-<body class="min-h-screen font-sans antialiased text-slate-800">
-
-  <!-- HEADER -->
-  <header class="header-gradient text-white shadow-lg">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="bg-white/20 p-2 rounded-xl">
-          <i class="fas fa-leaf text-white text-2xl"></i>
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold">Dashboard Proambiental</h1>
-          <p class="text-sm opacity-90 mt-1">Análisis de Comportamiento Proambiental y Sustentabilidad</p>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <div class="logo-text">
+          <h1>Análisis de Comportamiento Proambiental</h1>
+          <div class="subtitle">Panel de Indicadores de Sustentabilidad</div>
         </div>
       </div>
-      <div class="text-sm bg-white/10 px-3 py-2 rounded-lg">
-        <i class="fas fa-database mr-2"></i>
-        Base de datos: cuestionario_comportamiento_proambiental
+      <div class="header-actions">
+        <button id="btnHelp" class="secondary" title="Ayuda">
+          <i class="fas fa-question-circle"></i> Ayuda
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main class="max-w-7xl mx-auto px-6 py-8">
-    <!-- CONTROLES -->
-    <div class="grid md:grid-cols-4 gap-6 mb-8">
-      <div class="card p-5 indicator-highlight">
-        <label class="block text-sm font-medium text-slate-700 mb-3">
-          <i class="fas fa-chart-bar mr-2 text-emerald-600"></i>
-          Variable de Análisis
-        </label>
-        <select id="selectIndicator" class="w-full control" aria-label="Indicador"></select>
-        <p class="text-xs muted mt-3">Selecciona la variable para el análisis estadístico.</p>
+  <main>
+    <!-- Panel de control principal -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-sliders-h"></i>
+        Filtros de Análisis
       </div>
-
-      <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">
-          <i class="fas fa-chart-pie mr-2 text-blue-600"></i>
-          Tipo de Visualización
-        </label>
-        <select id="selectChartType" class="w-full control">
-          <option value="bar">Gráfico de Barras</option>
-          <option value="pie">Gráfico Circular</option>
-          <option value="doughnut">Gráfico de Dona</option>
-          <option value="line">Gráfico de Líneas</option>
-          <option value="radar">Gráfico Radar</option>
-          <option value="polarArea">Área Polar</option>
-        </select>
-        <p class="text-xs muted mt-3">Selecciona el tipo de representación gráfica.</p>
-      </div>
-
-      <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">
-          <i class="fas fa-filter mr-2 text-purple-600"></i>
-          Filtros Demográficos
-        </label>
-        <div class="flex flex-col gap-3">
-          <select id="filterSexo" class="w-full control">
-            <option value="todos">Género: Todos</option>
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
+      
+      <!-- Controles -->
+      <div class="controls" id="controls">
+        <div class="control-group">
+          <label for="selectEstadoCivil"><i class="fas fa-heart"></i> Estado Civil</label>
+          <select id="selectEstadoCivil">
+            <option value="">Todos los estados civiles</option>
           </select>
-          <select id="filterGrupo" class="w-full control">
-            <option value="todos">Grupo: Todos</option>
-          </select>
+          <div class="filter-info" id="estadoCivilInfo">Cargando...</div>
         </div>
-        <p class="text-xs muted mt-3">Filtra por características demográficas.</p>
+
+        <div class="control-group">
+          <label for="selectEducacion"><i class="fas fa-graduation-cap"></i> Nivel de Educación</label>
+          <select id="selectEducacion">
+            <option value="">Todos los niveles</option>
+          </select>
+          <div class="filter-info" id="educacionInfo">Cargando...</div>
+        </div>
+
+        <div class="control-group">
+          <label for="selectSituacionLaboral"><i class="fas fa-briefcase"></i> Situación Laboral</label>
+          <select id="selectSituacionLaboral">
+            <option value="">Todas las situaciones</option>
+          </select>
+          <div class="filter-info" id="situacionLaboralInfo">Cargando...</div>
+        </div>
+
+        <div class="control-group">
+          <label for="selectTipoHogar"><i class="fas fa-home"></i> Tipo de Hogar</label>
+          <select id="selectTipoHogar">
+            <option value="">Todos los tipos</option>
+          </select>
+          <div class="filter-info" id="tipoHogarInfo">Cargando...</div>
+        </div>
       </div>
 
-      <!-- FILTRO DE FECHA MEJORADO -->
-      <div class="card p-5">
-        <label class="block text-sm font-medium text-slate-700 mb-3">
-          <i class="fas fa-calendar-alt mr-2 text-amber-600"></i>
-          Filtro por Intervalo de Fecha
-        </label>
+      <div class="action-buttons">
+        <button id="btnResetFilters" class="secondary">
+          <i class="fas fa-undo"></i> Restablecer Filtros
+        </button>
+        <div style="position: relative;">
+          <button id="btnExport" class="secondary">
+            <i class="fas fa-download"></i> Exportar Datos
+          </button>
+          <div class="export-options" id="exportOptions">
+            <div class="export-option" data-type="png">
+              <i class="fas fa-image"></i> Gráfico (PNG)
+            </div>
+            <div class="export-option" data-type="csv">
+              <i class="fas fa-file-csv"></i> Datos (CSV)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjetas de resumen -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-chart-line"></i>
+        Resumen General
+      </div>
+      
+      <div class="summary-cards" id="summaryCards">
+        <div class="summary-card">
+          <div class="summary-title">
+            <i class="fas fa-users"></i> Total de Encuestados
+          </div>
+          <div class="summary-value" id="summaryTotal">0</div>
+          <div class="summary-subtitle" id="summaryTotalChange">
+            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">
+            <i class="fas fa-brain"></i> Conocimiento Ambiental
+          </div>
+          <div class="summary-value" id="summaryConocimiento">0%</div>
+          <div class="summary-subtitle" id="summaryConocimientoChange">
+            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">
+            <i class="fas fa-heart"></i> Actitud Proambiental
+          </div>
+          <div class="summary-value" id="summaryActitud">0%</div>
+          <div class="summary-subtitle" id="summaryActitudChange">
+            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">
+            <i class="fas fa-recycle"></i> Prácticas Sustentables
+          </div>
+          <div class="summary-value" id="summaryPracticas">0%</div>
+          <div class="summary-subtitle" id="summaryPracticasChange">
+            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos y visualizaciones -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-chart-bar"></i>
+        Visualización de Datos
+      </div>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="main-chart">Indicadores por Dimensión</div>
+        <div class="tab" data-tab="comparison">Comparación por Grupos</div>
+      </div>
+      
+      <div class="tab-content active" id="main-chart">
+        <!-- Selector de tipo de gráfico -->
+        <div class="chart-type-selector">
+          <span style="font-size: 14px; color: var(--muted); margin-right: 8px;">Tipo de gráfico:</span>
+          <div class="chart-type-btn active" data-type="bar">
+            <i class="fas fa-chart-bar"></i> Barras
+          </div>
+          <div class="chart-type-btn" data-type="pie">
+            <i class="fas fa-chart-pie"></i> Circular
+          </div>
+          <div class="chart-type-btn" data-type="line">
+            <i class="fas fa-chart-line"></i> Líneas
+          </div>
+          <div class="chart-type-btn" data-type="radar">
+            <i class="fas fa-bullseye"></i> Radar
+          </div>
+        </div>
         
-        <div class="date-filter-container">
-          <div class="date-input-group">
-            <label for="startDate">Fecha Inicial</label>
-            <input type="date" id="startDate" class="date-input">
-          </div>
-          
-          <div class="date-input-group">
-            <label for="endDate">Fecha Final</label>
-            <input type="date" id="endDate" class="date-input">
-          </div>
-        </div>
-
-        <div class="filter-actions">
-          <button id="applyDateFilter" class="btn-primary flex-1 flex items-center justify-center gap-2 text-sm py-2">
-            <i class="fas fa-check"></i>
-            Aplicar
-          </button>
-          <button id="clearDateFilter" class="btn-tertiary flex items-center justify-center gap-2 text-sm py-2 px-3">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <p class="text-xs muted mt-3">Filtra registros por rango de fecha específico.</p>
-      </div>
-    </div>
-
-    <!-- RESUMEN MEJORADO -->
-    <div class="grid md:grid-cols-4 gap-5 mb-8">
-      <div class="card summary-card">
-        <div class="summary-label">
-          <i class="fas fa-users text-emerald-600"></i>
-          Muestra Total
-        </div>
-        <div id="totalSurveys" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendSurveys">Dataset cargado</div>
-      </div>
-      
-      <div class="card summary-card">
-        <div class="summary-label">
-          <i class="fas fa-birthday-cake text-blue-600"></i>
-          Edad Promedio
-        </div>
-        <div id="avgAge" class="summary-value">—</div>
-        <div class="summary-trend" id="trendAge">Distribución etaria</div>
-      </div>
-      
-      <div class="card summary-card">
-        <div class="summary-label">
-          <i class="fas fa-graduation-cap text-purple-600"></i>
-          Nivel Educativo
-        </div>
-        <div id="educationLevel" class="summary-value">—</div>
-        <div class="summary-trend" id="trendEducation">Predominante</div>
-      </div>
-      
-      <div class="card summary-card">
-        <div class="summary-label">
-          <i class="fas fa-recycle text-amber-600"></i>
-          Conciencia Ambiental
-        </div>
-        <div id="environmentalAwareness" class="summary-value">—</div>
-        <div class="summary-trend trend-positive" id="trendAwareness">Nivel compuesto</div>
-      </div>
-    </div>
-
-    <!-- GRAFICO Y ESTADÍSTICAS -->
-    <div class="card p-6 mb-8">
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        <div>
-          <h2 id="chartTitle" class="chart-title">Análisis de Variable</h2>
-          <p id="chartSubtitle" class="chart-subtitle mt-1">Selecciona una variable para iniciar el análisis estadístico.</p>
-        </div>
-        <div class="flex gap-3">
-          <button id="btnExportChart" class="btn-secondary flex items-center gap-2">
-            <i class="fas fa-download text-sm"></i>
-            Exportar Visualización
-          </button>
-        </div>
-      </div>
-      
-      <!-- Loading State -->
-      <div id="chartLoading" class="hidden">
-        <div class="loading-spinner mb-4"></div>
-        <p class="text-center text-slate-500">Procesando datos estadísticos...</p>
-      </div>
-      
-      <div class="chart-container">
-        <div class="chart-wrapper">
+        <div class="chart-container">
           <canvas id="mainChart"></canvas>
         </div>
       </div>
       
-      <!-- ESTADÍSTICAS DETALLADAS -->
-      <div id="statisticsSection" class="mt-8 hidden">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">
-          <i class="fas fa-chart-line text-emerald-600 mr-2"></i>
-          Análisis Estadístico Detallado
-        </h3>
-        
-        <!-- Estadísticas Principales -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="stat-item">
-            <div class="stat-value" id="statTotal">—</div>
-            <div class="stat-label">Tamaño de Muestra</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="statMode">—</div>
-            <div class="stat-label">Moda Estadística</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="statDiversity">—</div>
-            <div class="stat-label">Índice de Diversidad</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="statConcentration">—</div>
-            <div class="stat-label">Índice de Concentración</div>
-          </div>
+      <div class="tab-content" id="comparison">
+        <div class="chart-container">
+          <canvas id="comparisonChart"></canvas>
         </div>
+      </div>
+    </div>
 
-        <!-- Distribución Detallada -->
-        <div class="card p-4 mb-4">
-          <h4 class="font-semibold text-slate-700 mb-3">
-            <i class="fas fa-chart-bar text-emerald-600 mr-2"></i>
-            Distribución de Frecuencias
-          </h4>
-          <div id="distributionDetails" class="space-y-2">
-            <!-- Las distribuciones se generarán aquí -->
+    <!-- Estadísticas básicas completas -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-chart-pie"></i>
+        Estadísticas Descriptivas
+      </div>
+      
+      <div class="stats-section">
+        <h3 style="color: var(--primary); margin-bottom: 16px;">Resumen del Conjunto de Datos</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Total de Registros</div>
+            <div class="stat-number" id="statTotalRecords">0</div>
           </div>
-        </div>
-
-        <!-- Insights y Análisis -->
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="card p-4 insight-card">
-            <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-lightbulb text-amber-500 mr-2"></i>
-              Hallazgos del Análisis
-            </h4>
-            <div id="insightsContent" class="text-sm text-slate-600 space-y-1">
-              <!-- Los insights se generarán aquí -->
-            </div>
+          <div class="stat-item">
+            <div class="stat-label">Estados Civiles Únicos</div>
+            <div class="stat-number" id="statEstadosCiviles">0</div>
           </div>
-          <div class="card p-4">
-            <h4 class="font-semibold text-slate-700 mb-2">
-              <i class="fas fa-calculator text-blue-500 mr-2"></i>
-              Métricas Estadísticas Avanzadas
-            </h4>
-            <div id="advancedMetrics" class="text-sm text-slate-600 space-y-2">
-              <!-- Métricas avanzadas se generarán aquí -->
-            </div>
+          <div class="stat-item">
+            <div class="stat-label">Niveles de Educación</div>
+            <div class="stat-number" id="statNivelesEducacion">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Situaciones Laborales</div>
+            <div class="stat-number" id="statSituacionesLaborales">0</div>
           </div>
         </div>
       </div>
       
-      <div id="noDataMsg" class="text-center py-8 muted hidden">
-        <i class="fas fa-database text-slate-300 text-4xl mb-3"></i>
-        <p class="text-lg font-medium text-slate-500">No se encontraron datos para los criterios seleccionados</p>
-        <p class="text-sm text-slate-400 mt-1">Ajusta los filtros o selecciona otra variable de análisis</p>
-      </div>
-    </div>
-
-    <!-- TABLA MEJORADA CON BÚSQUEDA Y EXPORTACIÓN -->
-    <div class="card p-6 mb-8">
-      <div class="table-actions">
-        <div>
-          <h3 class="table-title">Base de Datos Completa</h3>
-          <p class="text-sm text-slate-500 mt-1">Registros del estudio de comportamiento proambiental</p>
-        </div>
-        <div class="flex gap-3">
-          <button id="btnExportCSV" class="btn-primary flex items-center gap-2">
-            <i class="fas fa-file-export text-sm"></i>
-            Exportar Dataset
-          </button>
-        </div>
-      </div>
-
-      <!-- BÚSQUEDA MEJORADA -->
-      <div class="search-header">
-        <div class="search-container">
-          <i class="fas fa-search search-icon"></i>
-          <input type="text" id="tableSearch" placeholder="Buscar en todos los registros..." 
-                 class="search-input" aria-label="Buscar en la tabla">
-          <button id="clearSearch" class="clear-search hidden" aria-label="Limpiar búsqueda">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div id="searchResultsInfo" class="search-results-info hidden">
-          <!-- Información de resultados se mostrará aquí -->
-        </div>
-      </div>
-
-      <div class="dataTable-wrapper">
-        <div class="dataTable-container">
-          <table id="dataTable" class="dataTable-table">
-            <thead>
-              <tr id="tableHeaderRow"></tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PAGINACIÓN MEJORADA -->
-      <div class="pagination-container">
-        <div class="pagination-info" id="paginationInfo">
-          Mostrando 1-10 de 0 registros
-        </div>
-        
-        <div class="pagination-controls">
-          <div class="pagination-buttons">
-            <button id="firstPage" class="pagination-btn" title="Primera página" disabled>
-              <i class="fas fa-angle-double-left"></i>
-            </button>
-            <button id="prevPage" class="pagination-btn" title="Página anterior" disabled>
-              <i class="fas fa-angle-left"></i>
-            </button>
+      <div class="stats-section">
+        <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución Demográfica</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Edad Promedio</div>
+            <div class="stat-number" id="statEdadPromedio">0</div>
           </div>
-          
-          <div class="pagination-pages">
-            <div class="page-numbers" id="pageNumbers">
-              <!-- Los números de página se generarán aquí dinámicamente -->
+          <div class="stat-item">
+            <div class="stat-label">Integrantes Promedio</div>
+            <div class="stat-number" id="statIntegrantesPromedio">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edad Mínima</div>
+            <div class="stat-number" id="statEdadMinima">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edad Máxima</div>
+            <div class="stat-number" id="statEdadMaxima">0</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stats-section">
+        <h3 style="color: var(--primary); margin-bottom: 16px;">Indicadores de Sustentabilidad</h3>
+        <div class="statistics-grid">
+          <div class="stat-card">
+            <h4>Conocimiento Ambiental</h4>
+            <div class="stat-value" id="statConocimiento">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Conocimiento sobre desechos sólidos
             </div>
           </div>
           
-          <div class="pagination-buttons">
-            <button id="nextPage" class="pagination-btn" title="Página siguiente" disabled>
-              <i class="fas fa-angle-right"></i>
-            </button>
-            <button id="lastPage" class="pagination-btn" title="Última página" disabled>
-              <i class="fas fa-angle-double-right"></i>
-            </button>
+          <div class="stat-card">
+            <h4>Actitud Proambiental</h4>
+            <div class="stat-value" id="statActitud">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Preocupación y compromiso ambiental
+            </div>
           </div>
-        </div>
-        
-        <div class="rows-per-page-selector">
-          <span class="rows-per-page-label">Filas por página:</span>
-          <select id="rowsPerPage" class="rows-per-page-select">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-            <option value="250">250</option>
-          </select>
+          
+          <div class="stat-card">
+            <h4>Prácticas Sustentables</h4>
+            <div class="stat-value" id="statPracticas">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Reducción, reutilización y reciclaje
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <h4>Potencial Emprendedor</h4>
+            <div class="stat-value" id="statEmprendimiento">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Interés en emprendimientos sustentables
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <footer class="text-center text-sm text-slate-500 mb-8 py-6 border-t border-slate-200">
-      <p>© 2025 Proyecto Proambiental — Plataforma de Análisis Estadístico | Desarrollado con Supabase & Chart.js</p>
+    <!-- Tabla resumen -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-table"></i>
+        Tabla Resumen Detallada
+      </div>
+      
+      <div class="table-responsive">
+        <table id="tableResumen">
+          <thead>
+            <tr>
+              <th>Indicador</th>
+              <th style="text-align:right">Valor</th>
+              <th style="text-align:right">% Positivo</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>
+      <p>Fuente: Base de datos <code>cuestionario_comportamiento_proambiental_autosustentabilidad</code> | Última actualización: <span id="fechaActualizacion"></span></p>
     </footer>
   </main>
 
   <script>
-    /**************************************************************************
-     * Supabase config (usa las credenciales que me diste)
-     **************************************************************************/
+  (async function(){
+    // ---------- CONFIGURACIÓN ----------
     const SUPABASE_URL = "https://dutapywxsiuxboqsjqvf.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
-    const TABLE = "cuestionario_comportamiento_proambiental_autosustentabilidad";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /**************************************************************************
-     * Variables globales para el filtro de fecha
-     **************************************************************************/
-    let currentDateFilter = {
-      startDate: null,
-      endDate: null,
-      active: false
+    // ---------- SELECTORES ----------
+    const selectEstadoCivil = document.getElementById('selectEstadoCivil');
+    const selectEducacion = document.getElementById('selectEducacion');
+    const selectSituacionLaboral = document.getElementById('selectSituacionLaboral');
+    const selectTipoHogar = document.getElementById('selectTipoHogar');
+    const btnExport = document.getElementById('btnExport');
+    const btnResetFilters = document.getElementById('btnResetFilters');
+    const exportOptions = document.getElementById('exportOptions');
+    const fechaActualizacion = document.getElementById('fechaActualizacion');
+
+    // Elementos de información de filtros
+    const estadoCivilInfo = document.getElementById('estadoCivilInfo');
+    const educacionInfo = document.getElementById('educacionInfo');
+    const situacionLaboralInfo = document.getElementById('situacionLaboralInfo');
+    const tipoHogarInfo = document.getElementById('tipoHogarInfo');
+
+    // Elementos de resumen
+    const summaryTotal = document.getElementById('summaryTotal');
+    const summaryConocimiento = document.getElementById('summaryConocimiento');
+    const summaryActitud = document.getElementById('summaryActitud');
+    const summaryPracticas = document.getElementById('summaryPracticas');
+    const summaryTotalChange = document.getElementById('summaryTotalChange');
+    const summaryConocimientoChange = document.getElementById('summaryConocimientoChange');
+    const summaryActitudChange = document.getElementById('summaryActitudChange');
+    const summaryPracticasChange = document.getElementById('summaryPracticasChange');
+    
+    // Elementos de estadísticas básicas
+    const statTotalRecords = document.getElementById('statTotalRecords');
+    const statEstadosCiviles = document.getElementById('statEstadosCiviles');
+    const statNivelesEducacion = document.getElementById('statNivelesEducacion');
+    const statSituacionesLaborales = document.getElementById('statSituacionesLaborales');
+    const statEdadPromedio = document.getElementById('statEdadPromedio');
+    const statIntegrantesPromedio = document.getElementById('statIntegrantesPromedio');
+    const statEdadMinima = document.getElementById('statEdadMinima');
+    const statEdadMaxima = document.getElementById('statEdadMaxima');
+    
+    // Elementos de estadísticas avanzadas
+    const statConocimiento = document.getElementById('statConocimiento');
+    const statActitud = document.getElementById('statActitud');
+    const statPracticas = document.getElementById('statPracticas');
+    const statEmprendimiento = document.getElementById('statEmprendimiento');
+
+    // Tabla
+    const tbody = document.querySelector('#tableResumen tbody');
+
+    // Charts
+    const mainCtx = document.getElementById('mainChart').getContext('2d');
+    const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+    let mainChart, comparisonChart;
+
+    // Variables globales para datos
+    let currentData = [];
+    let previousPeriodData = [];
+    let allData = [];
+    let currentChartType = 'bar';
+    let filterOptions = {
+      estadosCiviles: [],
+      educaciones: [],
+      situacionesLaborales: [],
+      tiposHogar: []
     };
 
-    /**************************************************************************
-     * Variables globales para la tabla y búsqueda
-     **************************************************************************/
-    let dataTable = null;
-    let allTableData = [];
-    let currentSearchTerm = '';
-    let currentPage = 1;
-    let rowsPerPage = 10;
-    let totalPages = 1;
-
-    /**************************************************************************
-     * Indicadores con títulos mejorados
-     **************************************************************************/
-    const INDICATORS = [
-      { value: 'sexo', label: 'Distribución por Género' },
-      { value: 'estado_civil', label: 'Estado Civil' },
-      { value: 'educacion_jefe_hogar', label: 'Nivel Educativo del Jefe de Hogar' },
-      { value: 'situacion_laboral_jefe_hogar', label: 'Situación Laboral' },
-      { value: 'ingreso_mensual_jefe_hogar', label: 'Distribución de Ingresos Mensuales' },
-      { value: 'conoce_desechos_solidos', label: 'Conocimiento sobre Desechos Sólidos' },
-      { value: 'clasificacion_correcta_desechos', label: 'Clasificación Correcta de Desechos' },
-      { value: 'separar_desechos_por_origen', label: 'Práctica de Separación de Desechos' },
-      { value: 'dedica_tiempo_reducir_reutilizar_reciclar', label: 'Tiempo Dedicado a Prácticas Ambientales' },
-      { value: 'desechos_hogar_reutilizados', label: 'Reutilización de Desechos en el Hogar' },
-      { value: 'participaria_talleres_buenas_practicas', label: 'Disposición a Participar en Talleres' },
-      { value: 'manejo_adecuado_desechos_impacto_ambiente', label: 'Percepción del Impacto Ambiental' }
-    ];
-
-    /**************************************************************************
-     * Likert defaults (para las preguntas tipo Likert)
-     **************************************************************************/
-    const LIKERT_LEVELS = [
-      "Totalmente en desacuerdo",
-      "En desacuerdo",
-      "Indiferente",
-      "De acuerdo",
-      "Totalmente de acuerdo"
-    ];
-
-    /**************************************************************************
-     * Funciones de utilidad mejoradas
-     **************************************************************************/
-    function normalize(v) {
-      if (v === null || v === undefined) return null;
-      return String(v).trim();
+    // Inicializar la aplicación
+    async function initApp() {
+      await cargarTodosLosDatos();
+      await inicializarFiltros();
+      await actualizar();
+      setupEventListeners();
+      fechaActualizacion.textContent = new Date().toLocaleDateString('es-ES');
     }
 
-    function safeNumber(v) {
-      if (v === null || v === undefined || v === '') return null;
-      const num = Number(v);
-      return isNaN(num) ? null : num;
-    }
-
-    function countCategorical(arr) {
-      const counts = {};
-      arr.forEach(v => {
-        const k = normalize(v) || "No especificado";
-        counts[k] = (counts[k] || 0) + 1;
+    // Configurar event listeners
+    function setupEventListeners() {
+      // Actualización automática al cambiar filtros
+      selectEstadoCivil.addEventListener('change', async function() {
+        await actualizarFiltrosDependientes('estadoCivil');
+        await actualizar();
       });
-      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
-      return { 
-        labels: entries.map(e=>e[0]), 
-        values: entries.map(e=>e[1]),
-        counts: counts
-      };
-    }
-
-    function countLikert(arr) {
-      const lower = LIKERT_LEVELS.map(l => l.toLowerCase());
-      const counts = LIKERT_LEVELS.map(()=>0);
-      arr.forEach(v => {
-        const s = normalize(v);
-        if (!s) return;
-        const idx = lower.indexOf(s.toLowerCase());
-        if (idx !== -1) counts[idx] += 1;
-        else {
-          // intento de coincidencia por palabras clave (e.g., "de acuerdo", "en desacuerdo")
-          for (let i=0;i<lower.length;i++){
-            if (s.toLowerCase().includes(lower[i].split(' ')[0])) { counts[i]++; break; }
-          }
-        }
+      
+      selectEducacion.addEventListener('change', async function() {
+        await actualizarFiltrosDependientes('educacion');
+        await actualizar();
       });
-      const countsObj = {};
-      LIKERT_LEVELS.forEach((level, i) => {
-        countsObj[level] = counts[i];
+      
+      selectSituacionLaboral.addEventListener('change', async function() {
+        await actualizarFiltrosDependientes('situacionLaboral');
+        await actualizar();
       });
-      return { 
-        labels: LIKERT_LEVELS.slice(), 
-        values: counts,
-        counts: countsObj
-      };
-    }
-
-    /**************************************************************************
-     * NUEVAS FUNCIONES ESTADÍSTICAS MEJORADAS
-     **************************************************************************/
-    
-    // Función mejorada para calcular percentiles
-    function calculatePercentiles(values) {
-      if (!values.length) return null;
       
-      const sorted = [...values].sort((a, b) => a - b);
-      const n = sorted.length;
+      selectTipoHogar.addEventListener('change', async function() {
+        await actualizarFiltrosDependientes('tipoHogar');
+        await actualizar();
+      });
       
-      return {
-        q1: sorted[Math.floor(n * 0.25)],
-        median: sorted[Math.floor(n * 0.5)],
-        q3: sorted[Math.floor(n * 0.75)],
-        p90: sorted[Math.floor(n * 0.9)],
-        p95: sorted[Math.floor(n * 0.95)]
-      };
-    }
-
-    // Función para calcular intervalos de confianza
-    function calculateConfidenceInterval(values, confidence = 0.95) {
-      if (!values.length) return null;
-      
-      const mean = values.reduce((a, b) => a + b, 0) / values.length;
-      const stdDev = Math.sqrt(values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length);
-      const zScore = confidence === 0.95 ? 1.96 : 1.645; // Para 95% y 90% de confianza
-      const marginOfError = zScore * (stdDev / Math.sqrt(values.length));
-      
-      return {
-        lower: mean - marginOfError,
-        upper: mean + marginOfError,
-        mean: mean,
-        marginOfError: marginOfError
-      };
-    }
-
-    /**************************************************************************
-     * Funciones para el filtro de fecha profesional
-     **************************************************************************/
-    function detectDateColumn(rows) {
-      // Buscar columnas que contengan fechas en el dataset
-      const dateColumnCandidates = ['fecha', 'fecha_encuesta', 'created_at', 'timestamp', 'fecha_registro'];
-      
-      for (let col of dateColumnCandidates) {
-        if (rows[0] && rows[0][col]) {
-          const sampleValue = rows[0][col];
-          // Verificar si el valor parece una fecha
-          if (typeof sampleValue === 'string' && (
-            sampleValue.match(/\d{4}-\d{2}-\d{2}/) || 
-            sampleValue.includes('T') // formato ISO
-          )) {
-            return col;
+      // Selector de tipo de gráfico
+      document.querySelectorAll('.chart-type-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // Remover clase activa de todos los botones
+          document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+          // Agregar clase activa al botón clickeado
+          this.classList.add('active');
+          // Actualizar tipo de gráfico
+          currentChartType = this.getAttribute('data-type');
+          // Re-renderizar el gráfico
+          if (currentData.length > 0) {
+            const currentSummary = calcularIndicadores(currentData);
+            renderChart(currentSummary);
           }
-        }
-      }
+        });
+      });
       
-      // Si no se encuentra una columna específica, buscar cualquier campo que contenga fechas
-      for (let row of rows.slice(0, 10)) { // Revisar las primeras 10 filas
-        for (let key in row) {
-          if (row[key] && typeof row[key] === 'string') {
-            if (row[key].match(/\d{4}-\d{2}-\d{2}/)) {
-              return key;
-            }
-          }
-        }
-      }
+      // Botón para restablecer filtros
+      btnResetFilters.addEventListener('click', function() {
+        selectEstadoCivil.value = '';
+        selectEducacion.value = '';
+        selectSituacionLaboral.value = '';
+        selectTipoHogar.value = '';
+        actualizarFiltrosDependientes('reset');
+        actualizar();
+      });
       
-      return null;
-    }
-
-    function extractDateRange(rows, dateColumn) {
-      if (!dateColumn) return { min: null, max: null };
+      // Toggle export options
+      btnExport.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportOptions.classList.toggle('show');
+      });
       
-      const dates = rows
-        .map(row => {
-          const dateStr = row[dateColumn];
-          if (!dateStr) return null;
+      // Cerrar export options al hacer clic fuera
+      document.addEventListener('click', () => {
+        exportOptions.classList.remove('show');
+      });
+      
+      // Manejar opciones de exportación
+      document.querySelectorAll('.export-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const type = e.currentTarget.getAttribute('data-type');
+          exportarDatos(type);
+          exportOptions.classList.remove('show');
+        });
+      });
+      
+      // Manejar pestañas
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
           
-          // Convertir a objeto Date
-          const date = new Date(dateStr);
-          return isNaN(date.getTime()) ? null : date;
-        })
-        .filter(date => date !== null);
+          // Actualizar pestañas activas
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+          
+          // Renderizar gráficos específicos si es necesario
+          if (tabId === 'comparison') {
+            renderComparison();
+          }
+        });
+      });
       
-      if (dates.length === 0) return { min: null, max: null };
-      
-      const minDate = new Date(Math.min(...dates));
-      const maxDate = new Date(Math.max(...dates));
-      
-      return {
-        min: minDate.toISOString().split('T')[0],
-        max: maxDate.toISOString().split('T')[0]
-      };
-    }
-
-    function initializeDateFilter(dateRange) {
-      const startDateInput = document.getElementById('startDate');
-      const endDateInput = document.getElementById('endDate');
-      
-      if (dateRange.min && dateRange.max) {
-        startDateInput.min = dateRange.min;
-        startDateInput.max = dateRange.max;
-        endDateInput.min = dateRange.min;
-        endDateInput.max = dateRange.max;
-        
-        // Establecer valores por defecto (últimos 30 días)
-        const defaultEnd = new Date(dateRange.max);
-        const defaultStart = new Date(defaultEnd);
-        defaultStart.setDate(defaultStart.getDate() - 30);
-        
-        startDateInput.value = defaultStart.toISOString().split('T')[0];
-        endDateInput.value = defaultEnd.toISOString().split('T')[0];
-      }
-    }
-
-    function applyDateFilter() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      const applyButton = document.getElementById('applyDateFilter');
-      
-      if (!startDate || !endDate) {
-        alert('Por favor selecciona ambas fechas para aplicar el filtro.');
-        return;
-      }
-      
-      if (startDate > endDate) {
-        alert('La fecha inicial no puede ser mayor que la fecha final.');
-        return;
-      }
-      
-      currentDateFilter = {
-        startDate,
-        endDate,
-        active: true
-      };
-      
-      // Actualizar UI
-      applyButton.classList.add('active-filter');
-      applyButton.innerHTML = '<i class="fas fa-filter"></i> Filtro Activo';
-      
-      // Aplicar filtros
-      autoRefreshChart();
-    }
-
-    function clearDateFilter() {
-      const startDateInput = document.getElementById('startDate');
-      const endDateInput = document.getElementById('endDate');
-      const applyButton = document.getElementById('applyDateFilter');
-      
-      // Restablecer a los valores por defecto (últimos 30 días)
-      if (window.dateRange) {
-        const defaultEnd = new Date(window.dateRange.max);
-        const defaultStart = new Date(defaultEnd);
-        defaultStart.setDate(defaultStart.getDate() - 30);
-        
-        startDateInput.value = defaultStart.toISOString().split('T')[0];
-        endDateInput.value = defaultEnd.toISOString().split('T')[0];
-      } else {
-        startDateInput.value = '';
-        endDateInput.value = '';
-      }
-      
-      currentDateFilter = {
-        startDate: null,
-        endDate: null,
-        active: false
-      };
-      
-      // Actualizar UI
-      applyButton.classList.remove('active-filter');
-      applyButton.innerHTML = '<i class="fas fa-check"></i> Aplicar';
-      
-      // Aplicar filtros
-      autoRefreshChart();
-    }
-
-    function filterByDateRange(rows, dateColumn) {
-      if (!currentDateFilter.active || !dateColumn) return rows;
-      
-      return rows.filter(row => {
-        const rowDateStr = row[dateColumn];
-        if (!rowDateStr) return false;
-        
-        const rowDate = new Date(rowDateStr).toISOString().split('T')[0];
-        return rowDate >= currentDateFilter.startDate && rowDate <= currentDateFilter.endDate;
+      // Ayuda
+      document.getElementById('btnHelp').addEventListener('click', () => {
+        alert('Este panel permite analizar datos del cuestionario de comportamiento proambiental y autosustentabilidad. Los filtros se aplican automáticamente. Utilice las diferentes pestañas para explorar diversas visualizaciones y análisis estadísticos.');
       });
     }
 
-    /**************************************************************************
-     * Funciones para calcular las nuevas métricas de resumen
-     **************************************************************************/
-    function calculateEducationLevel(rows) {
-      const educationData = rows.map(r => normalize(r.educacion_jefe_hogar)).filter(Boolean);
-      if (!educationData.length) return { level: '—', detail: 'Sin datos' };
-      
-      const counts = {};
-      educationData.forEach(level => {
-        counts[level] = (counts[level] || 0) + 1;
-      });
-      
-      const mostFrequent = Object.entries(counts).sort((a, b) => b[1] - a[0])[0];
-      return { 
-        level: mostFrequent[0], 
-        count: mostFrequent[1],
-        percentage: ((mostFrequent[1] / educationData.length) * 100).toFixed(1)
-      };
+    // Cargar todos los datos para análisis comparativos
+    async function cargarTodosLosDatos() {
+      const q = await supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('*');
+      if (q.error) {
+        console.error(q.error);
+        return;
+      }
+      allData = q.data || [];
     }
 
-    function calculateEnvironmentalAwareness(rows) {
-      // Combinar múltiples indicadores de conciencia ambiental
-      const awarenessIndicators = [
-        'conoce_desechos_solidos',
-        'clasificacion_correcta_desechos', 
-        'separar_desechos_por_origen',
-        'dedica_tiempo_reducir_reutilizar_reciclar',
-        'manejo_adecuado_desechos_impacto_ambiente'
+    // Cargar lista de filtros desde la BD
+    async function inicializarFiltros() {
+      // Obtener todos los datos para construir los filtros
+      const q = await supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('estado_civil, educacion_jefe_hogar, situacion_laboral_jefe_hogar, tipo_hogar');
+      if (q.error) {
+        console.error(q.error);
+        return;
+      }
+      const rows = q.data || [];
+
+      // Construir opciones de filtro
+      filterOptions.estadosCiviles = [...new Set(rows.map(r => r.estado_civil).filter(Boolean))].sort();
+      filterOptions.educaciones = [...new Set(rows.map(r => r.educacion_jefe_hogar).filter(Boolean))].sort();
+      filterOptions.situacionesLaborales = [...new Set(rows.map(r => r.situacion_laboral_jefe_hogar).filter(Boolean))].sort();
+      filterOptions.tiposHogar = [...new Set(rows.map(r => r.tipo_hogar).filter(Boolean))].sort();
+
+      // Actualizar información de filtros
+      estadoCivilInfo.textContent = `${filterOptions.estadosCiviles.length} estados civiles disponibles`;
+      educacionInfo.textContent = `${filterOptions.educaciones.length} niveles educativos disponibles`;
+      situacionLaboralInfo.textContent = `${filterOptions.situacionesLaborales.length} situaciones laborales disponibles`;
+      tipoHogarInfo.textContent = `${filterOptions.tiposHogar.length} tipos de hogar disponibles`;
+
+      // Llenar selectores con todas las opciones iniciales
+      llenarSelector(selectEstadoCivil, filterOptions.estadosCiviles);
+      llenarSelector(selectEducacion, filterOptions.educaciones);
+      llenarSelector(selectSituacionLaboral, filterOptions.situacionesLaborales);
+      llenarSelector(selectTipoHogar, filterOptions.tiposHogar);
+    }
+
+    // Función para llenar un selector con opciones
+    function llenarSelector(selector, opciones) {
+      // Guardar la opción seleccionada actualmente
+      const valorActual = selector.value;
+      
+      // Limpiar selector (excepto la primera opción)
+      while (selector.options.length > 1) {
+        selector.remove(1);
+      }
+      
+      // Agregar nuevas opciones
+      opciones.forEach(opcion => {
+        const option = document.createElement('option');
+        option.value = opcion;
+        option.textContent = opcion;
+        selector.appendChild(option);
+      });
+      
+      // Restaurar la selección anterior si todavía existe
+      if (valorActual && opciones.includes(valorActual)) {
+        selector.value = valorActual;
+      }
+    }
+
+    // Actualizar filtros dependientes cuando cambia un filtro principal
+    async function actualizarFiltrosDependientes(filtroCambiado) {
+      // Obtener valores actuales de los filtros
+      const estadoCivilSeleccionado = selectEstadoCivil.value;
+      const educacionSeleccionado = selectEducacion.value;
+      const situacionLaboralSeleccionado = selectSituacionLaboral.value;
+      const tipoHogarSeleccionado = selectTipoHogar.value;
+
+      // Construir query para obtener datos filtrados
+      let query = supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('estado_civil, educacion_jefe_hogar, situacion_laboral_jefe_hogar, tipo_hogar');
+      
+      if (estadoCivilSeleccionado) query = query.eq('estado_civil', estadoCivilSeleccionado);
+      if (educacionSeleccionado) query = query.eq('educacion_jefe_hogar', educacionSeleccionado);
+      if (situacionLaboralSeleccionado) query = query.eq('situacion_laboral_jefe_hogar', situacionLaboralSeleccionado);
+      if (tipoHogarSeleccionado) query = query.eq('tipo_hogar', tipoHogarSeleccionado);
+      
+      const resultado = await query;
+      
+      if (resultado.error) {
+        console.error('Error al obtener datos para filtros:', resultado.error);
+        return;
+      }
+      
+      const datosFiltrados = resultado.data || [];
+      
+      // Extraer opciones disponibles de los datos filtrados
+      const estadosCivilesDisponibles = [...new Set(datosFiltrados.map(r => r.estado_civil).filter(Boolean))].sort();
+      const educacionesDisponibles = [...new Set(datosFiltrados.map(r => r.educacion_jefe_hogar).filter(Boolean))].sort();
+      const situacionesLaboralesDisponibles = [...new Set(datosFiltrados.map(r => r.situacion_laboral_jefe_hogar).filter(Boolean))].sort();
+      const tiposHogarDisponibles = [...new Set(datosFiltrados.map(r => r.tipo_hogar).filter(Boolean))].sort();
+      
+      // Actualizar selectores según el filtro que cambió
+      switch (filtroCambiado) {
+        case 'estadoCivil':
+          llenarSelector(selectEducacion, educacionesDisponibles);
+          llenarSelector(selectSituacionLaboral, situacionesLaboralesDisponibles);
+          llenarSelector(selectTipoHogar, tiposHogarDisponibles);
+          break;
+          
+        case 'educacion':
+          llenarSelector(selectEstadoCivil, estadosCivilesDisponibles);
+          llenarSelector(selectSituacionLaboral, situacionesLaboralesDisponibles);
+          llenarSelector(selectTipoHogar, tiposHogarDisponibles);
+          break;
+          
+        case 'situacionLaboral':
+          llenarSelector(selectEstadoCivil, estadosCivilesDisponibles);
+          llenarSelector(selectEducacion, educacionesDisponibles);
+          llenarSelector(selectTipoHogar, tiposHogarDisponibles);
+          break;
+          
+        case 'tipoHogar':
+          llenarSelector(selectEstadoCivil, estadosCivilesDisponibles);
+          llenarSelector(selectEducacion, educacionesDisponibles);
+          llenarSelector(selectSituacionLaboral, situacionesLaboralesDisponibles);
+          break;
+          
+        case 'reset':
+          // Restablecer todos los filtros a sus valores originales
+          llenarSelector(selectEstadoCivil, filterOptions.estadosCiviles);
+          llenarSelector(selectEducacion, filterOptions.educaciones);
+          llenarSelector(selectSituacionLaboral, filterOptions.situacionesLaborales);
+          llenarSelector(selectTipoHogar, filterOptions.tiposHogar);
+          break;
+      }
+      
+      // Actualizar información de filtros
+      estadoCivilInfo.textContent = `${estadosCivilesDisponibles.length} estados civiles disponibles`;
+      educacionInfo.textContent = `${educacionesDisponibles.length} niveles educativos disponibles`;
+      situacionLaboralInfo.textContent = `${situacionesLaboralesDisponibles.length} situaciones laborales disponibles`;
+      tipoHogarInfo.textContent = `${tiposHogarDisponibles.length} tipos de hogar disponibles`;
+    }
+
+    // Construir query según filtros y traer datos
+    async function obtenerFiltrados() {
+      let q = supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('*');
+      if (selectEstadoCivil.value) q = q.eq('estado_civil', selectEstadoCivil.value);
+      if (selectEducacion.value) q = q.eq('educacion_jefe_hogar', selectEducacion.value);
+      if (selectSituacionLaboral.value) q = q.eq('situacion_laboral_jefe_hogar', selectSituacionLaboral.value);
+      if (selectTipoHogar.value) q = q.eq('tipo_hogar', selectTipoHogar.value);
+      
+      const r = await q;
+      if (r.error) {
+        console.error(r.error);
+        return [];
+      }
+      return r.data || [];
+    }
+
+    // Obtener datos del período anterior para comparación
+    async function obtenerDatosPeriodoAnterior() {
+      // Para simplificar, usamos todos los datos como período anterior
+      // En una implementación real, se usaría un período de tiempo específico
+      return allData.filter(item => {
+        if (selectEstadoCivil.value && item.estado_civil !== selectEstadoCivil.value) return false;
+        if (selectEducacion.value && item.educacion_jefe_hogar !== selectEducacion.value) return false;
+        if (selectSituacionLaboral.value && item.situacion_laboral_jefe_hogar !== selectSituacionLaboral.value) return false;
+        if (selectTipoHogar.value && item.tipo_hogar !== selectTipoHogar.value) return false;
+        return true;
+      }).slice(0, Math.floor(allData.length / 2)); // Tomamos la primera mitad como período anterior
+    }
+
+    // Calcular indicadores de comportamiento proambiental
+    function calcularIndicadores(rows) {
+      if (!rows || rows.length === 0) return {
+        total: 0,
+        conocimiento: 0,
+        actitud: 0,
+        practicas: 0,
+        emprendimiento: 0,
+        indicadores: []
+      };
+      
+      // Definir indicadores y sus preguntas correspondientes
+      const indicadores = [
+        {
+          nombre: 'Conocimiento Desechos Sólidos',
+          preguntas: ['conoce_desechos_solidos', 'separa_desechos_por_origen', 'clasificacion_correcta_desechos']
+        },
+        {
+          nombre: 'Conciencia Ambiental',
+          preguntas: ['desechos_solidos_problema_comunidad', 'comportamiento_comunidad_influye', 'dedica_tiempo_reducir_reutilizar_reciclar']
+        },
+        {
+          nombre: 'Preocupación Ambiental',
+          preguntas: ['preocupa_exceso_desechos', 'desechos_contaminan_ambiente', 'afecta_emocionalmente_noticias_contaminacion']
+        },
+        {
+          nombre: 'Compromiso Futuro',
+          preguntas: ['frustracion_falta_acciones_ambientales', 'importancia_planeta_futuras_generaciones']
+        },
+        {
+          nombre: 'Conocimiento Impacto',
+          preguntas: ['consciente_impacto_desechos_salud', 'investiga_temas_ambientales', 'consecuencias_acumulacion_desechos']
+        },
+        {
+          nombre: 'Información Ambiental',
+          preguntas: ['beneficios_reutilizar_residuo', 'falta_informacion_obstaculo_gestion']
+        },
+        {
+          nombre: 'Sustentabilidad Ambiental',
+          preguntas: ['desechos_organicos_funcionalidad', 'acumulacion_desechos_afecta_salud', 'reduccion_reciclaje_reutilizacion_cuida_ambiente']
+        },
+        {
+          nombre: 'Transformación Desechos',
+          preguntas: ['transformacion_desechos_nuevos_productos', 'necesita_info_educacion_ambiental']
+        },
+        {
+          nombre: 'Sustentabilidad Económica',
+          preguntas: ['practica_separacion_reciclaje_ingreso', 'desechos_hogar_reutilizados', 'manejo_adecuado_desechos_aporta_desarrollo']
+        },
+        {
+          nombre: 'Emprendimiento Sustentable',
+          preguntas: ['emprendimientos_reutilizacion_aportan_economia', 'manejo_adecuado_desechos_oportunidad_emprendimiento']
+        },
+        {
+          nombre: 'Desarrollo Comunitario',
+          preguntas: ['reducir_residuos_eventos_concientizacion', 'participaria_talleres_buenas_practicas', 'manejo_adecuado_desechos_impacto_ambiente']
+        },
+        {
+          nombre: 'Participación Comunitaria',
+          preguntas: ['dispuesto_participar_emprendimiento_desechos', 'participaria_feria_emprendimientos_desechos']
+        }
       ];
       
-      let totalPositive = 0;
-      let totalResponses = 0;
-      
-      awarenessIndicators.forEach(indicator => {
-        const data = rows.map(r => normalize(r[indicator])).filter(Boolean);
-        data.forEach(response => {
-          totalResponses++;
-          if (response.toLowerCase().includes('sí') || 
-              response.toLowerCase().includes('si') ||
-              response.toLowerCase().includes('de acuerdo') ||
-              response.toLowerCase().includes('totalmente de acuerdo')) {
-            totalPositive++;
-          }
+      // Calcular porcentajes para cada indicador
+      const resultados = indicadores.map(indicador => {
+        let respuestasPositivas = 0;
+        let totalRespuestas = 0;
+        
+        indicador.preguntas.forEach(pregunta => {
+          rows.forEach(row => {
+            if (row[pregunta] !== null && row[pregunta] !== undefined) {
+              totalRespuestas++;
+              // Asumimos que respuestas "Sí" o afirmativas son positivas
+              if (typeof row[pregunta] === 'string') {
+                if (row[pregunta].toLowerCase().includes('sí') || 
+                    row[pregunta].toLowerCase().includes('si') ||
+                    row[pregunta].toLowerCase().includes('siempre') ||
+                    row[pregunta].toLowerCase().includes('mucho') ||
+                    row[pregunta].toLowerCase().includes('bastante')) {
+                  respuestasPositivas++;
+                }
+              } else if (typeof row[pregunta] === 'boolean') {
+                if (row[pregunta]) respuestasPositivas++;
+              }
+            }
+          });
         });
+        
+        const porcentaje = totalRespuestas > 0 ? (respuestasPositivas / totalRespuestas) * 100 : 0;
+        
+        return {
+          nombre: indicador.nombre,
+          porcentaje: porcentaje,
+          respuestasPositivas,
+          totalRespuestas
+        };
       });
       
-      if (totalResponses === 0) return { percentage: '—', level: 'Sin datos' };
-      
-      const percentage = (totalPositive / totalResponses * 100).toFixed(1);
-      let level = 'Baja';
-      if (percentage >= 70) level = 'Alta';
-      else if (percentage >= 40) level = 'Media';
-      
-      return { percentage: `${percentage}%`, level };
-    }
-
-    /**************************************************************************
-     * Funciones estadísticas avanzadas CORREGIDAS
-     **************************************************************************/
-    function calculateAdvancedStatistics(values, labels, total, rawValues = []) {
-      if (!values.length || !total) return null;
-      
-      // CORRECCIÓN: Calcular estadísticas usando los valores reales, no las frecuencias
-      const numericValues = rawValues.length ? rawValues : values;
-      
-      // Estadísticas básicas corregidas
-      const maxValue = Math.max(...numericValues);
-      const minValue = Math.min(...numericValues.filter(v => v > 0));
-      
-      // Calcular moda correctamente
-      const frequencyMap = {};
-      numericValues.forEach(val => {
-        frequencyMap[val] = (frequencyMap[val] || 0) + 1;
-      });
-      const modeValue = Object.keys(frequencyMap).reduce((a, b) => 
-        frequencyMap[a] > frequencyMap[b] ? a : b
-      );
-      
-      const maxPercentage = ((maxValue / total) * 100).toFixed(1);
-      const minPercentage = ((minValue / total) * 100).toFixed(1);
-      
-      // Calcular diversidad (índice de Shannon) CORREGIDO
-      let diversity = 0;
-      values.forEach(value => {
-        if (value > 0) {
-          const p = value / total;
-          diversity -= p * Math.log(p);
-        }
-      });
-      diversity = isNaN(diversity) ? 0 : diversity.toFixed(3);
-      
-      // Calcular índice de concentración (Herfindahl-Hirschman) CORREGIDO
-      let concentration = 0;
-      values.forEach(value => {
-        const p = value / total;
-        concentration += p * p;
-      });
-      concentration = concentration.toFixed(3);
-      
-      // Calcular desviación estándar CORREGIDA
-      const mean = numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
-      const variance = numericValues.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / numericValues.length;
-      const stdDev = Math.sqrt(variance).toFixed(2);
-      
-      // Calcular coeficiente de variación
-      const cv = mean > 0 ? ((stdDev / mean) * 100).toFixed(1) : '0.0';
-      
-      // Calcular percentiles CORREGIDOS
-      const percentiles = calculatePercentiles(numericValues);
-      
-      // Calcular asimetría (skewness) CORREGIDA
-      const skewness = numericValues.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0) / numericValues.length;
-      
-      // Calcular intervalo de confianza
-      const confidenceInterval = calculateConfidenceInterval(numericValues);
+      // Calcular indicadores generales
+      const total = rows.length;
+      const conocimiento = (resultados[0].porcentaje + resultados[1].porcentaje + resultados[4].porcentaje + resultados[5].porcentaje) / 4;
+      const actitud = (resultados[2].porcentaje + resultados[3].porcentaje) / 2;
+      const practicas = (resultados[6].porcentaje + resultados[7].porcentaje) / 2;
+      const emprendimiento = (resultados[8].porcentaje + resultados[9].porcentaje + resultados[10].porcentaje + resultados[11].porcentaje) / 4;
       
       return {
-        total: total,
-        max: { value: maxValue, percentage: maxPercentage },
-        min: { value: minValue, percentage: minPercentage },
-        mode: { value: parseFloat(modeValue) },
-        diversity: diversity,
-        concentration: concentration,
-        stdDev: stdDev,
-        cv: cv,
-        mean: mean.toFixed(2),
-        percentiles: percentiles,
-        skewness: isNaN(skewness) ? '0.000' : skewness.toFixed(3),
-        confidenceInterval: confidenceInterval
+        total,
+        conocimiento,
+        actitud,
+        practicas,
+        emprendimiento,
+        indicadores: resultados
       };
     }
 
-    function generateInsights(stats, labels, values, indicatorKey) {
-      const insights = [];
+    // Calcular estadísticas básicas completas
+    function calcularEstadisticasBasicas(rows, currentSummary) {
+      if (rows.length === 0) return {};
       
-      // Insight sobre concentración
-      if (stats.concentration > 0.5) {
-        insights.push("• Distribución concentrada en categorías específicas");
-      } else if (stats.concentration < 0.2) {
-        insights.push("• Distribución equilibrada entre categorías");
-      } else {
-        insights.push("• Distribución moderadamente concentrada");
-      }
+      // Estadísticas generales
+      const totalRecords = rows.length;
       
-      // Insight sobre diversidad
-      if (stats.diversity > 1.5) {
-        insights.push("• Alta diversidad en las respuestas");
-      } else if (stats.diversity < 0.5) {
-        insights.push("• Baja diversidad, respuestas concentradas");
-      }
+      // Estados civiles, educaciones y situaciones laborales únicos
+      const estadosCivilesUnicos = [...new Set(rows.map(r => r.estado_civil).filter(Boolean))];
+      const nivelesEducacionUnicos = [...new Set(rows.map(r => r.educacion_jefe_hogar).filter(Boolean))];
+      const situacionesLaboralesUnicos = [...new Set(rows.map(r => r.situacion_laboral_jefe_hogar).filter(Boolean))];
       
-      // Insight sobre variabilidad
-      if (parseFloat(stats.cv) > 100) {
-        insights.push("• Alta variabilidad en los datos");
-      } else if (parseFloat(stats.cv) < 20) {
-        insights.push("• Baja variabilidad, datos consistentes");
-      }
+      // Estadísticas demográficas
+      const edades = rows.map(r => r.edad).filter(edad => edad !== null && edad !== undefined);
+      const integrantes = rows.map(r => r.num_integrantes_familia).filter(num => num !== null && num !== undefined);
       
-      // Insight específico por tipo de indicador
-      if (indicatorKey.includes('ingreso')) {
-        insights.push("• Variable económica: distribución de ingresos");
-        if (stats.percentiles && stats.percentiles.p95) {
-          insights.push(`• Percentil 95: ${stats.percentiles.p95.toFixed(2)} (ingresos altos)`);
-        }
-      }
+      const edadPromedio = edades.length > 0 ? edades.reduce((a, b) => a + b, 0) / edades.length : 0;
+      const integrantesPromedio = integrantes.length > 0 ? integrantes.reduce((a, b) => a + b, 0) / integrantes.length : 0;
+      const edadMinima = edades.length > 0 ? Math.min(...edades) : 0;
+      const edadMaxima = edades.length > 0 ? Math.max(...edades) : 0;
       
-      if (indicatorKey.includes('talleres') || indicatorKey.includes('participaria')) {
-        insights.push("• Variable de disposición: potencial de participación");
-      }
-      
-      if (indicatorKey.includes('desechos') || indicatorKey.includes('reciclar')) {
-        insights.push("• Variable ambiental: relevancia para políticas sostenibles");
-      }
-      
-      // Insight sobre tamaño de muestra
-      if (stats.total < 30) {
-        insights.push("• Muestra pequeña, resultados pueden no ser representativos");
-      } else if (stats.total > 100) {
-        insights.push("• Muestra robusta, resultados estadísticamente significativos");
-      }
-      
-      return insights;
+      return {
+        totalRecords,
+        estadosCiviles: estadosCivilesUnicos.length,
+        nivelesEducacion: nivelesEducacionUnicos.length,
+        situacionesLaborales: situacionesLaboralesUnicos.length,
+        edadPromedio,
+        integrantesPromedio,
+        edadMinima,
+        edadMaxima
+      };
     }
 
-    function renderAdvancedStatistics(stats, labels, values, indicatorKey) {
-      // Actualizar estadísticas principales
-      document.getElementById('statTotal').textContent = stats.total;
-      document.getElementById('statMode').textContent = `${stats.mode.value}`;
-      document.getElementById('statDiversity').textContent = stats.diversity;
-      document.getElementById('statConcentration').textContent = stats.concentration;
+    // Renderizar gráfico principal con tipo seleccionado
+    function renderChart(currentSummary) {
+      const labels = currentSummary.indicadores.map(i => i.nombre);
+      const values = currentSummary.indicadores.map(i => i.porcentaje);
       
-      // Renderizar distribución detallada
-      const distributionContainer = document.getElementById('distributionDetails');
-      distributionContainer.innerHTML = labels.map((label, index) => {
-        const value = values[index];
-        const percentage = ((value / stats.total) * 100).toFixed(1);
-        const isMax = value === stats.max.value;
-        const isMin = value === stats.min.value;
-        
-        return `
-          <div class="flex items-center justify-between p-2 ${isMax ? 'bg-emerald-50 rounded' : isMin ? 'bg-red-50 rounded' : ''}">
-            <div class="flex items-center gap-3 flex-1">
-              <span class="text-sm font-medium ${isMax ? 'text-emerald-700' : isMin ? 'text-red-700' : 'text-slate-700'} truncate max-w-[200px]">
-                ${label}
-                ${isMax ? '<span class="badge-max ml-2">MAYOR</span>' : ''}
-                ${isMin ? '<span class="badge-min ml-2">MENOR</span>' : ''}
-              </span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="text-sm font-semibold ${isMax ? 'text-emerald-600' : isMin ? 'text-red-600' : 'text-slate-600'}">${value}</span>
-              <span class="text-xs text-slate-500 w-12 text-right">${percentage}%</span>
-              <div class="progress-bar w-20">
-                <div class="progress-fill" style="width: ${percentage}%"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      // Colores consistentes (HSL)
+      const colors = labels.map((_, i) => `hsl(${(i * 360 / labels.length) % 360} 70% 55%)`);
       
-      // Renderizar insights
-      const insightsContainer = document.getElementById('insightsContent');
-      const insights = generateInsights(stats, labels, values, indicatorKey);
-      insightsContainer.innerHTML = insights.map(insight => `
-        <p class="flex items-start gap-2">
-          <i class="fas fa-chevron-right text-emerald-500 mt-1 text-xs"></i>
-          <span>${insight}</span>
-        </p>
-      `).join('');
+      if (mainChart) mainChart.destroy();
       
-      // Renderizar métricas avanzadas
-      const metricsContainer = document.getElementById('advancedMetrics');
-      metricsContainer.innerHTML = `
-        <div class="space-y-3">
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="flex justify-between">
-              <span class="font-medium">Desviación Estándar:</span>
-              <span>${stats.stdDev}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Coef. Variación:</span>
-              <span>${stats.cv}%</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Media Aritmética:</span>
-              <span>${stats.mean}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="font-medium">Asimetría:</span>
-              <span>${stats.skewness}</span>
-            </div>
-          </div>
-          
-          ${stats.percentiles ? `
-          <div class="stat-card">
-            <div class="stat-card-title">Percentiles</div>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="flex justify-between">
-                <span>Q1 (25%):</span>
-                <span>${stats.percentiles.q1.toFixed(2)}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Mediana:</span>
-                <span>${stats.percentiles.median.toFixed(2)}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Q3 (75%):</span>
-                <span>${stats.percentiles.q3.toFixed(2)}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>P90:</span>
-                <span>${stats.percentiles.p90.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-          ` : ''}
-          
-          ${stats.confidenceInterval ? `
-          <div class="confidence-interval">
-            <div class="text-sm font-semibold text-amber-800">Intervalo de Confianza (95%)</div>
-            <div class="text-xs text-amber-700 mt-1">
-              ${stats.confidenceInterval.lower.toFixed(2)} - ${stats.confidenceInterval.upper.toFixed(2)}
-            </div>
-            <div class="text-xs text-amber-600 mt-1">
-              Margen de error: ±${stats.confidenceInterval.marginOfError.toFixed(2)}
-            </div>
-          </div>
-          ` : ''}
-        </div>
-      `;
-      
-      // Mostrar sección de estadísticas
-      document.getElementById('statisticsSection').classList.remove('hidden');
-    }
-
-    /**************************************************************************
-     * Chart handling con exportación mejorada
-     **************************************************************************/
-    let chartInstance = null;
-    function destroyChart(){ if(chartInstance){ try{ chartInstance.destroy(); }catch(e){} chartInstance = null; } }
-
-    function renderChart(type, labels, values, title) {
-      const canvas = document.getElementById('mainChart');
-      const ctx = canvas.getContext('2d');
-      destroyChart();
-
-      // Ajustar tamaño del canvas para gráficos circulares
-      if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
-        canvas.style.width = '100%';
-        canvas.style.maxWidth = '500px';
-        canvas.style.height = '400px';
-      } else {
-        canvas.style.width = '100%';
-        canvas.style.maxWidth = '100%';
-        canvas.style.height = '400px';
-      }
-
-      // default chart types
-      const palette = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
-      const bg = palette.slice(0, labels.length);
-      
-      // Configuración común para todos los gráficos
-      const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: {
-            top: 10,
-            right: 15,
-            bottom: 10,
-            left: 15
-          }
+      // Configuración base para todos los gráficos
+      const baseConfig = {
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Porcentaje Positivo (%)',
+            data: values,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace('hsl', 'hsla').replace(')', ', 0.8)')),
+            borderWidth: currentChartType === 'line' ? 2 : 1
+          }]
         },
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              boxWidth: 12,
-              padding: 15,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: currentChartType === 'pie' ? 'right' : 'top',
+              labels: {
+                font: {
+                  size: 12
+                },
+                // Para gráficos circulares, limitar el texto de la leyenda
+                generateLabels: function(chart) {
+                  if (currentChartType === 'pie') {
+                    const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                    const labels = original.call(this, chart);
+                    // Acortar etiquetas largas
+                    return labels.map(label => {
+                      if (label.text.length > 20) {
+                        label.text = label.text.substring(0, 17) + '...';
+                      }
+                      return label;
+                    });
+                  }
+                  return Chart.defaults.plugins.legend.labels.generateLabels.call(this, chart);
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: `Indicadores de Comportamiento Proambiental - ${getChartTypeName(currentChartType)}`,
               font: {
-                size: 12
+                size: 16,
+                weight: 'bold'
               },
-              usePointStyle: true
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleFont: { size: 12 },
-            bodyFont: { size: 12 },
-            padding: 10,
-            cornerRadius: 6,
-            callbacks: {
-              label: function(context) {
-                const label = context.label || '';
-                const value = context.raw || 0;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: ${value} (${percentage}%)`;
+              padding: 20
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) label += ': ';
+                  label += context.parsed !== undefined ? context.parsed.toFixed(2) + '%' : context.raw.toFixed(2) + '%';
+                  return label;
+                }
               }
             }
           }
         }
       };
-
-      // Opciones específicas por tipo de gráfico
-      let chartOptions = { ...commonOptions };
       
-      if (type === 'bar') {
-        chartOptions.scales = {
-          y: { 
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' },
-            title: {
-              display: true,
-              text: 'Frecuencia'
-            }
-          },
-          x: {
-            grid: { display: false },
-            title: {
-              display: true,
-              text: 'Categorías'
-            }
-          }
-        };
-      } else if (type === 'line') {
-        chartOptions.scales = {
-          y: { 
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)' }
-          },
-          x: {
-            grid: { display: false }
-          }
-        };
-      } else if (type === 'radar') {
-        chartOptions.scales = {
-          r: {
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.1)' },
-            angleLines: { color: 'rgba(0,0,0,0.1)' },
-            pointLabels: {
-              font: {
-                size: 11
+      // Configuraciones específicas por tipo de gráfico
+      const typeSpecificConfigs = {
+        bar: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje Positivo (%)',
+                font: { size: 14, weight: 'bold' }
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Indicadores de Comportamiento Proambiental',
+                font: { size: 14, weight: 'bold' }
+              },
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45
               }
             }
           }
-        };
-      } else if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
-        // Opciones específicas para gráficos circulares
-        chartOptions.plugins.legend.position = 'right';
-        chartOptions.layout.padding = {
-          top: 20,
-          right: 20,
-          bottom: 20,
-          left: 20
-        };
-      }
-
-      chartInstance = new Chart(ctx, {
-        type,
-        data: { 
-          labels, 
-          datasets: [{ 
-            label: title, 
-            data: values, 
-            backgroundColor: bg, 
-            borderColor: type === 'line' || type === 'radar' ? bg.map(color => color.replace('0.8', '1')) : '#fff',
-            borderWidth: type === 'line' || type === 'radar' ? 2 : 1,
-            hoverOffset: 15
-          }] 
         },
-        options: chartOptions
-      });
-    }
-
-    /**************************************************************************
-     * Función mejorada para exportar gráfico con porcentajes
-     **************************************************************************/
-    function exportChartWithPercentages() {
-      if (!chartInstance) return alert("No hay visualización para exportar.");
+        line: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje Positivo (%)',
+                font: { size: 14, weight: 'bold' }
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Indicadores de Comportamiento Proambiental',
+                font: { size: 14, weight: 'bold' }
+              }
+            }
+          }
+        },
+        pie: {
+          // Configuración específica para gráfico circular
+          plugins: {
+            datalabels: {
+              formatter: (value, ctx) => {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          }
+        },
+        radar: {
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                display: false
+              }
+            }
+          }
+        }
+      };
       
-      // Crear un canvas temporal para el gráfico con porcentajes
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCanvas.width = 1200;
-      tempCanvas.height = 800;
+      // Combinar configuración base con configuración específica del tipo
+      const finalConfig = {
+        type: currentChartType,
+        data: baseConfig.data,
+        options: {
+          ...baseConfig.options,
+          ...(typeSpecificConfigs[currentChartType] || {})
+        }
+      };
       
-      // Copiar el gráfico original
-      tempCtx.fillStyle = 'white';
-      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-      tempCtx.drawImage(document.getElementById('mainChart'), 50, 50, 1100, 700);
-      
-      // Agregar título y porcentajes si es un gráfico circular
-      if (chartInstance.config.type === 'pie' || chartInstance.config.type === 'doughnut') {
-        tempCtx.font = 'bold 24px Arial';
-        tempCtx.fillStyle = '#0f172a';
-        tempCtx.textAlign = 'center';
-        tempCtx.fillText(document.getElementById('chartTitle').textContent, tempCanvas.width / 2, 30);
-        
-        // Agregar porcentajes en el gráfico
-        const total = chartInstance.data.datasets[0].data.reduce((a, b) => a + b, 0);
-        chartInstance.data.datasets[0].data.forEach((value, index) => {
-          const percentage = ((value / total) * 100).toFixed(1);
-          tempCtx.font = 'bold 16px Arial';
-          tempCtx.fillStyle = '#374151';
-          tempCtx.fillText(`${percentage}%`, tempCanvas.width / 2, 750 + (index * 20));
-        });
-      }
-      
-      // Exportar la imagen
-      const url = tempCanvas.toDataURL('image/png', 1);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `analisis_${document.getElementById('chartTitle').textContent.replace(/\s+/g, '_')}_${Date.now()}.png`; 
-      a.click();
-    }
-
-    /**************************************************************************
-     * Table handling (Simple-DataTables) - MEJORADO CON PAGINACIÓN AVANZADA
-     **************************************************************************/
-    function buildTableHeaders(columns) {
-      const headerRow = document.getElementById('tableHeaderRow');
-      headerRow.innerHTML = '';
-      columns.forEach(c => {
-        const th = document.createElement('th');
-        // Mejorar los títulos de las columnas
-        const prettyTitle = c.replace(/_/g, ' ')
-                            .replace(/\b\w/g, l => l.toUpperCase())
-                            .replace('Jefe Hogar', 'Jefe de Hogar')
-                            .replace('Desechos', 'Residuos')
-                            .replace('Participaria', 'Disposición a Participar');
-        th.innerText = prettyTitle;
-        headerRow.appendChild(th);
-      });
+      mainChart = new Chart(mainCtx, finalConfig);
     }
     
-    function buildTableBody(rows, columns) {
-      const tbody = document.getElementById('tableBody'); 
-      tbody.innerHTML = '';
-      rows.forEach(r => {
-        const tr = document.createElement('tr');
-        columns.forEach(col => {
-          const td = document.createElement('td');
-          td.innerText = r[col] === null || r[col] === undefined ? '' : String(r[col]);
-          tr.appendChild(td);
+    // Obtener nombre legible del tipo de gráfico
+    function getChartTypeName(type) {
+      const names = {
+        'bar': 'Gráfico de Barras',
+        'pie': 'Gráfico Circular',
+        'line': 'Gráfico de Líneas',
+        'radar': 'Gráfico Radar'
+      };
+      return names[type] || type;
+    }
+
+    // Renderizar comparación
+    function renderComparison() {
+      if (!currentData.length) return;
+      
+      // Agrupar datos por estado civil
+      const datosPorEstadoCivil = {};
+      currentData.forEach(row => {
+        const estadoCivil = row.estado_civil || 'Sin especificar';
+        if (!datosPorEstadoCivil[estadoCivil]) datosPorEstadoCivil[estadoCivil] = [];
+        datosPorEstadoCivil[estadoCivil].push(row);
+      });
+      
+      // Calcular indicadores para cada grupo
+      const grupos = Object.keys(datosPorEstadoCivil);
+      const indicadores = ['Conocimiento', 'Actitud', 'Prácticas', 'Emprendimiento'];
+      
+      const datasets = indicadores.map((indicador, i) => {
+        const data = grupos.map(grupo => {
+          const indicadoresGrupo = calcularIndicadores(datosPorEstadoCivil[grupo]);
+          switch(indicador) {
+            case 'Conocimiento': return indicadoresGrupo.conocimiento;
+            case 'Actitud': return indicadoresGrupo.actitud;
+            case 'Prácticas': return indicadoresGrupo.practicas;
+            case 'Emprendimiento': return indicadoresGrupo.emprendimiento;
+            default: return 0;
+          }
         });
+        
+        return {
+          label: indicador,
+          data: data,
+          backgroundColor: `hsl(${(i * 360 / indicadores.length) % 360} 70% 55%)`,
+          borderColor: `hsl(${(i * 360 / indicadores.length) % 360} 70% 55%)`.replace('hsl', 'hsla').replace(')', ', 0.8)'),
+          borderWidth: 1
+        };
+      });
+      
+      if (comparisonChart) comparisonChart.destroy();
+      
+      comparisonChart = new Chart(comparisonCtx, {
+        type: 'bar',
+        data: {
+          labels: grupos,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 12
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Comparación de Indicadores por Estado Civil',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje Positivo (%)',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Estado Civil',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Rellenar tabla resumen y actualizar resúmenes
+    function renderResumen(currentSummary, previousSummary, basicStats) {
+      tbody.innerHTML = '';
+      
+      // Actualizar estadísticas básicas
+      statTotalRecords.textContent = basicStats.totalRecords;
+      statEstadosCiviles.textContent = basicStats.estadosCiviles;
+      statNivelesEducacion.textContent = basicStats.nivelesEducacion;
+      statSituacionesLaborales.textContent = basicStats.situacionesLaborales;
+      statEdadPromedio.textContent = basicStats.edadPromedio.toFixed(1);
+      statIntegrantesPromedio.textContent = basicStats.integrantesPromedio.toFixed(1);
+      statEdadMinima.textContent = basicStats.edadMinima;
+      statEdadMaxima.textContent = basicStats.edadMaxima;
+      
+      // Actualizar estadísticas avanzadas
+      statConocimiento.textContent = currentSummary.conocimiento.toFixed(1) + '%';
+      statActitud.textContent = currentSummary.actitud.toFixed(1) + '%';
+      statPracticas.textContent = currentSummary.practicas.toFixed(1) + '%';
+      statEmprendimiento.textContent = currentSummary.emprendimiento.toFixed(1) + '%';
+      
+      // Llenar tabla
+      currentSummary.indicadores.forEach(indicador => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${indicador.nombre}</td>
+          <td style="text-align:right">${indicador.respuestasPositivas}/${indicador.totalRespuestas}</td>
+          <td style="text-align:right">${indicador.porcentaje.toFixed(2)}%</td>
+        `;
         tbody.appendChild(tr);
       });
       
-      // Guardar datos para búsqueda
-      allTableData = rows;
+      // Actualizar tarjetas de resumen
+      summaryTotal.textContent = currentSummary.total;
+      summaryConocimiento.textContent = currentSummary.conocimiento.toFixed(1) + '%';
+      summaryActitud.textContent = currentSummary.actitud.toFixed(1) + '%';
+      summaryPracticas.textContent = currentSummary.practicas.toFixed(1) + '%';
       
-      // Inicializar o reinicializar DataTable con configuración en español
-      setTimeout(() => {
-        try { 
-          if (dataTable) dataTable.destroy(); 
-        } catch(e){}
+      // Calcular cambios porcentuales para resúmenes
+      if (previousSummary && previousSummary.total > 0) {
+        const totalChange = ((currentSummary.total - previousSummary.total) / previousSummary.total) * 100;
+        const conocimientoChange = ((currentSummary.conocimiento - previousSummary.conocimiento) / previousSummary.conocimiento) * 100;
+        const actitudChange = ((currentSummary.actitud - previousSummary.actitud) / previousSummary.actitud) * 100;
+        const practicasChange = ((currentSummary.practicas - previousSummary.practicas) / previousSummary.practicas) * 100;
         
-        dataTable = new simpleDatatables.DataTable("#dataTable", { 
-          searchable: true,
-          fixedHeight: false,
-          perPage: rowsPerPage,
-          perPageSelect: [10, 25, 50, 100, 250],
-          labels: {
-            placeholder: "Buscar en todos los registros...",
-            searchTitle: "Búsqueda en dataset",
-            pageTitle: "Página {page}",
-            perPage: "registros por página",
-            noRows: "No se encontraron registros",
-            noResults: "No hay resultados que coincidan con la búsqueda",
-            info: "Mostrando {start} a {end} de {rows} registros",
-            loading: "Cargando dataset...",
-            infoFiltered: "(Filtrado de {rows} registros totales)"
-          },
-          classes: {
-            active: "active",
-            container: "dataTable-container",
-            cursor: "dataTable-cursor",
-            disabled: "disabled",
-            dropdown: "dataTable-dropdown",
-            header: "dataTable-header",
-            info: "dataTable-info",
-            input: "dataTable-input",
-            pagination: "dataTable-pagination",
-            paginationList: "dataTable-paginationList",
-            selector: "dataTable-selector",
-            table: "dataTable-table",
-            tbody: "dataTable-tbody",
-            thead: "dataTable-thead",
-            wrapper: "dataTable-wrapper"
-          }
-        });
-
-        // Conectar el input de búsqueda personalizado
-        const searchInput = document.getElementById('tableSearch');
-        const clearSearchBtn = document.getElementById('clearSearch');
-        const searchResultsInfo = document.getElementById('searchResultsInfo');
-        
-        // Función para actualizar la información de resultados
-        function updateSearchInfo() {
-          const info = dataTable.data.info;
-          if (currentSearchTerm) {
-            const totalRows = allTableData.length;
-            const filteredRows = info.pageCount > 0 ? info.rows : 0;
-            
-            if (filteredRows === 0) {
-              searchResultsInfo.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>No se encontraron resultados para "${currentSearchTerm}"`;
-              searchResultsInfo.classList.remove('hidden');
-            } else {
-              searchResultsInfo.innerHTML = `<i class="fas fa-filter mr-2"></i>${filteredRows} de ${totalRows} registros coinciden con "${currentSearchTerm}"`;
-              searchResultsInfo.classList.remove('hidden');
-            }
-            
-            clearSearchBtn.classList.remove('hidden');
-          } else {
-            searchResultsInfo.classList.add('hidden');
-            clearSearchBtn.classList.add('hidden');
-          }
-        }
-        
-        // Búsqueda en tiempo real
-        searchInput.addEventListener('input', (e) => {
-          currentSearchTerm = e.target.value;
-          dataTable.search(currentSearchTerm);
-          
-          // Actualizar información después de un pequeño retraso
-          setTimeout(updateSearchInfo, 100);
-        });
-        
-        // Limpiar búsqueda
-        clearSearchBtn.addEventListener('click', () => {
-          searchInput.value = '';
-          currentSearchTerm = '';
-          dataTable.search('');
-          searchResultsInfo.classList.add('hidden');
-          clearSearchBtn.classList.add('hidden');
-        });
-        
-        // Actualizar información cuando cambie la página
-        dataTable.on('datatable.page', updateSearchInfo);
-        
-        // Actualizar información inicial
-        updateSearchInfo();
-        
-        // Configurar paginación personalizada
-        setupCustomPagination();
-      }, 100);
-    }
-
-    /**************************************************************************
-     * PAGINACIÓN PERSONALIZADA MEJORADA
-     **************************************************************************/
-    function setupCustomPagination() {
-      const rowsPerPageSelect = document.getElementById('rowsPerPage');
-      const firstPageBtn = document.getElementById('firstPage');
-      const prevPageBtn = document.getElementById('prevPage');
-      const nextPageBtn = document.getElementById('nextPage');
-      const lastPageBtn = document.getElementById('lastPage');
-      const pageNumbersContainer = document.getElementById('pageNumbers');
-      const paginationInfo = document.getElementById('paginationInfo');
-      
-      // Configurar selector de filas por página
-      rowsPerPageSelect.value = rowsPerPage;
-      rowsPerPageSelect.addEventListener('change', (e) => {
-        rowsPerPage = parseInt(e.target.value);
-        dataTable.rowsPerPage = rowsPerPage;
-        dataTable.setPage(1);
-        updatePagination();
-      });
-      
-      // Configurar botones de navegación
-      firstPageBtn.addEventListener('click', () => {
-        dataTable.setPage(1);
-        updatePagination();
-      });
-      
-      prevPageBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-          dataTable.setPage(currentPage - 1);
-          updatePagination();
-        }
-      });
-      
-      nextPageBtn.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-          dataTable.setPage(currentPage + 1);
-          updatePagination();
-        }
-      });
-      
-      lastPageBtn.addEventListener('click', () => {
-        dataTable.setPage(totalPages);
-        updatePagination();
-      });
-      
-      // Actualizar paginación cuando cambie la página en DataTable
-      dataTable.on('datatable.page', updatePagination);
-      
-      // Actualizar paginación inicial
-      updatePagination();
+        // Actualizar elementos de cambio
+        actualizarElementoCambio(summaryTotalChange, totalChange);
+        actualizarElementoCambio(summaryConocimientoChange, conocimientoChange);
+        actualizarElementoCambio(summaryActitudChange, actitudChange);
+        actualizarElementoCambio(summaryPracticasChange, practicasChange);
+      } else {
+        summaryTotalChange.innerHTML = '<i class="fas fa-minus"></i> <span>Sin datos comparativos</span>';
+        summaryConocimientoChange.innerHTML = '<i class="fas fa-minus"></i> <span>Sin datos comparativos</span>';
+        summaryActitudChange.innerHTML = '<i class="fas fa-minus"></i> <span>Sin datos comparativos</span>';
+        summaryPracticasChange.innerHTML = '<i class="fas fa-minus"></i> <span>Sin datos comparativos</span>';
+      }
     }
     
-    function updatePagination() {
-      const info = dataTable.data.info;
-      currentPage = info.page;
-      totalPages = info.pageCount;
+    // Helper para actualizar elementos de cambio
+    function actualizarElementoCambio(element, cambio) {
+      const icon = cambio > 0 ? 'fa-arrow-up' : (cambio < 0 ? 'fa-arrow-down' : 'fa-minus');
+      const className = cambio > 0 ? 'positive' : (cambio < 0 ? 'negative' : '');
       
-      // Actualizar información de paginación
-      const start = (currentPage - 1) * rowsPerPage + 1;
-      const end = Math.min(currentPage * rowsPerPage, info.rows);
-      const total = info.rows;
-      
-      document.getElementById('paginationInfo').textContent = 
-        `Mostrando ${start}-${end} de ${total} registros`;
-      
-      // Actualizar estado de botones de navegación
-      document.getElementById('firstPage').disabled = currentPage === 1;
-      document.getElementById('prevPage').disabled = currentPage === 1;
-      document.getElementById('nextPage').disabled = currentPage === totalPages;
-      document.getElementById('lastPage').disabled = currentPage === totalPages;
-      
-      // Generar números de página
-      generatePageNumbers();
-    }
-    
-    function generatePageNumbers() {
-      const pageNumbersContainer = document.getElementById('pageNumbers');
-      pageNumbersContainer.innerHTML = '';
-      
-      // Mostrar máximo 7 números de página (3 a cada lado de la página actual)
-      const maxVisiblePages = 7;
-      let startPage = Math.max(1, currentPage - 3);
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      
-      // Ajustar si estamos cerca del final
-      if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-      
-      // Agregar botón para primera página si es necesario
-      if (startPage > 1) {
-        const firstPageNumber = document.createElement('div');
-        firstPageNumber.className = 'page-number';
-        firstPageNumber.textContent = '1';
-        firstPageNumber.addEventListener('click', () => {
-          dataTable.setPage(1);
-          updatePagination();
-        });
-        pageNumbersContainer.appendChild(firstPageNumber);
-        
-        // Agregar puntos suspensivos si hay más páginas antes
-        if (startPage > 2) {
-          const ellipsis = document.createElement('div');
-          ellipsis.className = 'page-ellipsis';
-          ellipsis.textContent = '...';
-          pageNumbersContainer.appendChild(ellipsis);
-        }
-      }
-      
-      // Agregar números de página
-      for (let i = startPage; i <= endPage; i++) {
-        const pageNumber = document.createElement('div');
-        pageNumber.className = i === currentPage ? 'page-number active' : 'page-number';
-        pageNumber.textContent = i;
-        pageNumber.addEventListener('click', () => {
-          dataTable.setPage(i);
-          updatePagination();
-        });
-        pageNumbersContainer.appendChild(pageNumber);
-      }
-      
-      // Agregar botón para última página si es necesario
-      if (endPage < totalPages) {
-        // Agregar puntos suspensivos si hay más páginas después
-        if (endPage < totalPages - 1) {
-          const ellipsis = document.createElement('div');
-          ellipsis.className = 'page-ellipsis';
-          ellipsis.textContent = '...';
-          pageNumbersContainer.appendChild(ellipsis);
-        }
-        
-        const lastPageNumber = document.createElement('div');
-        lastPageNumber.className = 'page-number';
-        lastPageNumber.textContent = totalPages;
-        lastPageNumber.addEventListener('click', () => {
-          dataTable.setPage(totalPages);
-          updatePagination();
-        });
-        pageNumbersContainer.appendChild(lastPageNumber);
-      }
+      element.innerHTML = `<i class="fas ${icon}"></i> <span>${Math.abs(cambio).toFixed(2)}% vs período anterior</span>`;
+      element.className = `summary-subtitle ${className}`;
     }
 
-    /**************************************************************************
-     * Fetch data from Supabase and render all (chart + table + summaries)
-     **************************************************************************/
-    async function fetchAllAndRender() {
-      // Mostrar loading
-      document.getElementById('chartLoading').classList.remove('hidden');
-      
-      // fetch
-      const { data, error } = await supabase.from(TABLE).select("*");
-      if (error) { 
-        console.error("Supabase error:", error); 
-        alert("Error cargando datos desde Supabase. Revisar consola."); 
-        document.getElementById('chartLoading').classList.add('hidden');
-        return; 
-      }
-      // store raw
-      window.__RAW_DATA = data || [];
-
-      // Detectar columna de fecha y configurar filtro
-      window.dateColumn = detectDateColumn(data);
-      if (window.dateColumn) {
-        window.dateRange = extractDateRange(data, window.dateColumn);
-        initializeDateFilter(window.dateRange);
-      }
-
-      // populate group filter
-      const groups = Array.from(new Set(data.map(d => normalize(d.grupo)).filter(Boolean)));
-      const filterGrupo = document.getElementById('filterGrupo');
-      filterGrupo.innerHTML = '<option value="todos">Grupo: Todos</option>';
-      groups.forEach(g => { 
-        const opt = document.createElement('option'); 
-        opt.value = g; 
-        opt.textContent = g; 
-        filterGrupo.appendChild(opt); 
-      });
-
-      // populate indicator selector (once)
-      const sel = document.getElementById('selectIndicator');
-      if (!sel.options.length) {
-        INDICATORS.forEach(i => {
-          const opt = document.createElement('option'); 
-          opt.value = i.value; 
-          opt.textContent = i.label; 
-          sel.appendChild(opt);
-        });
-      }
-
-      // build table headers & body
-      const columns = Object.keys(data[0] || { id: 'id' });
-      buildTableHeaders(columns);
-      buildTableBody(data, columns);
-
-      // update summaries
-      updateSummaries(data);
-
-      // initial render: first indicator
-      const initial = document.getElementById('selectIndicator').value || INDICATORS[0].value;
-      const chartType = document.getElementById('selectChartType').value || 'bar';
-      await renderIndicator(initial, chartType, { sexo: 'todos', grupo: 'todos' });
-      
-      // Ocultar loading
-      document.getElementById('chartLoading').classList.add('hidden');
-    }
-
-    function updateSummaries(rows) {
-      // Total de encuestas
-      document.getElementById('totalSurveys').innerText = rows.length;
-      
-      // Edad promedio CORREGIDA
-      const ages = rows.map(r => safeNumber(r.edad)).filter(n => n !== null);
-      const avg = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1) : '—';
-      document.getElementById('avgAge').innerText = avg === '—' ? '—' : `${avg}`;
-      
-      // Nivel educativo más frecuente
-      const education = calculateEducationLevel(rows);
-      document.getElementById('educationLevel').innerText = education.level;
-      document.getElementById('trendEducation').textContent = education.percentage !== 'Sin datos' ? 
-        `${education.percentage}%` : 'Sin datos';
-      
-      // Conciencia ambiental
-      const awareness = calculateEnvironmentalAwareness(rows);
-      document.getElementById('environmentalAwareness').innerText = awareness.percentage;
-      document.getElementById('trendAwareness').textContent = awareness.level;
-      document.getElementById('trendAwareness').className = `summary-trend ${
-        awareness.level === 'Alta' ? 'trend-positive' : 
-        awareness.level === 'Baja' ? 'trend-negative' : ''
-      }`;
-    }
-
-    /**************************************************************************
-     * Render indicator with filters (incluyendo fecha) - MEJORADO
-     **************************************************************************/
-    async function renderIndicator(indicatorKey, chartType, filters = { sexo:'todos', grupo:'todos' }) {
-      // Mostrar loading
-      document.getElementById('chartLoading').classList.remove('hidden');
-      
-      const data = window.__RAW_DATA || [];
-      let filtered = data.slice();
-      
-      // Aplicar filtros demográficos
-      if (filters.sexo && filters.sexo !== 'todos') {
-        filtered = filtered.filter(r => (r.sexo||'').toLowerCase() === filters.sexo.toLowerCase());
-      }
-      if (filters.grupo && filters.grupo !== 'todos') {
-        filtered = filtered.filter(r => (r.grupo||'').toLowerCase() === filters.grupo.toLowerCase());
-      }
-      
-      // Aplicar filtro de fecha si está activo
-      if (currentDateFilter.active && window.dateColumn) {
-        filtered = filterByDateRange(filtered, window.dateColumn);
-      }
-
-      updateSummaries(filtered);
-
-      // find label
-      const indObj = INDICATORS.find(i=> i.value === indicatorKey);
-      const title = indObj ? indObj.label : indicatorKey;
-
-      // prepare labels/values
-      let labels = [], values = [], counts = {};
-      
-      // Get the data for the selected indicator
-      const arr = filtered.map(r => r[indicatorKey]).filter(v => v !== null && v !== undefined);
-
-      // if arr empty -> show no data
-      if (!arr.length) {
-        document.getElementById('noDataMsg').classList.remove('hidden');
-        document.getElementById('statisticsSection').classList.add('hidden');
-        document.getElementById('chartLoading').classList.add('hidden');
-        destroyChart();
+    // Exportar datos
+    function exportarDatos(tipo) {
+      if (!currentData.length) {
+        alert('No hay datos para exportar');
         return;
-      } else {
-        document.getElementById('noDataMsg').classList.add('hidden');
       }
-
-      // decide processing: if many arr elements match likert options => likert
-      const lowerLikert = LIKERT_LEVELS.map(l => l.toLowerCase());
-      const matchCount = arr.reduce((acc, v) => lowerLikert.includes(String(v).toLowerCase()) ? acc+1 : acc, 0);
-      const isLikert = (matchCount / arr.length) >= 0.25; // threshold 25%
-
-      // Obtener valores numéricos para estadísticas avanzadas
-      const numericValues = arr.map(v => safeNumber(v)).filter(v => v !== null);
-
-      if (isLikert) {
-        const res = countLikert(arr);
-        labels = res.labels; 
-        values = res.values;
-        counts = res.counts;
-      } else {
-        // categorical
-        const res = countCategorical(arr);
-        labels = res.labels; 
-        values = res.values;
-        counts = res.counts;
+      
+      switch (tipo) {
+        case 'png':
+          if (!mainChart) {
+            alert('Gráfico no disponible');
+            return;
+          }
+          const a = document.createElement('a');
+          a.href = mainChart.toBase64Image();
+          a.download = 'grafico-comportamiento-proambiental.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          break;
+          
+        case 'csv':
+          const currentSummary = calcularIndicadores(currentData);
+          
+          let csvContent = "Indicador,Respuestas Positivas,Total Respuestas,Porcentaje Positivo\n";
+          currentSummary.indicadores.forEach(indicador => {
+            csvContent += `"${indicador.nombre}",${indicador.respuestasPositivas},${indicador.totalRespuestas},${indicador.porcentaje.toFixed(2)}%\n`;
+          });
+          
+          // Agregar indicadores generales
+          csvContent += `"Conocimiento Ambiental",,,${currentSummary.conocimiento.toFixed(2)}%\n`;
+          csvContent += `"Actitud Proambiental",,,${currentSummary.actitud.toFixed(2)}%\n`;
+          csvContent += `"Prácticas Sustentables",,,${currentSummary.practicas.toFixed(2)}%\n`;
+          csvContent += `"Potencial Emprendedor",,,${currentSummary.emprendimiento.toFixed(2)}%\n`;
+          
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'datos-comportamiento-proambiental.csv');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          break;
       }
-
-      // Calcular estadísticas avanzadas CORREGIDAS
-      const total = values.reduce((sum, val) => sum + val, 0);
-      const stats = calculateAdvancedStatistics(values, labels, total, numericValues);
-      
-      // Renderizar gráfico y estadísticas
-      document.getElementById('chartTitle').innerText = title;
-      
-      // Actualizar subtítulo con información del filtro de fecha
-      let subtitle = `Visualización: ${chartType} • Muestra: ${filtered.length} registros`;
-      if (currentDateFilter.active) {
-        subtitle += ` • Período: ${currentDateFilter.startDate} a ${currentDateFilter.endDate}`;
-      }
-      document.getElementById('chartSubtitle').innerText = subtitle;
-      
-      renderChart(chartType, labels, values, title);
-      renderAdvancedStatistics(stats, labels, values, indicatorKey);
-      
-      // Ocultar loading
-      document.getElementById('chartLoading').classList.add('hidden');
     }
 
-    /**************************************************************************
-     * Export table as CSV
-     **************************************************************************/
-    function exportTableCSV() {
-      const data = window.__RAW_DATA || [];
-      if (!data.length) return alert("No hay datos para exportar.");
-      const cols = Object.keys(data[0]);
-      const csvRows = [cols.join(",")];
-      data.forEach(row => {
-        const vals = cols.map(c => {
-          let v = row[c];
-          if (v === null || v === undefined) return "";
-          // escape quotes
-          v = String(v).replace(/"/g, '""');
-          if (v.includes(",") || v.includes("\n")) return `"${v}"`;
-          return v;
-        });
-        csvRows.push(vals.join(","));
-      });
-      const csv = csvRows.join("\n");
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); 
-      a.href = url; 
-      a.download = `dataset_proambiental_${Date.now()}.csv`; 
-      a.click(); 
-      URL.revokeObjectURL(url);
+    // Acción principal: obtener datos, procesar y renderizar
+    async function actualizar() {
+      try {
+        // Obtener datos del período actual y anterior
+        currentData = await obtenerFiltrados();
+        previousPeriodData = await obtenerDatosPeriodoAnterior();
+        
+        // Procesar datos
+        const currentSummary = calcularIndicadores(currentData);
+        const previousSummary = calcularIndicadores(previousPeriodData);
+        
+        // Calcular estadísticas
+        const basicStats = calcularEstadisticasBasicas(currentData, currentSummary);
+        
+        // Renderizar
+        renderChart(currentSummary);
+        renderResumen(currentSummary, previousSummary, basicStats);
+        
+        // Si la pestaña de comparación está activa, renderizarla
+        if (document.querySelector('.tab[data-tab="comparison"]').classList.contains('active')) {
+          renderComparison();
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error al actualizar. Revisa la consola para más detalles.');
+      }
     }
 
-    /**************************************************************************
-     * Auto-refresh function (incluye filtro de fecha)
-     **************************************************************************/
-    function autoRefreshChart() {
-      const indicator = document.getElementById('selectIndicator').value;
-      const chartType = document.getElementById('selectChartType').value;
-      const sexo = document.getElementById('filterSexo').value;
-      const grupo = document.getElementById('filterGrupo').value;
-      renderIndicator(indicator, chartType, { sexo, grupo });
-    }
+    // Inicialización
+    await initApp();
 
-    /**************************************************************************
-     * Init UI & events
-     **************************************************************************/
-    document.getElementById('btnExportCSV').addEventListener('click', exportTableCSV);
-    document.getElementById('btnExportChart').addEventListener('click', exportChartWithPercentages);
-    document.getElementById('applyDateFilter').addEventListener('click', applyDateFilter);
-    document.getElementById('clearDateFilter').addEventListener('click', clearDateFilter);
-
-    // Add event listeners for auto-refresh
-    document.getElementById('selectIndicator').addEventListener('change', autoRefreshChart);
-    document.getElementById('selectChartType').addEventListener('change', autoRefreshChart);
-    document.getElementById('filterSexo').addEventListener('change', autoRefreshChart);
-    document.getElementById('filterGrupo').addEventListener('change', autoRefreshChart);
-
-    // initial load
-    (async function init(){
-      // populate indicator dropdown quickly (in case fetch slow)
-      const sel = document.getElementById('selectIndicator');
-      INDICATORS.forEach(i => { 
-        const opt = document.createElement('option'); 
-        opt.value = i.value; 
-        opt.textContent = i.label; 
-        sel.appendChild(opt); 
-      });
-
-      await fetchAllAndRender();
-
-      // optional: auto-refresh every 60s (uncomment if desired)
-      // setInterval(async ()=> { await fetchAllAndRender(); }, 60000);
-    })();
+  })();
   </script>
 </body>
 </html>
