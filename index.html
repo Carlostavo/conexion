@@ -283,6 +283,12 @@
       margin-top: 20px;
     }
     
+    .chart-container-sm {
+      position: relative;
+      height: 300px;
+      margin-top: 20px;
+    }
+    
     .tabs {
       display: flex;
       border-bottom: 1px solid var(--border);
@@ -555,6 +561,29 @@
       margin-top: 10px;
     }
     
+    .demographics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .demographic-chart-container {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+    
+    .demographic-chart-title {
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
@@ -575,6 +604,10 @@
         height: 400px;
       }
       
+      .chart-container-sm {
+        height: 250px;
+      }
+      
       .summary-cards {
         grid-template-columns: 1fr;
       }
@@ -586,6 +619,10 @@
       .question-row {
         grid-template-columns: 1fr;
         gap: 5px;
+      }
+      
+      .demographics-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -761,8 +798,41 @@
       </div>
       
       <div class="tab-content" id="demographics">
-        <div class="chart-container">
-          <canvas id="demographicsChart"></canvas>
+        <div class="demographics-grid">
+          <div class="demographic-chart-container">
+            <div class="demographic-chart-title">Distribución por Edad</div>
+            <div class="chart-container-sm">
+              <canvas id="edadChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="demographic-chart-container">
+            <div class="demographic-chart-title">Distribución por Nivel Educativo</div>
+            <div class="chart-container-sm">
+              <canvas id="educacionChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="demographic-chart-container">
+            <div class="demographic-chart-title">Distribución por Situación Laboral</div>
+            <div class="chart-container-sm">
+              <canvas id="situacionLaboralChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="demographic-chart-container">
+            <div class="demographic-chart-title">Distribución por Ingreso Mensual</div>
+            <div class="chart-container-sm">
+              <canvas id="ingresoChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="demographic-chart-container">
+            <div class="demographic-chart-title">Distribución por Tipo de Hogar</div>
+            <div class="chart-container-sm">
+              <canvas id="tipoHogarChart"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -926,8 +996,13 @@
     // Charts
     const mainCtx = document.getElementById('mainChart').getContext('2d');
     const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
-    const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
-    let mainChart, comparisonChart, demographicsChart;
+    const edadCtx = document.getElementById('edadChart').getContext('2d');
+    const educacionCtx = document.getElementById('educacionChart').getContext('2d');
+    const situacionLaboralCtx = document.getElementById('situacionLaboralChart').getContext('2d');
+    const ingresoCtx = document.getElementById('ingresoChart').getContext('2d');
+    const tipoHogarCtx = document.getElementById('tipoHogarChart').getContext('2d');
+    
+    let mainChart, comparisonChart, edadChart, educacionChart, situacionLaboralChart, ingresoChart, tipoHogarChart;
 
     // Variables globales para datos
     let currentData = [];
@@ -1472,6 +1547,20 @@
         situacionPorcentajes[sit] = totalSituaciones > 0 ? (situacionDist[sit] / totalSituaciones) * 100 : 0;
       });
       
+      // Distribución por ingreso mensual
+      const ingresos = rows.map(r => r.ingreso_mensual_jefe_hogar).filter(i => i !== null && i !== undefined);
+      const ingresoDist = {};
+      ingresos.forEach(ingreso => {
+        ingresoDist[ingreso] = (ingresoDist[ingreso] || 0) + 1;
+      });
+      
+      // Calcular porcentajes
+      const totalIngresos = ingresos.length;
+      const ingresoPorcentajes = {};
+      Object.keys(ingresoDist).forEach(ingreso => {
+        ingresoPorcentajes[ingreso] = totalIngresos > 0 ? (ingresoDist[ingreso] / totalIngresos) * 100 : 0;
+      });
+      
       // Distribución por tipo de hogar
       const tiposHogar = rows.map(r => r.tipo_hogar).filter(t => t !== null && t !== undefined);
       const hogarDist = {};
@@ -1493,6 +1582,8 @@
         educacionPorcentajes,
         situacionDist,
         situacionPorcentajes,
+        ingresoDist,
+        ingresoPorcentajes,
         hogarDist,
         hogarPorcentajes
       };
@@ -1790,101 +1881,276 @@
       });
     }
 
-    // Renderizar gráfico demográfico
+    // Renderizar gráficos demográficos
     function renderDemographics() {
       if (!currentData.length) return;
       
       const datosDemograficos = calcularEstadisticasDemograficas(currentData);
       
       // Gráfico de edades
-      const edadLabels = Object.keys(datosDemograficos.edadRangos);
-      const edadData = Object.values(datosDemograficos.edadRangos);
-      const edadPorcentajes = Object.values(datosDemograficos.edadPorcentajes);
-      
-      if (demographicsChart) demographicsChart.destroy();
-      
-      demographicsChart = new Chart(demographicsCtx, {
-        type: 'bar',
+      if (edadChart) edadChart.destroy();
+      edadChart = new Chart(edadCtx, {
+        type: 'pie',
         data: {
-          labels: edadLabels,
-          datasets: [
-            {
-              label: 'Cantidad',
-              data: edadData,
-              backgroundColor: 'rgba(15, 118, 110, 0.7)',
-              borderColor: 'rgba(15, 118, 110, 1)',
-              borderWidth: 1,
-              yAxisID: 'y'
-            },
-            {
-              label: 'Porcentaje (%)',
-              data: edadPorcentajes,
-              backgroundColor: 'rgba(20, 184, 166, 0.5)',
-              borderColor: 'rgba(20, 184, 166, 1)',
-              borderWidth: 1,
-              type: 'line',
-              yAxisID: 'y1'
-            }
-          ]
+          labels: Object.keys(datosDemograficos.edadRangos),
+          datasets: [{
+            data: Object.values(datosDemograficos.edadPorcentajes),
+            backgroundColor: [
+              'rgba(15, 118, 110, 0.7)',
+              'rgba(20, 184, 166, 0.7)',
+              'rgba(45, 76, 200, 0.7)',
+              'rgba(124, 58, 237, 0.7)'
+            ],
+            borderColor: [
+              'rgba(15, 118, 110, 1)',
+              'rgba(20, 184, 166, 1)',
+              'rgba(45, 76, 200, 1)',
+              'rgba(124, 58, 237, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'Distribución Demográfica por Edad',
-              font: {
-                size: 16,
-                weight: 'bold'
-              },
-              padding: 20
+              position: 'bottom',
             },
             tooltip: {
               callbacks: {
                 label: function(context) {
-                  let label = context.dataset.label || '';
-                  if (label) label += ': ';
-                  if (context.datasetIndex === 0) {
-                    label += context.parsed.y;
-                  } else {
-                    label += context.parsed.y.toFixed(1) + '%';
-                  }
-                  return label;
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Cantidad de Personas',
-                font: {
-                  size: 14,
-                  weight: 'bold'
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  return `${label}: ${value.toFixed(1)}%`;
                 }
               }
             },
-            y1: {
-              beginAtZero: true,
-              max: 100,
-              position: 'right',
-              title: {
-                display: true,
-                text: 'Porcentaje (%)',
-                font: {
-                  size: 14,
-                  weight: 'bold'
+            datalabels: {
+              formatter: (value, ctx) => {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          }
+        }
+      });
+      
+      // Gráfico de educación
+      if (educacionChart) educacionChart.destroy();
+      educacionChart = new Chart(educacionCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(datosDemograficos.educacionDist),
+          datasets: [{
+            data: Object.values(datosDemograficos.educacionPorcentajes),
+            backgroundColor: [
+              'rgba(15, 118, 110, 0.7)',
+              'rgba(20, 184, 166, 0.7)',
+              'rgba(45, 76, 200, 0.7)',
+              'rgba(124, 58, 237, 0.7)',
+              'rgba(245, 158, 11, 0.7)',
+              'rgba(239, 68, 68, 0.7)'
+            ],
+            borderColor: [
+              'rgba(15, 118, 110, 1)',
+              'rgba(20, 184, 166, 1)',
+              'rgba(45, 76, 200, 1)',
+              'rgba(124, 58, 237, 1)',
+              'rgba(245, 158, 11, 1)',
+              'rgba(239, 68, 68, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  return `${label}: ${value.toFixed(1)}%`;
                 }
+              }
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                return value.toFixed(1) + '%';
               },
-              grid: {
-                drawOnChartArea: false,
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          }
+        }
+      });
+      
+      // Gráfico de situación laboral
+      if (situacionLaboralChart) situacionLaboralChart.destroy();
+      situacionLaboralChart = new Chart(situacionLaboralCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(datosDemograficos.situacionDist),
+          datasets: [{
+            data: Object.values(datosDemograficos.situacionPorcentajes),
+            backgroundColor: [
+              'rgba(15, 118, 110, 0.7)',
+              'rgba(20, 184, 166, 0.7)',
+              'rgba(45, 76, 200, 0.7)',
+              'rgba(124, 58, 237, 0.7)'
+            ],
+            borderColor: [
+              'rgba(15, 118, 110, 1)',
+              'rgba(20, 184, 166, 1)',
+              'rgba(45, 76, 200, 1)',
+              'rgba(124, 58, 237, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  return `${label}: ${value.toFixed(1)}%`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                return value.toFixed(1) + '%';
               },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          }
+        }
+      });
+      
+      // Gráfico de ingreso mensual
+      if (ingresoChart) ingresoChart.destroy();
+      ingresoChart = new Chart(ingresoCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(datosDemograficos.ingresoDist),
+          datasets: [{
+            data: Object.values(datosDemograficos.ingresoPorcentajes),
+            backgroundColor: [
+              'rgba(15, 118, 110, 0.7)',
+              'rgba(20, 184, 166, 0.7)',
+              'rgba(45, 76, 200, 0.7)',
+              'rgba(124, 58, 237, 0.7)'
+            ],
+            borderColor: [
+              'rgba(15, 118, 110, 1)',
+              'rgba(20, 184, 166, 1)',
+              'rgba(45, 76, 200, 1)',
+              'rgba(124, 58, 237, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  return `${label}: ${value.toFixed(1)}%`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          }
+        }
+      });
+      
+      // Gráfico de tipo de hogar
+      if (tipoHogarChart) tipoHogarChart.destroy();
+      tipoHogarChart = new Chart(tipoHogarCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(datosDemograficos.hogarDist),
+          datasets: [{
+            data: Object.values(datosDemograficos.hogarPorcentajes),
+            backgroundColor: [
+              'rgba(15, 118, 110, 0.7)',
+              'rgba(20, 184, 166, 0.7)',
+              'rgba(45, 76, 200, 0.7)',
+              'rgba(124, 58, 237, 0.7)'
+            ],
+            borderColor: [
+              'rgba(15, 118, 110, 1)',
+              'rgba(20, 184, 166, 1)',
+              'rgba(45, 76, 200, 1)',
+              'rgba(124, 58, 237, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  return `${label}: ${value.toFixed(1)}%`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
             }
           }
         }
