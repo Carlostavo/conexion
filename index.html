@@ -1483,43 +1483,125 @@
       return { distribuciones, promedios };
     }
 
-    // Renderizar gráficos demográficos
+    // Renderizar gráficos demográficos en barras
     function renderDemographicsCharts(distribuciones) {
       // Gráfico de estado civil
-      renderChart('estadoCivilChart', 'doughnut', 
+      renderDemographicChart('estadoCivilChart', 
         Object.keys(distribuciones.estadoCivil), 
         Object.values(distribuciones.estadoCivil),
+        distribuciones.counts.estadoCivil,
         'Distribución por Estado Civil');
       
       // Gráfico de edades
-      renderChart('edadChart', 'pie', 
+      renderDemographicChart('edadChart', 
         Object.keys(distribuciones.edad), 
         Object.values(distribuciones.edad),
+        distribuciones.counts.edad,
         'Distribución por Grupos de Edad');
       
       // Gráfico de educación
-      renderChart('educacionChart', 'bar', 
+      renderDemographicChart('educacionChart', 
         Object.keys(distribuciones.educacion), 
         Object.values(distribuciones.educacion),
+        distribuciones.counts.educacion,
         'Distribución por Nivel Educativo');
       
       // Gráfico de situación laboral
-      renderChart('laboralChart', 'bar', 
+      renderDemographicChart('laboralChart', 
         Object.keys(distribuciones.laboral), 
         Object.values(distribuciones.laboral),
+        distribuciones.counts.laboral,
         'Distribución por Situación Laboral');
       
       // Gráfico de ingreso
-      renderChart('ingresoChart', 'bar', 
+      renderDemographicChart('ingresoChart', 
         Object.keys(distribuciones.ingreso), 
         Object.values(distribuciones.ingreso),
+        distribuciones.counts.ingreso,
         'Distribución por Ingreso Mensual');
       
       // Gráfico de tipo de hogar
-      renderChart('hogarChart', 'doughnut', 
+      renderDemographicChart('hogarChart', 
         Object.keys(distribuciones.hogar), 
         Object.values(distribuciones.hogar),
+        distribuciones.counts.hogar,
         'Distribución por Tipo de Hogar');
+    }
+
+    // Función para renderizar gráficos demográficos en barras
+    function renderDemographicChart(canvasId, labels, data, counts, title) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      
+      // Destruir gráfico existente si existe
+      if (window[canvasId + 'Chart']) {
+        window[canvasId + 'Chart'].destroy();
+      }
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      
+      window[canvasId + 'Chart'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Porcentaje (%)',
+            data: data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderColor: colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)')),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje (%)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: title,
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  const value = context.parsed.y;
+                  const count = counts[context.label] || 0;
+                  return `${label}: ${value.toFixed(1)}% (${count} personas)`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#1e293b',
+              font: {
+                weight: 'bold',
+                size: 12
+              },
+              anchor: 'end',
+              align: 'top'
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
     }
 
     // Renderizar gráficos individuales para Determinantes Socioculturales
@@ -1552,7 +1634,7 @@
         const titulo = titulosSociocultural[index];
         const datos = distribucionesLikert.sociocultural[pregunta];
         
-        renderQuestionChart(canvasId, datos, titulo);
+        renderQuestionChart(canvasId, datos, titulo, currentData.length);
       });
     }
 
@@ -1582,7 +1664,7 @@
         const titulo = titulosAfectivos[index];
         const datos = distribucionesLikert.afectivos[pregunta];
         
-        renderQuestionChart(canvasId, datos, titulo);
+        renderQuestionChart(canvasId, datos, titulo, currentData.length);
       });
     }
 
@@ -1612,7 +1694,7 @@
         const titulo = titulosCognitivos[index];
         const datos = distribucionesLikert.cognitivos[pregunta];
         
-        renderQuestionChart(canvasId, datos, titulo);
+        renderQuestionChart(canvasId, datos, titulo, currentData.length);
       });
     }
 
@@ -1642,7 +1724,7 @@
         const titulo = titulosAmbiental[index];
         const datos = distribucionesLikert.ambiental[pregunta];
         
-        renderQuestionChart(canvasId, datos, titulo);
+        renderQuestionChart(canvasId, datos, titulo, currentData.length);
       });
     }
 
@@ -1672,7 +1754,7 @@
         const titulo = titulosEconomica[index];
         const datos = distribucionesLikert.economica[pregunta];
         
-        renderQuestionChart(canvasId, datos, titulo);
+        renderQuestionChart(canvasId, datos, titulo, currentData.length);
       });
     }
 
@@ -1702,12 +1784,12 @@
         const titulo = titulosComunitario[index];
         const datos = distribucionesLikert.comunitario[pregunta];
         
-        renderQuestionChart(canvasId, datos, titulo);
+        renderQuestionChart(canvasId, datos, titulo, currentData.length);
       });
     }
 
     // Función para renderizar gráficos individuales de preguntas
-    function renderQuestionChart(canvasId, data, title) {
+    function renderQuestionChart(canvasId, data, title, total) {
       const ctx = document.getElementById(canvasId).getContext('2d');
       
       // Destruir gráfico existente si existe
@@ -1718,6 +1800,9 @@
       const respuestas = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
       const valores = respuestas.map(respuesta => data[respuesta]);
       const colors = ['#ef4444', '#f59e0b', '#64748b', '#0ea5e9', '#10b981'];
+      
+      // Calcular cantidades para cada respuesta
+      const cantidades = respuestas.map(respuesta => Math.round((data[respuesta] / 100) * total));
       
       window[canvasId + 'Chart'] = new Chart(ctx, {
         type: 'bar',
@@ -1759,7 +1844,11 @@
             tooltip: {
               callbacks: {
                 label: function(context) {
-                  return `${context.parsed}%`;
+                  const label = context.dataset.label || '';
+                  const value = context.parsed.y;
+                  const index = context.dataIndex;
+                  const cantidad = cantidades[index];
+                  return `${label}: ${value.toFixed(1)}% (${cantidad} personas)`;
                 }
               }
             },
@@ -1778,66 +1867,6 @@
           }
         },
         plugins: [ChartDataLabels]
-      });
-    }
-
-    // Función genérica para renderizar gráficos
-    function renderChart(canvasId, type, labels, data, title) {
-      const ctx = document.getElementById(canvasId).getContext('2d');
-      
-      // Destruir gráfico existente si existe
-      if (window[canvasId + 'Chart']) {
-        window[canvasId + 'Chart'].destroy();
-      }
-      
-      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-      
-      window[canvasId + 'Chart'] = new Chart(ctx, {
-        type: type,
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Porcentaje (%)',
-            data: data,
-            backgroundColor: colors.slice(0, labels.length),
-            borderColor: colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)')),
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: title,
-              font: {
-                size: 14,
-                weight: 'bold'
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return `${context.parsed}%`;
-                }
-              }
-            },
-            datalabels: {
-              formatter: function(value) {
-                return value.toFixed(1) + '%';
-              },
-              color: '#fff',
-              font: {
-                weight: 'bold',
-                size: 10
-              }
-            }
-          }
-        }
       });
     }
 
