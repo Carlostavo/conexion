@@ -285,7 +285,7 @@
     
     .chart-container-sm {
       position: relative;
-      height: 300px;
+      height: 350px;
       margin-top: 20px;
     }
     
@@ -516,25 +516,6 @@
       border-color: var(--primary-light);
     }
     
-    .regression-info {
-      background: #f8fafc;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 16px;
-      border-left: 4px solid var(--primary);
-    }
-    
-    .regression-info h4 {
-      color: var(--primary);
-      margin-bottom: 8px;
-      font-size: 16px;
-    }
-    
-    .regression-info p {
-      margin: 4px 0;
-      font-size: 14px;
-    }
-    
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -568,6 +549,10 @@
       margin-bottom: 16px;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border);
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
     }
     
     @media (max-width: 768px) {
@@ -743,7 +728,6 @@
         <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
         <div class="tab" data-tab="determinants">Determinantes Proambientales</div>
         <div class="tab" data-tab="likert">Escala Likert</div>
-        <div class="tab" data-tab="regression">Análisis de Regresión</div>
       </div>
       
       <div class="tab-content active" id="demographics">
@@ -833,18 +817,6 @@
           <canvas id="likertChart"></canvas>
         </div>
       </div>
-      
-      <div class="tab-content" id="regression">
-        <div class="chart-container">
-          <canvas id="regressionChart"></canvas>
-        </div>
-        <div class="regression-info" id="regressionInfo">
-          <h4><i class="fas fa-chart-line"></i> Análisis de Regresión Lineal</h4>
-          <p><strong>Ecuación:</strong> <span id="regressionEquation">y = mx + b</span></p>
-          <p><strong>Coeficiente de determinación (R²):</strong> <span id="rSquared">0.00</span></p>
-          <p><strong>Correlación:</strong> <span id="correlation">0.00</span></p>
-        </div>
-      </div>
     </div>
 
     <!-- Tablas resumen por categorías -->
@@ -862,190 +834,328 @@
       <div class="tab-content active" id="tabla-demografica">
         <div class="category-section">
           <div class="category-title">Estado Civil</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Estado Civil</th>
-                <th style="text-align:right">Cantidad</th>
-                <th style="text-align:right">% del Total</th>
-              </tr>
-            </thead>
-            <tbody id="tablaEstadoCivil"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estado Civil</th>
+                  <th style="text-align:right">Cantidad</th>
+                  <th style="text-align:right">% del Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaEstadoCivil"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Total</strong></td>
+                  <td style="text-align:right"><strong id="totalEstadoCivil">0</strong></td>
+                  <td style="text-align:right"><strong>100%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Distribución por Edades</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Grupo de Edad</th>
-                <th style="text-align:right">Cantidad</th>
-                <th style="text-align:right">% del Total</th>
-              </tr>
-            </thead>
-            <tbody id="tablaEdades"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Grupo de Edad</th>
+                  <th style="text-align:right">Cantidad</th>
+                  <th style="text-align:right">% del Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaEdades"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Total</strong></td>
+                  <td style="text-align:right"><strong id="totalEdades">0</strong></td>
+                  <td style="text-align:right"><strong>100%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Nivel de Educación</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Nivel Educativo</th>
-                <th style="text-align:right">Cantidad</th>
-                <th style="text-align:right">% del Total</th>
-              </tr>
-            </thead>
-            <tbody id="tablaEducacion"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nivel Educativo</th>
+                  <th style="text-align:right">Cantidad</th>
+                  <th style="text-align:right">% del Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaEducacion"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Total</strong></td>
+                  <td style="text-align:right"><strong id="totalEducacion">0</strong></td>
+                  <td style="text-align:right"><strong>100%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Situación Laboral</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Situación Laboral</th>
-                <th style="text-align:right">Cantidad</th>
-                <th style="text-align:right">% del Total</th>
-              </tr>
-            </thead>
-            <tbody id="tablaLaboral"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Situación Laboral</th>
+                  <th style="text-align:right">Cantidad</th>
+                  <th style="text-align:right">% del Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaLaboral"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Total</strong></td>
+                  <td style="text-align:right"><strong id="totalLaboral">0</strong></td>
+                  <td style="text-align:right"><strong>100%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Ingreso Mensual</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Nivel de Ingreso</th>
-                <th style="text-align:right">Cantidad</th>
-                <th style="text-align:right">% del Total</th>
-              </tr>
-            </thead>
-            <tbody id="tablaIngreso"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nivel de Ingreso</th>
+                  <th style="text-align:right">Cantidad</th>
+                  <th style="text-align:right">% del Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaIngreso"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Total</strong></td>
+                  <td style="text-align:right"><strong id="totalIngreso">0</strong></td>
+                  <td style="text-align:right"><strong>100%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Tipo de Hogar</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Tipo de Hogar</th>
-                <th style="text-align:right">Cantidad</th>
-                <th style="text-align:right">% del Total</th>
-              </tr>
-            </thead>
-            <tbody id="tablaHogar"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo de Hogar</th>
+                  <th style="text-align:right">Cantidad</th>
+                  <th style="text-align:right">% del Total</th>
+                </tr>
+              </thead>
+              <tbody id="tablaHogar"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Total</strong></td>
+                  <td style="text-align:right"><strong id="totalHogar">0</strong></td>
+                  <td style="text-align:right"><strong>100%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
       
       <div class="tab-content" id="tabla-determinantes">
         <div class="category-section">
           <div class="category-title">Determinantes Socioculturales</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pregunta</th>
-                <th style="text-align:center">Totalmente Desacuerdo</th>
-                <th style="text-align:center">Desacuerdo</th>
-                <th style="text-align:center">Indiferente</th>
-                <th style="text-align:center">De Acuerdo</th>
-                <th style="text-align:center">Totalmente Acuerdo</th>
-              </tr>
-            </thead>
-            <tbody id="tablaSociocultural"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th style="text-align:center">Totalmente Desacuerdo</th>
+                  <th style="text-align:center">Desacuerdo</th>
+                  <th style="text-align:center">Indiferente</th>
+                  <th style="text-align:center">De Acuerdo</th>
+                  <th style="text-align:center">Totalmente Acuerdo</th>
+                  <th style="text-align:center">Promedio</th>
+                </tr>
+              </thead>
+              <tbody id="tablaSociocultural"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Promedio General</strong></td>
+                  <td style="text-align:center"><strong id="promedioSocioculturalTD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioSocioculturalD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioSocioculturalI">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioSocioculturalA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioSocioculturalTA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioSociocultural">0%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Determinantes Afectivos</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pregunta</th>
-                <th style="text-align:center">Totalmente Desacuerdo</th>
-                <th style="text-align:center">Desacuerdo</th>
-                <th style="text-align:center">Indiferente</th>
-                <th style="text-align:center">De Acuerdo</th>
-                <th style="text-align:center">Totalmente Acuerdo</th>
-              </tr>
-            </thead>
-            <tbody id="tablaAfectivos"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th style="text-align:center">Totalmente Desacuerdo</th>
+                  <th style="text-align:center">Desacuerdo</th>
+                  <th style="text-align:center">Indiferente</th>
+                  <th style="text-align:center">De Acuerdo</th>
+                  <th style="text-align:center">Totalmente Acuerdo</th>
+                  <th style="text-align:center">Promedio</th>
+                </tr>
+              </thead>
+              <tbody id="tablaAfectivos"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Promedio General</strong></td>
+                  <td style="text-align:center"><strong id="promedioAfectivosTD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAfectivosD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAfectivosI">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAfectivosA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAfectivosTA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAfectivos">0%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Determinantes Cognitivos</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pregunta</th>
-                <th style="text-align:center">Totalmente Desacuerdo</th>
-                <th style="text-align:center">Desacuerdo</th>
-                <th style="text-align:center">Indiferente</th>
-                <th style="text-align:center">De Acuerdo</th>
-                <th style="text-align:center">Totalmente Acuerdo</th>
-              </tr>
-            </thead>
-            <tbody id="tablaCognitivos"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th style="text-align:center">Totalmente Desacuerdo</th>
+                  <th style="text-align:center">Desacuerdo</th>
+                  <th style="text-align:center">Indiferente</th>
+                  <th style="text-align:center">De Acuerdo</th>
+                  <th style="text-align:center">Totalmente Acuerdo</th>
+                  <th style="text-align:center">Promedio</th>
+                </tr>
+              </thead>
+              <tbody id="tablaCognitivos"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Promedio General</strong></td>
+                  <td style="text-align:center"><strong id="promedioCognitivosTD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioCognitivosD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioCognitivosI">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioCognitivosA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioCognitivosTA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioCognitivos">0%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Sustentabilidad Ambiental</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pregunta</th>
-                <th style="text-align:center">Totalmente Desacuerdo</th>
-                <th style="text-align:center">Desacuerdo</th>
-                <th style="text-align:center">Indiferente</th>
-                <th style="text-align:center">De Acuerdo</th>
-                <th style="text-align:center">Totalmente Acuerdo</th>
-              </tr>
-            </thead>
-            <tbody id="tablaAmbiental"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th style="text-align:center">Totalmente Desacuerdo</th>
+                  <th style="text-align:center">Desacuerdo</th>
+                  <th style="text-align:center">Indiferente</th>
+                  <th style="text-align:center">De Acuerdo</th>
+                  <th style="text-align:center">Totalmente Acuerdo</th>
+                  <th style="text-align:center">Promedio</th>
+                </tr>
+              </thead>
+              <tbody id="tablaAmbiental"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Promedio General</strong></td>
+                  <td style="text-align:center"><strong id="promedioAmbientalTD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAmbientalD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAmbientalI">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAmbientalA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAmbientalTA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioAmbiental">0%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Sustentabilidad Económica</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pregunta</th>
-                <th style="text-align:center">Totalmente Desacuerdo</th>
-                <th style="text-align:center">Desacuerdo</th>
-                <th style="text-align:center">Indiferente</th>
-                <th style="text-align:center">De Acuerdo</th>
-                <th style="text-align:center">Totalmente Acuerdo</th>
-              </tr>
-            </thead>
-            <tbody id="tablaEconomica"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th style="text-align:center">Totalmente Desacuerdo</th>
+                  <th style="text-align:center">Desacuerdo</th>
+                  <th style="text-align:center">Indiferente</th>
+                  <th style="text-align:center">De Acuerdo</th>
+                  <th style="text-align:center">Totalmente Acuerdo</th>
+                  <th style="text-align:center">Promedio</th>
+                </tr>
+              </thead>
+              <tbody id="tablaEconomica"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Promedio General</strong></td>
+                  <td style="text-align:center"><strong id="promedioEconomicaTD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioEconomicaD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioEconomicaI">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioEconomicaA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioEconomicaTA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioEconomica">0%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
         <div class="category-section">
           <div class="category-title">Desarrollo Comunitario</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pregunta</th>
-                <th style="text-align:center">Totalmente Desacuerdo</th>
-                <th style="text-align:center">Desacuerdo</th>
-                <th style="text-align:center">Indiferente</th>
-                <th style="text-align:center">De Acuerdo</th>
-                <th style="text-align:center">Totalmente Acuerdo</th>
-              </tr>
-            </thead>
-            <tbody id="tablaComunitario"></tbody>
-          </table>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pregunta</th>
+                  <th style="text-align:center">Totalmente Desacuerdo</th>
+                  <th style="text-align:center">Desacuerdo</th>
+                  <th style="text-align:center">Indiferente</th>
+                  <th style="text-align:center">De Acuerdo</th>
+                  <th style="text-align:center">Totalmente Acuerdo</th>
+                  <th style="text-align:center">Promedio</th>
+                </tr>
+              </thead>
+              <tbody id="tablaComunitario"></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td><strong>Promedio General</strong></td>
+                  <td style="text-align:center"><strong id="promedioComunitarioTD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioComunitarioD">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioComunitarioI">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioComunitarioA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioComunitarioTA">0%</strong></td>
+                  <td style="text-align:center"><strong id="promedioComunitario">0%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -1086,11 +1196,6 @@
     const summaryHogarChange = document.getElementById('summaryHogarChange');
     const summaryEducacionChange = document.getElementById('summaryEducacionChange');
     const summaryLaboralChange = document.getElementById('summaryLaboralChange');
-    
-    // Elementos de regresión
-    const regressionEquation = document.getElementById('regressionEquation');
-    const rSquared = document.getElementById('rSquared');
-    const correlation = document.getElementById('correlation');
 
     // Variables globales para datos
     let currentData = [];
@@ -1174,8 +1279,6 @@
           // Renderizar gráficos específicos si es necesario
           if (tabId === 'likert') {
             renderLikertChart();
-          } else if (tabId === 'regression') {
-            renderRegressionChart();
           }
         });
       });
@@ -1352,7 +1455,15 @@
         educacion,
         laboral,
         ingreso,
-        hogar
+        hogar,
+        counts: {
+          estadoCivil: estadoCivilCounts,
+          edad: { '0-10 años': age0_10, '11-25 años': age11_25, '26-50 años': age26_50, '51-90 años': age51_90 },
+          educacion: educacionCounts,
+          laboral: laboralCounts,
+          ingreso: ingresoCounts,
+          hogar: hogarCounts
+        }
       };
     }
 
@@ -1407,10 +1518,19 @@
       };
       
       const distribuciones = {};
+      const promedios = {};
       
       // Para cada categoría, calcular distribuciones
       Object.keys(categorias).forEach(categoria => {
         distribuciones[categoria] = {};
+        promedios[categoria] = {
+          'Totalmente desacuerdo': 0,
+          'Desacuerdo': 0,
+          'Indiferente': 0,
+          'De acuerdo': 0,
+          'Totalmente de acuerdo': 0,
+          'Promedio': 0
+        };
         
         categorias[categoria].forEach(pregunta => {
           distribuciones[categoria][pregunta] = {
@@ -1418,7 +1538,8 @@
             'Desacuerdo': 0,
             'Indiferente': 0,
             'De acuerdo': 0,
-            'Totalmente de acuerdo': 0
+            'Totalmente de acuerdo': 0,
+            'Promedio': 0
           };
           
           rows.forEach(row => {
@@ -1428,15 +1549,46 @@
             }
           });
           
-          // Calcular porcentajes
+          // Calcular porcentajes y promedio
           const total = rows.length;
+          let sumaPonderada = 0;
           Object.keys(distribuciones[categoria][pregunta]).forEach(respuesta => {
-            distribuciones[categoria][pregunta][respuesta] = (distribuciones[categoria][pregunta][respuesta] / total) * 100;
+            if (respuesta !== 'Promedio') {
+              const porcentaje = (distribuciones[categoria][pregunta][respuesta] / total) * 100;
+              distribuciones[categoria][pregunta][respuesta] = porcentaje;
+              
+              // Calcular promedio ponderado (1-5)
+              const valor = {
+                'Totalmente desacuerdo': 1,
+                'Desacuerdo': 2,
+                'Indiferente': 3,
+                'De acuerdo': 4,
+                'Totalmente de acuerdo': 5
+              }[respuesta];
+              
+              sumaPonderada += valor * (distribuciones[categoria][pregunta][respuesta] / 100);
+            }
           });
+          
+          distribuciones[categoria][pregunta]['Promedio'] = (sumaPonderada / 5) * 100;
+          
+          // Acumular para promedios generales
+          Object.keys(promedios[categoria]).forEach(respuesta => {
+            if (respuesta !== 'Promedio') {
+              promedios[categoria][respuesta] += distribuciones[categoria][pregunta][respuesta];
+            }
+          });
+          promedios[categoria]['Promedio'] += distribuciones[categoria][pregunta]['Promedio'];
+        });
+        
+        // Calcular promedios generales
+        const numPreguntas = categorias[categoria].length;
+        Object.keys(promedios[categoria]).forEach(respuesta => {
+          promedios[categoria][respuesta] = promedios[categoria][respuesta] / numPreguntas;
         });
       });
       
-      return distribuciones;
+      return { distribuciones, promedios };
     }
 
     // Renderizar gráficos demográficos
@@ -1665,7 +1817,7 @@
     function renderLikertChart() {
       if (!currentData.length) return;
       
-      const distribucionesLikert = calcularDistribucionesLikert(currentData);
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
       const ctx = document.getElementById('likertChart').getContext('2d');
       
       // Destruir gráfico existente si existe
@@ -1755,237 +1907,45 @@
       });
     }
 
-    // Renderizar gráfico de regresión
-    function renderRegressionChart() {
-      if (!currentData.length) return;
-      
-      const ctx = document.getElementById('regressionChart').getContext('2d');
-      
-      // Destruir gráfico existente si existe
-      if (window.regressionChart) {
-        window.regressionChart.destroy();
-      }
-      
-      // Crear datos para regresión (edad vs. nivel de conciencia ambiental)
-      const datos = currentData.map(row => ({
-        x: row.edad || 0,
-        y: calcularPuntajeConciencia(row)
-      }));
-      
-      // Calcular regresión lineal
-      const regression = calcularRegresionLineal(datos);
-      
-      // Crear línea de regresión
-      const minX = Math.min(...datos.map(d => d.x));
-      const maxX = Math.max(...datos.map(d => d.x));
-      const lineaRegresion = [
-        { x: minX, y: regression.m * minX + regression.b },
-        { x: maxX, y: regression.m * maxX + regression.b }
-      ];
-      
-      window.regressionChart = new Chart(ctx, {
-        type: 'scatter',
-        data: {
-          datasets: [
-            {
-              label: 'Datos (Edad vs. Conciencia)',
-              data: datos,
-              backgroundColor: '#0ea5e9',
-              pointRadius: 6,
-              pointHoverRadius: 8
-            },
-            {
-              label: 'Línea de Regresión',
-              data: lineaRegresion,
-              type: 'line',
-              borderColor: '#ef4444',
-              borderWidth: 2,
-              pointRadius: 0,
-              fill: false,
-              tension: 0
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'Regresión: Edad vs. Nivel de Conciencia Ambiental',
-              font: {
-                size: 16,
-                weight: 'bold'
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  if (context.datasetIndex === 0) {
-                    return `Edad: ${context.parsed.x}, Conciencia: ${context.parsed.y.toFixed(2)}`;
-                  }
-                  return `Regresión: ${context.parsed.y.toFixed(2)}`;
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: 'Edad'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'Nivel de Conciencia Ambiental'
-              },
-              min: 0,
-              max: 100
-            }
-          }
-        }
-      });
-      
-      // Actualizar información de regresión
-      regressionEquation.textContent = regression.equation;
-      rSquared.textContent = regression.rSquared.toFixed(4);
-      correlation.textContent = regression.correlation.toFixed(4);
-    }
-
-    // Calcular puntaje de conciencia ambiental
-    function calcularPuntajeConciencia(row) {
-      const preguntasConciencia = [
-        'conoce_desechos_solidos',
-        'cree_comportamiento_adecuado_manejo',
-        'separar_desechos_por_origen',
-        'clasificacion_correcta_desechos',
-        'comportamiento_comunidad_influye',
-        'preocupa_exceso_desechos',
-        'desechos_contaminan_ambiente',
-        'consciente_impacto_desechos_salud',
-        'consecuencias_acumulacion_desechos',
-        'beneficios_reutilizar_residuo'
-      ];
-      
-      let puntaje = 0;
-      let count = 0;
-      
-      preguntasConciencia.forEach(pregunta => {
-        const respuesta = row[pregunta];
-        if (respuesta) {
-          const valores = {
-            'Totalmente desacuerdo': 0,
-            'Desacuerdo': 25,
-            'Indiferente': 50,
-            'De acuerdo': 75,
-            'Totalmente de acuerdo': 100
-          };
-          
-          if (valores[respuesta] !== undefined) {
-            puntaje += valores[respuesta];
-            count++;
-          }
-        }
-      });
-      
-      return count > 0 ? puntaje / count : 0;
-    }
-
-    // Calcular regresión lineal
-    function calcularRegresionLineal(datos) {
-      const xValues = datos.map(d => d.x);
-      const yValues = datos.map(d => d.y);
-      
-      const n = xValues.length;
-      
-      // Calcular sumatorias
-      const sumX = xValues.reduce((a, b) => a + b, 0);
-      const sumY = yValues.reduce((a, b) => a + b, 0);
-      const sumXY = xValues.reduce((sum, x, i) => sum + x * yValues[i], 0);
-      const sumX2 = xValues.reduce((sum, x) => sum + x * x, 0);
-      const sumY2 = yValues.reduce((sum, y) => sum + y * y, 0);
-      
-      // Calcular pendiente (m) e intercepto (b)
-      const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-      const b = (sumY - m * sumX) / n;
-      
-      // Calcular coeficiente de determinación (R²)
-      const yMean = sumY / n;
-      const ssTot = yValues.reduce((sum, y) => sum + Math.pow(y - yMean, 2), 0);
-      const ssRes = yValues.reduce((sum, y, i) => {
-        const yPred = m * xValues[i] + b;
-        return sum + Math.pow(y - yPred, 2);
-      }, 0);
-      
-      const rSquared = ssTot === 0 ? 0 : 1 - (ssRes / ssTot);
-      
-      // Calcular correlación
-      const correlation = (n * sumXY - sumX * sumY) / 
-        Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-      
-      return {
-        m, b, rSquared, correlation,
-        equation: `y = ${m.toFixed(4)}x + ${b.toFixed(4)}`
-      };
-    }
-
     // Llenar tablas resumen
     function llenarTablasResumen(distribuciones, distribucionesLikert) {
       // Tabla de estado civil
-      llenarTablaCategoria('tablaEstadoCivil', distribuciones.estadoCivil);
+      llenarTablaCategoria('tablaEstadoCivil', distribuciones.estadoCivil, distribuciones.counts.estadoCivil, 'totalEstadoCivil');
       
       // Tabla de edades
-      llenarTablaCategoria('tablaEdades', distribuciones.edad);
+      llenarTablaCategoria('tablaEdades', distribuciones.edad, distribuciones.counts.edad, 'totalEdades');
       
       // Tabla de educación
-      llenarTablaCategoria('tablaEducacion', distribuciones.educacion);
+      llenarTablaCategoria('tablaEducacion', distribuciones.educacion, distribuciones.counts.educacion, 'totalEducacion');
       
       // Tabla de situación laboral
-      llenarTablaCategoria('tablaLaboral', distribuciones.laboral);
+      llenarTablaCategoria('tablaLaboral', distribuciones.laboral, distribuciones.counts.laboral, 'totalLaboral');
       
       // Tabla de ingreso
-      llenarTablaCategoria('tablaIngreso', distribuciones.ingreso);
+      llenarTablaCategoria('tablaIngreso', distribuciones.ingreso, distribuciones.counts.ingreso, 'totalIngreso');
       
       // Tabla de tipo de hogar
-      llenarTablaCategoria('tablaHogar', distribuciones.hogar);
+      llenarTablaCategoria('tablaHogar', distribuciones.hogar, distribuciones.counts.hogar, 'totalHogar');
       
       // Tablas de determinantes Likert
-      llenarTablaLikert('tablaSociocultural', distribucionesLikert.sociocultural);
-      llenarTablaLikert('tablaAfectivos', distribucionesLikert.afectivos);
-      llenarTablaLikert('tablaCognitivos', distribucionesLikert.cognitivos);
-      llenarTablaLikert('tablaAmbiental', distribucionesLikert.ambiental);
-      llenarTablaLikert('tablaEconomica', distribucionesLikert.economica);
-      llenarTablaLikert('tablaComunitario', distribucionesLikert.comunitario);
+      llenarTablaLikert('tablaSociocultural', distribucionesLikert.distribuciones.sociocultural, distribucionesLikert.promedios.sociocultural, 'sociocultural');
+      llenarTablaLikert('tablaAfectivos', distribucionesLikert.distribuciones.afectivos, distribucionesLikert.promedios.afectivos, 'afectivos');
+      llenarTablaLikert('tablaCognitivos', distribucionesLikert.distribuciones.cognitivos, distribucionesLikert.promedios.cognitivos, 'cognitivos');
+      llenarTablaLikert('tablaAmbiental', distribucionesLikert.distribuciones.ambiental, distribucionesLikert.promedios.ambiental, 'ambiental');
+      llenarTablaLikert('tablaEconomica', distribucionesLikert.distribuciones.economica, distribucionesLikert.promedios.economica, 'economica');
+      llenarTablaLikert('tablaComunitario', distribucionesLikert.distribuciones.comunitario, distribucionesLikert.promedios.comunitario, 'comunitario');
     }
 
     // Función para llenar tablas de categorías
-    function llenarTablaCategoria(tablaId, distribucion) {
+    function llenarTablaCategoria(tablaId, distribucion, counts, totalId) {
       const tbody = document.getElementById(tablaId);
       tbody.innerHTML = '';
       
+      let totalCount = 0;
+      
       Object.keys(distribucion).forEach(categoria => {
-        const count = currentData.filter(row => {
-          if (tablaId === 'tablaEdades') {
-            const edadKey = categoria.replace(' años', '').replace('-', '_').replace('-', '_');
-            return row[`edad_${edadKey}`] > 0;
-          } else if (tablaId === 'tablaEstadoCivil') {
-            return row.estado_civil === categoria;
-          } else if (tablaId === 'tablaEducacion') {
-            return row.educacion_jefe_hogar === categoria;
-          } else if (tablaId === 'tablaLaboral') {
-            return row.situacion_laboral_jefe_hogar === categoria;
-          } else if (tablaId === 'tablaIngreso') {
-            return row.ingreso_mensual_jefe_hogar === categoria;
-          } else if (tablaId === 'tablaHogar') {
-            return row.tipo_hogar === categoria;
-          }
-          return false;
-        }).length;
+        const count = counts[categoria] || 0;
+        totalCount += count;
         
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -1995,10 +1955,13 @@
         `;
         tbody.appendChild(tr);
       });
+      
+      // Actualizar total
+      document.getElementById(totalId).textContent = totalCount;
     }
 
     // Función para llenar tablas Likert
-    function llenarTablaLikert(tablaId, distribucion) {
+    function llenarTablaLikert(tablaId, distribucion, promedios, categoria) {
       const tbody = document.getElementById(tablaId);
       tbody.innerHTML = '';
       
@@ -2051,9 +2014,19 @@
           celdas += `<td style="text-align:center">${distribucion[pregunta][respuesta].toFixed(1)}%</td>`;
         });
         
+        celdas += `<td style="text-align:center"><strong>${distribucion[pregunta]['Promedio'].toFixed(1)}%</strong></td>`;
+        
         tr.innerHTML = celdas;
         tbody.appendChild(tr);
       });
+      
+      // Actualizar promedios generales
+      document.getElementById(`promedio${categoria.charAt(0).toUpperCase() + categoria.slice(1)}TD`).textContent = promedios['Totalmente desacuerdo'].toFixed(1) + '%';
+      document.getElementById(`promedio${categoria.charAt(0).toUpperCase() + categoria.slice(1)}D`).textContent = promedios['Desacuerdo'].toFixed(1) + '%';
+      document.getElementById(`promedio${categoria.charAt(0).toUpperCase() + categoria.slice(1)}I`).textContent = promedios['Indiferente'].toFixed(1) + '%';
+      document.getElementById(`promedio${categoria.charAt(0).toUpperCase() + categoria.slice(1)}A`).textContent = promedios['De acuerdo'].toFixed(1) + '%';
+      document.getElementById(`promedio${categoria.charAt(0).toUpperCase() + categoria.slice(1)}TA`).textContent = promedios['Totalmente de acuerdo'].toFixed(1) + '%';
+      document.getElementById(`promedio${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`).textContent = promedios['Promedio'].toFixed(1) + '%';
     }
 
     // Actualizar resúmenes
@@ -2106,35 +2079,22 @@
           
           // Exportar datos demográficos
           Object.keys(distribuciones).forEach(categoria => {
-            Object.keys(distribuciones[categoria]).forEach(subcategoria => {
-              const count = currentData.filter(row => {
-                if (categoria === 'edad') {
-                  const edadKey = subcategoria.replace(' años', '').replace('-', '_').replace('-', '_');
-                  return row[`edad_${edadKey}`] > 0;
-                } else if (categoria === 'estadoCivil') {
-                  return row.estado_civil === subcategoria;
-                } else if (categoria === 'educacion') {
-                  return row.educacion_jefe_hogar === subcategoria;
-                } else if (categoria === 'laboral') {
-                  return row.situacion_laboral_jefe_hogar === subcategoria;
-                } else if (categoria === 'ingreso') {
-                  return row.ingreso_mensual_jefe_hogar === subcategoria;
-                } else if (categoria === 'hogar') {
-                  return row.tipo_hogar === subcategoria;
-                }
-                return false;
-              }).length;
-              
-              csvContent += `"${categoria}","${subcategoria}",${count},${distribuciones[categoria][subcategoria].toFixed(2)}\n`;
-            });
+            if (categoria !== 'counts') {
+              Object.keys(distribuciones[categoria]).forEach(subcategoria => {
+                const count = distribuciones.counts[categoria][subcategoria] || 0;
+                csvContent += `"${categoria}","${subcategoria}",${count},${distribuciones[categoria][subcategoria].toFixed(2)}\n`;
+              });
+            }
           });
           
           // Exportar datos Likert
-          Object.keys(distribucionesLikert).forEach(categoria => {
-            Object.keys(distribucionesLikert[categoria]).forEach(pregunta => {
-              Object.keys(distribucionesLikert[categoria][pregunta]).forEach(respuesta => {
-                const porcentaje = distribucionesLikert[categoria][pregunta][respuesta];
-                csvContent += `"${categoria}","${pregunta} - ${respuesta}",,${porcentaje.toFixed(2)}\n`;
+          Object.keys(distribucionesLikert.distribuciones).forEach(categoria => {
+            Object.keys(distribucionesLikert.distribuciones[categoria]).forEach(pregunta => {
+              Object.keys(distribucionesLikert.distribuciones[categoria][pregunta]).forEach(respuesta => {
+                if (respuesta !== 'Promedio') {
+                  const porcentaje = distribucionesLikert.distribuciones[categoria][pregunta][respuesta];
+                  csvContent += `"${categoria}","${pregunta} - ${respuesta}",,${porcentaje.toFixed(2)}\n`;
+                }
               });
             });
           });
@@ -2164,18 +2124,13 @@
         
         // Renderizar
         renderDemographicsCharts(distribuciones);
-        renderDeterminantsCharts(distribucionesLikert);
+        renderDeterminantsCharts(distribucionesLikert.distribuciones);
         llenarTablasResumen(distribuciones, distribucionesLikert);
         actualizarResumenes(distribuciones);
         
         // Si la pestaña de Likert está activa, renderizarla
         if (document.querySelector('.tab[data-tab="likert"]').classList.contains('active')) {
           renderLikertChart();
-        }
-        
-        // Si la pestaña de regresión está activa, renderizarla
-        if (document.querySelector('.tab[data-tab="regression"]').classList.contains('active')) {
-          renderRegressionChart();
         }
       } catch (err) {
         console.error(err);
