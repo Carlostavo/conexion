@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Análisis de Cuestionario Ambiental - Cantón Daule</title>
+  <title>Análisis de Comportamiento Proambiental - Cantón Daule</title>
 
   <!-- Supabase (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -287,7 +287,6 @@
       display: flex;
       border-bottom: 1px solid var(--border);
       margin-bottom: 16px;
-      flex-wrap: wrap;
     }
     
     .tab {
@@ -529,86 +528,6 @@
       font-size: 14px;
     }
     
-    .likert-scale {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0;
-      padding: 10px;
-      background: #f8fafc;
-      border-radius: 8px;
-    }
-    
-    .likert-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-    
-    .likert-label {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      margin-bottom: 5px;
-    }
-    
-    .likert-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--primary);
-    }
-    
-    .likert-percentage {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    
-    .question-group {
-      margin-bottom: 24px;
-      padding: 16px;
-      border-radius: 8px;
-      background: #f8fafc;
-    }
-    
-    .question-group-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-    }
-    
-    .question-item {
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px dashed var(--border);
-    }
-    
-    .question-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-    
-    .question-text {
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: #334155;
-    }
-    
-    .demographic-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-    
-    .demographic-chart-container {
-      height: 300px;
-      position: relative;
-    }
-    
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
@@ -636,15 +555,6 @@
       .chart-type-selector {
         justify-content: center;
       }
-      
-      .likert-scale {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .demographic-grid {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
@@ -654,8 +564,8 @@
       <div class="logo">
         <i class="fas fa-leaf"></i>
         <div class="logo-text">
-          <h1>Análisis de Cuestionario Ambiental</h1>
-          <div class="subtitle">Cantón Daule - Comportamiento Proambiental</div>
+          <h1>Análisis de Comportamiento Proambiental</h1>
+          <div class="subtitle">Cantón Daule - Panel de Indicadores</div>
         </div>
       </div>
       <div class="header-actions">
@@ -685,7 +595,7 @@
         </div>
 
         <div class="control-group">
-          <label for="selectEducacion"><i class="fas fa-graduation-cap"></i> Educación</label>
+          <label for="selectEducacion"><i class="fas fa-graduation-cap"></i> Nivel de Educación</label>
           <select id="selectEducacion">
             <option value="">Todos los niveles</option>
           </select>
@@ -701,11 +611,11 @@
         </div>
 
         <div class="control-group">
-          <label for="selectTipoHogar"><i class="fas fa-home"></i> Tipo de Hogar</label>
-          <select id="selectTipoHogar">
-            <option value="">Todos los tipos</option>
+          <label for="selectIngreso"><i class="fas fa-money-bill-wave"></i> Ingreso Mensual</label>
+          <select id="selectIngreso">
+            <option value="">Todos los ingresos</option>
           </select>
-          <div class="filter-info" id="tipoHogarInfo">Cargando...</div>
+          <div class="filter-info" id="ingresoInfo">Cargando...</div>
         </div>
       </div>
 
@@ -748,28 +658,28 @@
         </div>
         <div class="summary-card">
           <div class="summary-title">
-            <i class="fas fa-user"></i> Edad Promedio
+            <i class="fas fa-home"></i> Tipo de Hogar Predominante
           </div>
-          <div class="summary-value" id="summaryEdadPromedio">0</div>
-          <div class="summary-subtitle" id="summaryEdadPromedioChange">
-            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
-          </div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-title">
-            <i class="fas fa-home"></i> Tipo de Hogar Más Común
-          </div>
-          <div class="summary-value" id="summaryTipoHogar">-</div>
-          <div class="summary-subtitle" id="summaryTipoHogarChange">
+          <div class="summary-value" id="summaryHogar">-</div>
+          <div class="summary-subtitle" id="summaryHogarChange">
             <span>% del total</span>
           </div>
         </div>
         <div class="summary-card">
           <div class="summary-title">
-            <i class="fas fa-graduation-cap"></i> Nivel Educativo Más Común
+            <i class="fas fa-user-graduate"></i> Educación Predominante
           </div>
           <div class="summary-value" id="summaryEducacion">-</div>
           <div class="summary-subtitle" id="summaryEducacionChange">
+            <span>% del total</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-title">
+            <i class="fas fa-briefcase"></i> Situación Laboral Predominante
+          </div>
+          <div class="summary-value" id="summaryLaboral">-</div>
+          <div class="summary-subtitle" id="summaryLaboralChange">
             <span>% del total</span>
           </div>
         </div>
@@ -784,90 +694,33 @@
       </div>
       
       <div class="tabs">
-        <div class="tab active" data-tab="demographic">Datos Demográficos</div>
-        <div class="tab" data-tab="likert">Escala Likert</div>
-        <div class="tab" data-tab="comparison">Comparación por Grupos</div>
+        <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
+        <div class="tab" data-tab="determinants">Determinantes Proambientales</div>
       </div>
       
-      <div class="tab-content active" id="demographic">
-        <div class="demographic-grid">
-          <div>
-            <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución por Edad</h3>
-            <div class="demographic-chart-container">
-              <canvas id="edadChart"></canvas>
-            </div>
-          </div>
-          <div>
-            <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución por Educación</h3>
-            <div class="demographic-chart-container">
-              <canvas id="educacionChart"></canvas>
-            </div>
-          </div>
-          <div>
-            <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución por Situación Laboral</h3>
-            <div class="demographic-chart-container">
-              <canvas id="situacionLaboralChart"></canvas>
-            </div>
-          </div>
-          <div>
-            <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución por Tipo de Hogar</h3>
-            <div class="demographic-chart-container">
-              <canvas id="tipoHogarChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="tab-content" id="likert">
+      <div class="tab-content active" id="demographics">
+        <!-- Selector de tipo de gráfico -->
         <div class="chart-type-selector">
-          <span style="font-size: 14px; color: var(--muted); margin-right: 8px;">Tipo de visualización:</span>
+          <span style="font-size: 14px; color: var(--muted); margin-right: 8px;">Tipo de gráfico:</span>
           <div class="chart-type-btn active" data-type="bar">
             <i class="fas fa-chart-bar"></i> Barras
           </div>
-          <div class="chart-type-btn" data-type="radar">
-            <i class="fas fa-bullseye"></i> Radar
+          <div class="chart-type-btn" data-type="pie">
+            <i class="fas fa-chart-pie"></i> Circular
+          </div>
+          <div class="chart-type-btn" data-type="line">
+            <i class="fas fa-chart-line"></i> Líneas
           </div>
         </div>
         
         <div class="chart-container">
-          <canvas id="likertChart"></canvas>
-        </div>
-        
-        <!-- Grupos de preguntas -->
-        <div class="question-group">
-          <div class="question-group-title">2.2 DETERMINANTES SOCIOCULTURALES O DISPOSICIONALES</div>
-          <div id="socioculturalQuestions"></div>
-        </div>
-        
-        <div class="question-group">
-          <div class="question-group-title">2.3 DETERMINANTES AFECTIVOS</div>
-          <div id="afectivosQuestions"></div>
-        </div>
-        
-        <div class="question-group">
-          <div class="question-group-title">2.4 DETERMINANTES COGNITIVOS</div>
-          <div id="cognitivosQuestions"></div>
-        </div>
-        
-        <div class="question-group">
-          <div class="question-group-title">2.5 SUSTENTABILIDAD AMBIENTAL</div>
-          <div id="sustentabilidadAmbientalQuestions"></div>
-        </div>
-        
-        <div class="question-group">
-          <div class="question-group-title">2.6 SUSTENTABILIDAD ECONÓMICA</div>
-          <div id="sustentabilidadEconomicaQuestions"></div>
-        </div>
-        
-        <div class="question-group">
-          <div class="question-group-title">2.7 DESARROLLO COMUNITARIO</div>
-          <div id="desarrolloComunitarioQuestions"></div>
+          <canvas id="demographicsChart"></canvas>
         </div>
       </div>
       
-      <div class="tab-content" id="comparison">
+      <div class="tab-content" id="determinants">
         <div class="chart-container">
-          <canvas id="comparisonChart"></canvas>
+          <canvas id="determinantsChart"></canvas>
         </div>
       </div>
     </div>
@@ -883,42 +736,79 @@
         <h3 style="color: var(--primary); margin-bottom: 16px;">Resumen del Conjunto de Datos</h3>
         <div class="stats-grid">
           <div class="stat-item">
-            <div class="stat-label">Total de Registros</div>
+            <div class="stat-label">Total de Encuestados</div>
             <div class="stat-number" id="statTotalRecords">0</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">Edad Promedio</div>
-            <div class="stat-number" id="statEdadPromedio">0</div>
+            <div class="stat-number" id="statAvgAge">0</div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">Integrantes Promedio</div>
-            <div class="stat-number" id="statIntegrantesPromedio">0</div>
+            <div class="stat-label">Integrantes por Familia (Prom.)</div>
+            <div class="stat-number" id="statAvgFamily">0</div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">Estado Civil Más Común</div>
-            <div class="stat-number" id="statEstadoCivilComun">-</div>
+            <div class="stat-label">Estado Civil Predominante</div>
+            <div class="stat-number" id="statDominantCivil">-</div>
           </div>
         </div>
       </div>
       
       <div class="stats-section">
-        <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución de Respuestas</h3>
+        <h3 style="color: var(--primary); margin-bottom: 16px;">Distribución por Edades</h3>
         <div class="stats-grid">
           <div class="stat-item">
-            <div class="stat-label">Pregunta Más Positiva</div>
-            <div class="stat-number" id="statPreguntaPositiva">-</div>
+            <div class="stat-label">0-10 años</div>
+            <div class="stat-number" id="statAge0_10">0</div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">Pregunta Más Negativa</div>
-            <div class="stat-number" id="statPreguntaNegativa">-</div>
+            <div class="stat-label">11-25 años</div>
+            <div class="stat-number" id="statAge11_25">0</div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">Promedio General Likert</div>
-            <div class="stat-number" id="statPromedioLikert">0</div>
+            <div class="stat-label">26-50 años</div>
+            <div class="stat-number" id="statAge26_50">0</div>
           </div>
           <div class="stat-item">
-            <div class="stat-label">Desviación Estándar Likert</div>
-            <div class="stat-number" id="statDesviacionLikert">0</div>
+            <div class="stat-label">51-90 años</div>
+            <div class="stat-number" id="statAge51_90">0</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stats-section">
+        <h3 style="color: var(--primary); margin-bottom: 16px;">Estadísticas Avanzadas</h3>
+        <div class="statistics-grid">
+          <div class="stat-card">
+            <h4>Nivel de Conocimiento Ambiental</h4>
+            <div class="stat-value" id="statKnowledge">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Basado en respuestas afirmativas
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <h4>Disposición a Participar</h4>
+            <div class="stat-value" id="statWillingness">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              En actividades ambientales
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <h4>Conciencia Ambiental</h4>
+            <div class="stat-value" id="statAwareness">0%</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Nivel de conciencia general
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <h4>Índice de Sustentabilidad</h4>
+            <div class="stat-value" id="statSustainability">0</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+              Comportamiento proambiental
+            </div>
           </div>
         </div>
       </div>
@@ -961,7 +851,7 @@
     const selectEstadoCivil = document.getElementById('selectEstadoCivil');
     const selectEducacion = document.getElementById('selectEducacion');
     const selectSituacionLaboral = document.getElementById('selectSituacionLaboral');
-    const selectTipoHogar = document.getElementById('selectTipoHogar');
+    const selectIngreso = document.getElementById('selectIngreso');
     const btnExport = document.getElementById('btnExport');
     const btnResetFilters = document.getElementById('btnResetFilters');
     const exportOptions = document.getElementById('exportOptions');
@@ -970,52 +860,823 @@
     const estadoCivilInfo = document.getElementById('estadoCivilInfo');
     const educacionInfo = document.getElementById('educacionInfo');
     const situacionLaboralInfo = document.getElementById('situacionLaboralInfo');
-    const tipoHogarInfo = document.getElementById('tipoHogarInfo');
+    const ingresoInfo = document.getElementById('ingresoInfo');
 
     // Elementos de resumen
     const summaryTotal = document.getElementById('summaryTotal');
-    const summaryEdadPromedio = document.getElementById('summaryEdadPromedio');
-    const summaryTipoHogar = document.getElementById('summaryTipoHogar');
+    const summaryHogar = document.getElementById('summaryHogar');
     const summaryEducacion = document.getElementById('summaryEducacion');
+    const summaryLaboral = document.getElementById('summaryLaboral');
+    const summaryTotalChange = document.getElementById('summaryTotalChange');
+    const summaryHogarChange = document.getElementById('summaryHogarChange');
+    const summaryEducacionChange = document.getElementById('summaryEducacionChange');
+    const summaryLaboralChange = document.getElementById('summaryLaboralChange');
     
     // Elementos de estadísticas básicas
     const statTotalRecords = document.getElementById('statTotalRecords');
-    const statEdadPromedio = document.getElementById('statEdadPromedio');
-    const statIntegrantesPromedio = document.getElementById('statIntegrantesPromedio');
-    const statEstadoCivilComun = document.getElementById('statEstadoCivilComun');
-    const statPreguntaPositiva = document.getElementById('statPreguntaPositiva');
-    const statPreguntaNegativa = document.getElementById('statPreguntaNegativa');
-    const statPromedioLikert = document.getElementById('statPromedioLikert');
-    const statDesviacionLikert = document.getElementById('statDesviacionLikert');
+    const statAvgAge = document.getElementById('statAvgAge');
+    const statAvgFamily = document.getElementById('statAvgFamily');
+    const statDominantCivil = document.getElementById('statDominantCivil');
+    const statAge0_10 = document.getElementById('statAge0_10');
+    const statAge11_25 = document.getElementById('statAge11_25');
+    const statAge26_50 = document.getElementById('statAge26_50');
+    const statAge51_90 = document.getElementById('statAge51_90');
+    
+    // Elementos de estadísticas avanzadas
+    const statKnowledge = document.getElementById('statKnowledge');
+    const statWillingness = document.getElementById('statWillingness');
+    const statAwareness = document.getElementById('statAwareness');
+    const statSustainability = document.getElementById('statSustainability');
 
     // Tabla
     const tbody = document.querySelector('#tableResumen tbody');
 
     // Charts
-    const edadCtx = document.getElementById('edadChart').getContext('2d');
-    const educacionCtx = document.getElementById('educacionChart').getContext('2d');
-    const situacionLaboralCtx = document.getElementById('situacionLaboralChart').getContext('2d');
-    const tipoHogarCtx = document.getElementById('tipoHogarChart').getContext('2d');
-    const likertCtx = document.getElementById('likertChart').getContext('2d');
-    const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
-    
-    let edadChart, educacionChart, situacionLaboralChart, tipoHogarChart, likertChart, comparisonChart;
+    const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
+    const determinantsCtx = document.getElementById('determinantsChart').getContext('2d');
+    let demographicsChart, determinantsChart;
 
     // Variables globales para datos
     let currentData = [];
     let allData = [];
     let currentChartType = 'bar';
     let filterOptions = {
-      estadoCivil: [],
-      educacion: [],
-      situacionLaboral: [],
-      tipoHogar: []
+      estadosCiviles: [],
+      nivelesEducacion: [],
+      situacionesLaborales: [],
+      nivelesIngreso: []
     };
 
-    // Mapeo de preguntas Likert
-    const likertQuestions = {
-      // 2.2 DETERMINANTES SOCIOCULTURALES O DISPOSICIONALES
-      'conoce_desechos_solidos': '¿Conoce usted qué son los desechos sólidos domiciliarios?',
-      'cree_comportamiento_adecuado_manejo': '¿Cree usted que existe un comportamiento adecuado en el manejo de los desechos sólidos domiciliarios en la comunidad?',
-      'separar_desechos_por_origen': '¿Se debe separar los desechos sólidos según su tipo ejemplo: (papel - plástico - orgánico - inorgánico)?',
-      'clasificacion_correcta_desechos': '¿Es importante la correcta
+    // Inicializar la aplicación
+    async function initApp() {
+      await cargarTodosLosDatos();
+      await inicializarFiltros();
+      await actualizar();
+      setupEventListeners();
+    }
+
+    // Configurar event listeners
+    function setupEventListeners() {
+      // Actualización automática al cambiar filtros
+      selectEstadoCivil.addEventListener('change', async function() {
+        await actualizar();
+      });
+      
+      selectEducacion.addEventListener('change', async function() {
+        await actualizar();
+      });
+      
+      selectSituacionLaboral.addEventListener('change', async function() {
+        await actualizar();
+      });
+      
+      selectIngreso.addEventListener('change', async function() {
+        await actualizar();
+      });
+      
+      // Selector de tipo de gráfico
+      document.querySelectorAll('.chart-type-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // Remover clase activa de todos los botones
+          document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+          // Agregar clase activa al botón clickeado
+          this.classList.add('active');
+          // Actualizar tipo de gráfico
+          currentChartType = this.getAttribute('data-type');
+          // Re-renderizar el gráfico
+          if (currentData.length > 0) {
+            renderDemographicsChart(currentChartType);
+          }
+        });
+      });
+      
+      // Botón para restablecer filtros
+      btnResetFilters.addEventListener('click', function() {
+        selectEstadoCivil.value = '';
+        selectEducacion.value = '';
+        selectSituacionLaboral.value = '';
+        selectIngreso.value = '';
+        actualizar();
+      });
+      
+      // Toggle export options
+      btnExport.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportOptions.classList.toggle('show');
+      });
+      
+      // Cerrar export options al hacer clic fuera
+      document.addEventListener('click', () => {
+        exportOptions.classList.remove('show');
+      });
+      
+      // Manejar opciones de exportación
+      document.querySelectorAll('.export-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const type = e.currentTarget.getAttribute('data-type');
+          exportarDatos(type);
+          exportOptions.classList.remove('show');
+        });
+      });
+      
+      // Manejar pestañas
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
+          
+          // Actualizar pestañas activas
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+          
+          // Renderizar gráficos específicos si es necesario
+          if (tabId === 'determinants') {
+            renderDeterminantsChart();
+          }
+        });
+      });
+      
+      // Ayuda
+      document.getElementById('btnHelp').addEventListener('click', () => {
+        alert('Este panel permite analizar datos del cuestionario de comportamiento proambiental del Cantón Daule. Los filtros se aplican automáticamente. Utilice las diferentes pestañas para explorar diversas visualizaciones y análisis estadísticos.');
+      });
+    }
+
+    // Cargar todos los datos para análisis
+    async function cargarTodosLosDatos() {
+      const q = await supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('*');
+      if (q.error) {
+        console.error(q.error);
+        return;
+      }
+      allData = q.data || [];
+    }
+
+    // Cargar lista de filtros desde la BD
+    async function inicializarFiltros() {
+      // Obtener todos los datos para construir los filtros
+      const q = await supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('estado_civil, educacion_jefe_hogar, situacion_laboral_jefe_hogar, ingreso_mensual_jefe_hogar');
+      if (q.error) {
+        console.error(q.error);
+        return;
+      }
+      const rows = q.data || [];
+
+      // Construir opciones de filtro
+      filterOptions.estadosCiviles = [...new Set(rows.map(r => r.estado_civil).filter(Boolean))].sort();
+      filterOptions.nivelesEducacion = [...new Set(rows.map(r => r.educacion_jefe_hogar).filter(Boolean))].sort();
+      filterOptions.situacionesLaborales = [...new Set(rows.map(r => r.situacion_laboral_jefe_hogar).filter(Boolean))].sort();
+      filterOptions.nivelesIngreso = [...new Set(rows.map(r => r.ingreso_mensual_jefe_hogar).filter(Boolean))].sort();
+
+      // Actualizar información de filtros
+      estadoCivilInfo.textContent = `${filterOptions.estadosCiviles.length} estados civiles disponibles`;
+      educacionInfo.textContent = `${filterOptions.nivelesEducacion.length} niveles educativos disponibles`;
+      situacionLaboralInfo.textContent = `${filterOptions.situacionesLaborales.length} situaciones laborales disponibles`;
+      ingresoInfo.textContent = `${filterOptions.nivelesIngreso.length} niveles de ingreso disponibles`;
+
+      // Llenar selectores con todas las opciones iniciales
+      llenarSelector(selectEstadoCivil, filterOptions.estadosCiviles);
+      llenarSelector(selectEducacion, filterOptions.nivelesEducacion);
+      llenarSelector(selectSituacionLaboral, filterOptions.situacionesLaborales);
+      llenarSelector(selectIngreso, filterOptions.nivelesIngreso);
+    }
+
+    // Función para llenar un selector con opciones
+    function llenarSelector(selector, opciones) {
+      // Guardar la opción seleccionada actualmente
+      const valorActual = selector.value;
+      
+      // Limpiar selector (excepto la primera opción)
+      while (selector.options.length > 1) {
+        selector.remove(1);
+      }
+      
+      // Agregar nuevas opciones
+      opciones.forEach(opcion => {
+        const option = document.createElement('option');
+        option.value = opcion;
+        option.textContent = opcion;
+        selector.appendChild(option);
+      });
+      
+      // Restaurar la selección anterior si todavía existe
+      if (valorActual && opciones.includes(valorActual)) {
+        selector.value = valorActual;
+      }
+    }
+
+    // Construir query según filtros y traer datos
+    async function obtenerFiltrados() {
+      let q = supabase.from('cuestionario_comportamiento_proambiental_autosustentabilidad').select('*');
+      if (selectEstadoCivil.value) q = q.eq('estado_civil', selectEstadoCivil.value);
+      if (selectEducacion.value) q = q.eq('educacion_jefe_hogar', selectEducacion.value);
+      if (selectSituacionLaboral.value) q = q.eq('situacion_laboral_jefe_hogar', selectSituacionLaboral.value);
+      if (selectIngreso.value) q = q.eq('ingreso_mensual_jefe_hogar', selectIngreso.value);
+      
+      const r = await q;
+      if (r.error) {
+        console.error(r.error);
+        return [];
+      }
+      return r.data || [];
+    }
+
+    // Calcular estadísticas demográficas
+    function calcularEstadisticasDemograficas(rows) {
+      if (rows.length === 0) return {};
+      
+      // Estadísticas generales
+      const totalRecords = rows.length;
+      
+      // Edad promedio
+      const avgAge = rows.reduce((sum, row) => sum + (row.edad || 0), 0) / totalRecords;
+      
+      // Promedio de integrantes por familia
+      const avgFamily = rows.reduce((sum, row) => sum + (row.num_integrantes_familia || 0), 0) / totalRecords;
+      
+      // Estado civil predominante
+      const estadosCiviles = {};
+      rows.forEach(row => {
+        if (row.estado_civil) {
+          estadosCiviles[row.estado_civil] = (estadosCiviles[row.estado_civil] || 0) + 1;
+        }
+      });
+      const dominantCivil = Object.keys(estadosCiviles).reduce((a, b) => estadosCiviles[a] > estadosCiviles[b] ? a : b, '');
+      
+      // Distribución por edades
+      const age0_10 = rows.reduce((sum, row) => sum + (row.edad_0_10 || 0), 0);
+      const age11_25 = rows.reduce((sum, row) => sum + (row.edad_11_25 || 0), 0);
+      const age26_50 = rows.reduce((sum, row) => sum + (row.edad_26_50 || 0), 0);
+      const age51_90 = rows.reduce((sum, row) => sum + (row.edad_51_90 || 0), 0);
+      
+      return {
+        totalRecords,
+        avgAge,
+        avgFamily,
+        dominantCivil,
+        age0_10,
+        age11_25,
+        age26_50,
+        age51_90
+      };
+    }
+
+    // Calcular estadísticas avanzadas de comportamiento proambiental
+    function calcularEstadisticasAvanzadas(rows) {
+      if (rows.length === 0) return {};
+      
+      // Variables para calcular índices
+      let conocimientoCount = 0;
+      let disposicionCount = 0;
+      let concienciaCount = 0;
+      let sustentabilidadCount = 0;
+      
+      // Preguntas clave para cada dimensión
+      const preguntasConocimiento = [
+        'conoce_desechos_solidos',
+        'cree_comportamiento_adecuado_manejo',
+        'separar_desechos_por_origen',
+        'clasificacion_correcta_desechos',
+        'consecuencias_acumulacion_desechos',
+        'beneficios_reutilizar_residuo'
+      ];
+      
+      const preguntasDisposicion = [
+        'dedica_tiempo_reducir_reutilizar_reciclar',
+        'participaria_talleres_buenas_practicas',
+        'dispuesto_participar_emprendimiento_desechos',
+        'participaria_feria_emprendimientos_desechos'
+      ];
+      
+      const preguntasConciencia = [
+        'comportamiento_comunidad_influye',
+        'preocupa_exceso_desechos',
+        'desechos_contaminan_ambiente',
+        'afecta_emocionalmente_noticias_contaminacion',
+        'frustracion_falta_acciones_ambientales',
+        'importancia_planeta_futuras_generaciones',
+        'consciente_impacto_desechos_salud'
+      ];
+      
+      const preguntasSustentabilidad = [
+        'desechos_organicos_funcionalidad',
+        'acumulacion_desechos_afecta_salud',
+        'reduccion_reciclaje_reutilizacion_cuida_ambiente',
+        'transformacion_desechos_nuevos_productos',
+        'practica_separacion_reciclaje_ingreso',
+        'desechos_hogar_reutilizados',
+        'manejo_adecuado_desechos_aporta_desarrollo',
+        'emprendimientos_reutilizacion_aportan_economia',
+        'manejo_adecuado_desechos_oportunidad_emprendimiento',
+        'reducir_residuos_eventos_concientizacion',
+        'manejo_adecuado_desechos_impacto_ambiente'
+      ];
+      
+      // Contar respuestas positivas para cada dimensión
+      rows.forEach(row => {
+        // Conocimiento (respuestas "De acuerdo" o "Totalmente de acuerdo")
+        preguntasConocimiento.forEach(pregunta => {
+          if (row[pregunta] === 'De acuerdo' || row[pregunta] === 'Totalmente de acuerdo') {
+            conocimientoCount++;
+          }
+        });
+        
+        // Disposición (respuestas "De acuerdo" o "Totalmente de acuerdo")
+        preguntasDisposicion.forEach(pregunta => {
+          if (row[pregunta] === 'De acuerdo' || row[pregunta] === 'Totalmente de acuerdo') {
+            disposicionCount++;
+          }
+        });
+        
+        // Conciencia (respuestas "De acuerdo" o "Totalmente de acuerdo")
+        preguntasConciencia.forEach(pregunta => {
+          if (row[pregunta] === 'De acuerdo' || row[pregunta] === 'Totalmente de acuerdo') {
+            concienciaCount++;
+          }
+        });
+        
+        // Sustentabilidad (respuestas "De acuerdo" o "Totalmente de acuerdo")
+        preguntasSustentabilidad.forEach(pregunta => {
+          if (row[pregunta] === 'De acuerdo' || row[pregunta] === 'Totalmente de acuerdo') {
+            sustentabilidadCount++;
+          }
+        });
+      });
+      
+      // Calcular porcentajes
+      const totalPreguntasConocimiento = rows.length * preguntasConocimiento.length;
+      const totalPreguntasDisposicion = rows.length * preguntasDisposicion.length;
+      const totalPreguntasConciencia = rows.length * preguntasConciencia.length;
+      const totalPreguntasSustentabilidad = rows.length * preguntasSustentabilidad.length;
+      
+      const conocimiento = (conocimientoCount / totalPreguntasConocimiento) * 100;
+      const disposicion = (disposicionCount / totalPreguntasDisposicion) * 100;
+      const conciencia = (concienciaCount / totalPreguntasConciencia) * 100;
+      const sustentabilidad = (sustentabilidadCount / totalPreguntasSustentabilidad) * 100;
+      
+      return {
+        conocimiento,
+        disposicion,
+        conciencia,
+        sustentabilidad
+      };
+    }
+
+    // Renderizar gráfico demográfico
+    function renderDemographicsChart(chartType) {
+      if (!currentData.length) return;
+      
+      // Calcular distribuciones
+      const distribuciones = calcularDistribuciones(currentData);
+      
+      const labels = Object.keys(distribuciones);
+      const datasets = [];
+      
+      // Crear datasets para cada categoría
+      Object.keys(distribuciones.edad).forEach(categoria => {
+        datasets.push({
+          label: categoria,
+          data: [distribuciones.edad[categoria]],
+          backgroundColor: getColorForCategory(categoria)
+        });
+      });
+      
+      if (demographicsChart) demographicsChart.destroy();
+      
+      demographicsChart = new Chart(demographicsCtx, {
+        type: chartType,
+        data: {
+          labels: ['Distribución'],
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 12
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Distribución Demográfica de Encuestados',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje (%)',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Calcular distribuciones para diferentes categorías
+    function calcularDistribuciones(rows) {
+      // Distribución por edades
+      const totalAge0_10 = rows.reduce((sum, row) => sum + (row.edad_0_10 || 0), 0);
+      const totalAge11_25 = rows.reduce((sum, row) => sum + (row.edad_11_25 || 0), 0);
+      const totalAge26_50 = rows.reduce((sum, row) => sum + (row.edad_26_50 || 0), 0);
+      const totalAge51_90 = rows.reduce((sum, row) => sum + (row.edad_51_90 || 0), 0);
+      const totalAge = totalAge0_10 + totalAge11_25 + totalAge26_50 + totalAge51_90;
+      
+      const edad = {
+        '0-10 años': totalAge > 0 ? (totalAge0_10 / totalAge) * 100 : 0,
+        '11-25 años': totalAge > 0 ? (totalAge11_25 / totalAge) * 100 : 0,
+        '26-50 años': totalAge > 0 ? (totalAge26_50 / totalAge) * 100 : 0,
+        '51-90 años': totalAge > 0 ? (totalAge51_90 / totalAge) * 100 : 0
+      };
+      
+      // Distribución por educación
+      const educacionCounts = {};
+      rows.forEach(row => {
+        if (row.educacion_jefe_hogar) {
+          educacionCounts[row.educacion_jefe_hogar] = (educacionCounts[row.educacion_jefe_hogar] || 0) + 1;
+        }
+      });
+      const totalEducacion = Object.values(educacionCounts).reduce((a, b) => a + b, 0);
+      const educacion = {};
+      Object.keys(educacionCounts).forEach(key => {
+        educacion[key] = totalEducacion > 0 ? (educacionCounts[key] / totalEducacion) * 100 : 0;
+      });
+      
+      // Distribución por situación laboral
+      const laboralCounts = {};
+      rows.forEach(row => {
+        if (row.situacion_laboral_jefe_hogar) {
+          laboralCounts[row.situacion_laboral_jefe_hogar] = (laboralCounts[row.situacion_laboral_jefe_hogar] || 0) + 1;
+        }
+      });
+      const totalLaboral = Object.values(laboralCounts).reduce((a, b) => a + b, 0);
+      const laboral = {};
+      Object.keys(laboralCounts).forEach(key => {
+        laboral[key] = totalLaboral > 0 ? (laboralCounts[key] / totalLaboral) * 100 : 0;
+      });
+      
+      // Distribución por ingreso
+      const ingresoCounts = {};
+      rows.forEach(row => {
+        if (row.ingreso_mensual_jefe_hogar) {
+          ingresoCounts[row.ingreso_mensual_jefe_hogar] = (ingresoCounts[row.ingreso_mensual_jefe_hogar] || 0) + 1;
+        }
+      });
+      const totalIngreso = Object.values(ingresoCounts).reduce((a, b) => a + b, 0);
+      const ingreso = {};
+      Object.keys(ingresoCounts).forEach(key => {
+        ingreso[key] = totalIngreso > 0 ? (ingresoCounts[key] / totalIngreso) * 100 : 0;
+      });
+      
+      // Distribución por tipo de hogar
+      const hogarCounts = {};
+      rows.forEach(row => {
+        if (row.tipo_hogar) {
+          hogarCounts[row.tipo_hogar] = (hogarCounts[row.tipo_hogar] || 0) + 1;
+        }
+      });
+      const totalHogar = Object.values(hogarCounts).reduce((a, b) => a + b, 0);
+      const hogar = {};
+      Object.keys(hogarCounts).forEach(key => {
+        hogar[key] = totalHogar > 0 ? (hogarCounts[key] / totalHogar) * 100 : 0;
+      });
+      
+      return {
+        edad,
+        educacion,
+        laboral,
+        ingreso,
+        hogar
+      };
+    }
+    
+    // Obtener color para categoría
+    function getColorForCategory(category) {
+      const colorMap = {
+        '0-10 años': '#4f46e5',
+        '11-25 años': '#0ea5e9',
+        '26-50 años': '#10b981',
+        '51-90 años': '#f59e0b',
+        'Primaria': '#ef4444',
+        'Secundaria': '#8b5cf6',
+        'Universidad': '#06b6d4',
+        'Postgrado': '#84cc16',
+        'Desempleado': '#f97316',
+        'Trabajo Temporal': '#ec4899',
+        'Empleado': '#14b8a6',
+        'Menor al sueldo básico': '#6366f1',
+        'Sueldo básico': '#a855f7',
+        'Mayor al sueldo básico': '#f43f5e',
+        'Alquilada': '#0ea5e9',
+        'Propia': '#10b981',
+        'Prestada': '#f59e0b'
+      };
+      
+      return colorMap[category] || '#64748b';
+    }
+
+    // Renderizar gráfico de determinantes
+    function renderDeterminantsChart() {
+      if (!currentData.length) return;
+      
+      const avanzadas = calcularEstadisticasAvanzadas(currentData);
+      
+      const labels = ['Conocimiento', 'Disposición', 'Conciencia', 'Sustentabilidad'];
+      const data = [
+        avanzadas.conocimiento,
+        avanzadas.disposicion,
+        avanzadas.conciencia,
+        avanzadas.sustentabilidad
+      ];
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
+      
+      if (determinantsChart) determinantsChart.destroy();
+      
+      determinantsChart = new Chart(determinantsCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Porcentaje de Respuestas Positivas',
+            data: data,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace(')', ', 0.8)')),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 12
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Determinantes del Comportamiento Proambiental',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed.y.toFixed(2)}%`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje (%)',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Rellenar tabla resumen y actualizar resúmenes
+    function renderResumen(demographics, avanzadas, distribuciones) {
+      tbody.innerHTML = '';
+      
+      // Encontrar categorías predominantes para resumen
+      const hogarPredominante = Object.keys(distribuciones.hogar).reduce((a, b) => 
+        distribuciones.hogar[a] > distribuciones.hogar[b] ? a : b, '');
+      const hogarPorcentaje = distribuciones.hogar[hogarPredominante] || 0;
+      
+      const educacionPredominante = Object.keys(distribuciones.educacion).reduce((a, b) => 
+        distribuciones.educacion[a] > distribuciones.educacion[b] ? a : b, '');
+      const educacionPorcentaje = distribuciones.educacion[educacionPredominante] || 0;
+      
+      const laboralPredominante = Object.keys(distribuciones.laboral).reduce((a, b) => 
+        distribuciones.laboral[a] > distribuciones.laboral[b] ? a : b, '');
+      const laboralPorcentaje = distribuciones.laboral[laboralPredominante] || 0;
+      
+      // Actualizar tarjetas de resumen
+      summaryTotal.textContent = demographics.totalRecords;
+      summaryHogar.textContent = hogarPredominante;
+      summaryEducacion.textContent = educacionPredominante;
+      summaryLaboral.textContent = laboralPredominante;
+      
+      // Actualizar resúmenes de porcentajes
+      summaryHogarChange.innerHTML = `<span>${hogarPorcentaje.toFixed(1)}% del total</span>`;
+      summaryEducacionChange.innerHTML = `<span>${educacionPorcentaje.toFixed(1)}% del total</span>`;
+      summaryLaboralChange.innerHTML = `<span>${laboralPorcentaje.toFixed(1)}% del total</span>`;
+      
+      // Actualizar estadísticas básicas
+      statTotalRecords.textContent = demographics.totalRecords;
+      statAvgAge.textContent = demographics.avgAge.toFixed(1);
+      statAvgFamily.textContent = demographics.avgFamily.toFixed(1);
+      statDominantCivil.textContent = demographics.dominantCivil;
+      statAge0_10.textContent = demographics.age0_10;
+      statAge11_25.textContent = demographics.age11_25;
+      statAge26_50.textContent = demographics.age26_50;
+      statAge51_90.textContent = demographics.age51_90;
+      
+      // Actualizar estadísticas avanzadas
+      statKnowledge.textContent = avanzadas.conocimiento.toFixed(1) + '%';
+      statWillingness.textContent = avanzadas.disposicion.toFixed(1) + '%';
+      statAwareness.textContent = avanzadas.conciencia.toFixed(1) + '%';
+      statSustainability.textContent = avanzadas.sustentabilidad.toFixed(1);
+      
+      // Llenar tabla con distribuciones
+      Object.keys(distribuciones.edad).forEach(categoria => {
+        const valor = distribuciones.edad[categoria];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Edad: ${categoria}</td>
+          <td style="text-align:right">${valor.toFixed(2)}%</td>
+          <td style="text-align:right">${(valor).toFixed(2)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      Object.keys(distribuciones.educacion).forEach(categoria => {
+        const valor = distribuciones.educacion[categoria];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Educación: ${categoria}</td>
+          <td style="text-align:right">${valor.toFixed(2)}%</td>
+          <td style="text-align:right">${(valor).toFixed(2)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      Object.keys(distribuciones.laboral).forEach(categoria => {
+        const valor = distribuciones.laboral[categoria];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Situación Laboral: ${categoria}</td>
+          <td style="text-align:right">${valor.toFixed(2)}%</td>
+          <td style="text-align:right">${(valor).toFixed(2)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      Object.keys(distribuciones.ingreso).forEach(categoria => {
+        const valor = distribuciones.ingreso[categoria];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Ingreso: ${categoria}</td>
+          <td style="text-align:right">${valor.toFixed(2)}%</td>
+          <td style="text-align:right">${(valor).toFixed(2)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      Object.keys(distribuciones.hogar).forEach(categoria => {
+        const valor = distribuciones.hogar[categoria];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Tipo de Hogar: ${categoria}</td>
+          <td style="text-align:right">${valor.toFixed(2)}%</td>
+          <td style="text-align:right">${(valor).toFixed(2)}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Exportar datos
+    function exportarDatos(tipo) {
+      if (!currentData.length) {
+        alert('No hay datos para exportar');
+        return;
+      }
+      
+      switch (tipo) {
+        case 'png':
+          if (!demographicsChart) {
+            alert('Gráfico no disponible');
+            return;
+          }
+          const a = document.createElement('a');
+          a.href = demographicsChart.toBase64Image();
+          a.download = 'grafico-comportamiento-proambiental.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          break;
+          
+        case 'csv':
+          const distribuciones = calcularDistribuciones(currentData);
+          
+          let csvContent = "Categoría,Porcentaje\n";
+          
+          Object.keys(distribuciones.edad).forEach(categoria => {
+            csvContent += `"Edad: ${categoria}",${distribuciones.edad[categoria].toFixed(2)}\n`;
+          });
+          
+          Object.keys(distribuciones.educacion).forEach(categoria => {
+            csvContent += `"Educación: ${categoria}",${distribuciones.educacion[categoria].toFixed(2)}\n`;
+          });
+          
+          Object.keys(distribuciones.laboral).forEach(categoria => {
+            csvContent += `"Situación Laboral: ${categoria}",${distribuciones.laboral[categoria].toFixed(2)}\n`;
+          });
+          
+          Object.keys(distribuciones.ingreso).forEach(categoria => {
+            csvContent += `"Ingreso: ${categoria}",${distribuciones.ingreso[categoria].toFixed(2)}\n`;
+          });
+          
+          Object.keys(distribuciones.hogar).forEach(categoria => {
+            csvContent += `"Tipo de Hogar: ${categoria}",${distribuciones.hogar[categoria].toFixed(2)}\n`;
+          });
+          
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'datos-comportamiento-proambiental.csv');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          break;
+      }
+    }
+
+    // Acción principal: obtener datos, procesar y renderizar
+    async function actualizar() {
+      try {
+        // Obtener datos del período actual
+        currentData = await obtenerFiltrados();
+        
+        // Procesar datos
+        const demographics = calcularEstadisticasDemograficas(currentData);
+        const avanzadas = calcularEstadisticasAvanzadas(currentData);
+        const distribuciones = calcularDistribuciones(currentData);
+        
+        // Renderizar
+        renderDemographicsChart(currentChartType);
+        renderResumen(demographics, avanzadas, distribuciones);
+        
+        // Si la pestaña de determinantes está activa, renderizarla
+        if (document.querySelector('.tab[data-tab="determinants"]').classList.contains('active')) {
+          renderDeterminantsChart();
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error al actualizar. Revisa la consola para más detalles.');
+      }
+    }
+
+    // Inicialización
+    await initApp();
+
+  })();
+  </script>
+</body>
+</html>
