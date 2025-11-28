@@ -3,499 +3,928 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análisis Estadístico - Comportamiento Proambiental</title>
+    <title>Cuestionario Proambiental</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <style>
         :root {
             --primary-color: #2e7d32;
-            --secondary-color: #4caf50;
-            --accent-color: #8bc34a;
-            --light-color: #e8f5e9;
-            --dark-color: #1b5e20;
+            --primary-light: #60ad5e;
+            --primary-dark: #005005;
+            --secondary-color: #ff9800;
             --text-color: #333;
-            --light-text: #fff;
+            --light-bg: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background-color: #f5f5f5;
+            background-color: var(--light-bg);
             color: var(--text-color);
             line-height: 1.6;
         }
-        
-        header {
-            background-color: var(--primary-color);
-            color: var(--light-text);
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 20px;
         }
-        
-        .section {
-            background-color: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
         }
-        
-        .section-title {
-            color: var(--dark-color);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .logo {
             font-size: 1.5rem;
+            font-weight: bold;
         }
-        
-        .charts-container {
+
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-option input, .checkbox-option input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .likert-scale {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .likert-option {
+            text-align: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .likert-option:hover {
+            background-color: #e9e9e9;
+        }
+
+        .likert-option.selected {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .age-distribution {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .age-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .age-input label {
+            width: 120px;
+            margin-bottom: 0;
+        }
+
+        .age-input input {
+            width: 80px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e68900;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            gap: 20px;
         }
-        
-        .chart-card {
-            background-color: var(--light-color);
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .chart-title {
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            color: var(--dark-color);
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 250px;
-        }
-        
-        .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        
+
         .stat-card {
-            background-color: var(--light-color);
+            background-color: var(--white);
             border-radius: 8px;
-            padding: 1rem;
+            box-shadow: var(--shadow);
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        
+
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--primary-color);
+            margin: 10px 0;
         }
-        
+
         .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-color);
-            margin-top: 0.5rem;
+            color: #666;
         }
-        
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            color: var(--primary-color);
+
+        .progress-bar {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
         }
-        
-        .error {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            color: #d32f2f;
-            background-color: #ffebee;
-            border-radius: 8px;
-            margin-bottom: 2rem;
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            transition: width 0.5s;
         }
-        
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            background-color: var(--dark-color);
-            color: var(--light-text);
-            margin-top: 2rem;
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            z-index: 1000;
         }
-        
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
         @media (max-width: 768px) {
-            .charts-container {
+            .age-distribution {
                 grid-template-columns: 1fr;
             }
             
-            .stats-summary {
-                grid-template-columns: repeat(2, 1fr);
+            .likert-scale {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Análisis Estadístico</h1>
-        <div class="subtitle">Comportamiento Proambiental y Autosustentabilidad</div>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1>Cuestionario de Comportamiento Proambiental</h1>
+                    <p>Autosustentabilidad y Desarrollo Comunitario</p>
+                </div>
+                <div class="logo">ECO-ENCUESTA</div>
+            </div>
+        </div>
     </header>
-    
+
     <div class="container">
-        <div id="loading" class="loading">
-            Cargando datos...
+        <div class="tabs">
+            <div class="tab active" data-tab="form">Formulario</div>
+            <div class="tab" data-tab="stats">Estadísticas</div>
         </div>
-        
-        <div id="error" class="error" style="display: none;">
-            Error al cargar los datos
+
+        <div class="tab-content active" id="form-tab">
+            <form id="cuestionario-form">
+                <div class="card">
+                    <h2 class="section-title">Información Demográfica</h2>
+                    
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hora">Hora</label>
+                        <input type="time" id="hora" name="hora" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edad">Edad</label>
+                        <input type="number" id="edad" name="edad" min="1" max="120" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Estado Civil</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="soltero" name="estado_civil" value="Soltero" required>
+                                <label for="soltero">Soltero</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="casado" name="estado_civil" value="Casado">
+                                <label for="casado">Casado</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="divorciado" name="estado_civil" value="Divorciado">
+                                <label for="divorciado">Divorciado</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="union_libre" name="estado_civil" value="Unión Libre">
+                                <label for="union_libre">Unión Libre</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="viudo" name="estado_civil" value="Viudo">
+                                <label for="viudo">Viudo</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="num_integrantes_familia">Número de integrantes en la familia</label>
+                        <input type="number" id="num_integrantes_familia" name="num_integrantes_familia" min="1" max="20" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Distribución de edades en la familia</label>
+                        <div class="age-distribution">
+                            <div class="age-input">
+                                <label for="edad_0_10">0 - 10 años</label>
+                                <input type="number" id="edad_0_10" name="edad_0_10" min="0" max="20" value="0">
+                            </div>
+                            <div class="age-input">
+                                <label for="edad_11_25">11 - 25 años</label>
+                                <input type="number" id="edad_11_25" name="edad_11_25" min="0" max="20" value="0">
+                            </div>
+                            <div class="age-input">
+                                <label for="edad_26_50">26 - 50 años</label>
+                                <input type="number" id="edad_26_50" name="edad_26_50" min="0" max="20" value="0">
+                            </div>
+                            <div class="age-input">
+                                <label for="edad_51_90">51 - 90 años</label>
+                                <input type="number" id="edad_51_90" name="edad_51_90" min="0" max="20" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="educacion_jefe_hogar">Nivel de educación del jefe del hogar</label>
+                        <select id="educacion_jefe_hogar" name="educacion_jefe_hogar" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Primaria">Primaria</option>
+                            <option value="Secundaria">Secundaria</option>
+                            <option value="Universidad">Universidad</option>
+                            <option value="Postgrado">Postgrado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="situacion_laboral_jefe_hogar">Situación laboral del jefe del hogar</label>
+                        <select id="situacion_laboral_jefe_hogar" name="situacion_laboral_jefe_hogar" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Desempleado">Desempleado</option>
+                            <option value="Trabajo Temporal">Trabajo Temporal</option>
+                            <option value="Empleado">Empleado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ingreso_mensual_jefe_hogar">Ingreso estimado mensual del jefe del hogar</label>
+                        <select id="ingreso_mensual_jefe_hogar" name="ingreso_mensual_jefe_hogar" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Menor al sueldo básico">Menor al sueldo básico</option>
+                            <option value="Sueldo básico">Sueldo básico</option>
+                            <option value="Mayor al sueldo básico">Mayor al sueldo básico</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tipo_hogar">Tipo de hogar</label>
+                        <select id="tipo_hogar" name="tipo_hogar" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Alquilada">Alquilada</option>
+                            <option value="Propia">Propia</option>
+                            <option value="Prestada">Prestada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Secciones de preguntas Likert -->
+                <div class="card">
+                    <h2 class="section-title">2.2 DETERMINANTES SOCIOCULTURALES O DISPOSICIONALES</h2>
+                    <div id="sociocultural-questions">
+                        <!-- Las preguntas se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">2.3 DETERMINANTES AFECTIVOS</h2>
+                    <div id="afectivos-questions">
+                        <!-- Las preguntas se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">2.4 DETERMINANTES COGNITIVOS</h2>
+                    <div id="cognitivos-questions">
+                        <!-- Las preguntas se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">2.5 SUSTENTABILIDAD AMBIENTAL</h2>
+                    <div id="sustentabilidad-ambiental-questions">
+                        <!-- Las preguntas se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">2.6 SUSTENTABILIDAD ECONÓMICA</h2>
+                    <div id="sustentabilidad-economica-questions">
+                        <!-- Las preguntas se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">2.7 DESARROLLO COMUNITARIO</h2>
+                    <div id="desarrollo-comunitario-questions">
+                        <!-- Las preguntas se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" id="reset-btn" class="btn btn-secondary">Reiniciar</button>
+                    <button type="submit" id="submit-btn" class="btn">Enviar Cuestionario</button>
+                </div>
+            </form>
         </div>
-        
-        <div id="content" style="display: none;">
-            <!-- Resumen General -->
-            <section class="section">
-                <h2 class="section-title">Resumen General</h2>
-                <div class="stats-summary">
+
+        <div class="tab-content" id="stats-tab">
+            <div class="card">
+                <h2 class="section-title">Estadísticas del Cuestionario</h2>
+                
+                <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-value" id="total-encuestas">0</div>
                         <div class="stat-label">Total de Encuestas</div>
+                        <div class="stat-value" id="total-surveys">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="promedio-edad">0</div>
                         <div class="stat-label">Edad Promedio</div>
+                        <div class="stat-value" id="average-age">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="promedio-integrantes">0</div>
-                        <div class="stat-label">Integrantes por Familia</div>
+                        <div class="stat-label">Integrantes Promedio</div>
+                        <div class="stat-value" id="average-members">0</div>
                     </div>
                 </div>
-            </section>
-            
-            <!-- Distribución por Edad -->
-            <section class="section">
-                <h2 class="section-title">Distribución por Edad</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Rangos de Edad</div>
-                        <div class="chart-container">
-                            <canvas id="edadChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Integrantes por Rango de Edad</div>
-                        <div class="chart-container">
-                            <canvas id="integrantesEdadChart"></canvas>
-                        </div>
-                    </div>
+
+                <h3 class="section-title">Distribución por Edades</h3>
+                <div class="chart-container">
+                    <canvas id="age-distribution-chart"></canvas>
                 </div>
-            </section>
-            
-            <!-- Características del Hogar -->
-            <section class="section">
-                <h2 class="section-title">Características del Hogar</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Nivel de Educación del Jefe de Hogar</div>
-                        <div class="chart-container">
-                            <canvas id="educacionChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Situación Laboral del Jefe de Hogar</div>
-                        <div class="chart-container">
-                            <canvas id="laboralChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Ingreso Mensual del Jefe de Hogar</div>
-                        <div class="chart-container">
-                            <canvas id="ingresoChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Tipo de Hogar</div>
-                        <div class="chart-container">
-                            <canvas id="hogarChart"></canvas>
-                        </div>
-                    </div>
+
+                <h3 class="section-title">Nivel de Educación</h3>
+                <div class="chart-container">
+                    <canvas id="education-chart"></canvas>
                 </div>
-            </section>
-            
-            <!-- Determinantes Socioculturales -->
-            <section class="section">
-                <h2 class="section-title">Determinantes Socioculturales</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Conocimiento sobre Desechos Sólidos</div>
-                        <div class="chart-container">
-                            <canvas id="conoceDesechosChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Comportamiento Adecuado en la Comunidad</div>
-                        <div class="chart-container">
-                            <canvas id="comportamientoAdecuadoChart"></canvas>
-                        </div>
-                    </div>
+
+                <h3 class="section-title">Situación Laboral</h3>
+                <div class="chart-container">
+                    <canvas id="employment-chart"></canvas>
                 </div>
-            </section>
-            
-            <!-- Determinantes Afectivos -->
-            <section class="section">
-                <h2 class="section-title">Determinantes Afectivos</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Preocupación por Exceso de Desechos</div>
-                        <div class="chart-container">
-                            <canvas id="preocupaDesechosChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Importancia del Planeta para Futuras Generaciones</div>
-                        <div class="chart-container">
-                            <canvas id="planetaFuturasGeneracionesChart"></canvas>
-                        </div>
-                    </div>
+
+                <h3 class="section-title">Ingreso Mensual</h3>
+                <div class="chart-container">
+                    <canvas id="income-chart"></canvas>
                 </div>
-            </section>
-            
-            <!-- Sustentabilidad Ambiental -->
-            <section class="section">
-                <h2 class="section-title">Sustentabilidad Ambiental</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Funcionalidad de Desechos Orgánicos</div>
-                        <div class="chart-container">
-                            <canvas id="desechosOrganicosFuncionalidadChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Impacto de Reducción, Reciclaje y Reutilización</div>
-                        <div class="chart-container">
-                            <canvas id="reduccionReciclajeChart"></canvas>
-                        </div>
-                    </div>
+
+                <h3 class="section-title">Tipo de Hogar</h3>
+                <div class="chart-container">
+                    <canvas id="housing-chart"></canvas>
                 </div>
-            </section>
-            
-            <!-- Sustentabilidad Económica -->
-            <section class="section">
-                <h2 class="section-title">Sustentabilidad Económica</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Práctica de Separación para Reciclaje con Ingreso</div>
-                        <div class="chart-container">
-                            <canvas id="separacionReciclajeIngresoChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Oportunidades de Emprendimiento</div>
-                        <div class="chart-container">
-                            <canvas id="oportunidadEmprendimientoChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Desarrollo Comunitario -->
-            <section class="section">
-                <h2 class="section-title">Desarrollo Comunitario</h2>
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-title">Participación en Talleres</div>
-                        <div class="chart-container">
-                            <canvas id="participacionTalleresChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-title">Disposición a Participar en Emprendimientos</div>
-                        <div class="chart-container">
-                            <canvas id="participacionEmprendimientosChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
         </div>
     </div>
-    
-    <footer>
-        <p>Análisis Estadístico - Comportamiento Proambiental y Autosustentabilidad</p>
-    </footer>
+
+    <div class="notification" id="notification">
+        ¡Formulario enviado correctamente!
+    </div>
 
     <script>
         // Configuración de Supabase
         const supabaseUrl = 'https://dutapywxsiuxboqsjqvf.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouYgRB9Y4';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-        
-        // Variables globales para almacenar datos
-        let encuestas = [];
-        let charts = {};
-        
-        // Función para cargar datos desde Supabase
-        async function cargarDatos() {
-            try {
-                const { data, error } = await supabase
-                    .from('cuestionario_comportamiento_proambiental_autosustentabilidad')
-                    .select('*');
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1dGFweXd4c2l1eGJvcXNqcXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MTk1MTUsImV4cCI6MjA2OTI5NTUxNX0.SBIDeV_WAWlyLs-ROD1ibXtqqY5bbbh0gouY8gRB9Y4';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Preguntas organizadas por sección
+        const questions = {
+            sociocultural: [
+                "¿Conoce usted qué son los desechos sólidos domiciliarios?",
+                "¿Cree usted que existe un comportamiento adecuado en el manejo de los desechos sólidos domiciliarios en la comunidad?",
+                "¿Se debe separar los desechos sólidos según su tipo ejemplo: (papel - plástico - orgánico - inorgánico)?",
+                "¿Es importante la correcta clasificación de los desechos sólidos orgánicos e inorgánicos en el hogar?",
+                "¿Cree que el comportamiento de la comunidad influye en deterioro del medio ambiente?",
+                "¿Dedica tiempo para reducir, reutilizar y/o reciclar los desechos sólidos que se generan en el hogar?",
+                "¿Los desechos sólidos son un gran problema para la comunidad?"
+            ],
+            afectivos: [
+                "¿Le preocupa el exceso de desechos sólidos domiciliarios?",
+                "¿Considera que los desechos sólidos domiciliarios intervienen en las consecuencias climáticas?",
+                "¿Le afecta emocionalmente cuando escucha noticias acerca de los desastres naturales?",
+                "¿Siente frustración debido a la falta de acciones significativas para abordar la generación de los desechos sólidos?",
+                "¿Considera importante pensar en el tipo de planeta que dejaremos a las futuras generaciones?"
+            ],
+            cognitivos: [
+                "¿Es consciente del impacto de los desechos sólidos domiciliarios en el medio ambiente?",
+                "¿Investiga frecuentemente acerca de temas medio ambientales?",
+                "¿Conoce las consecuencias de la acumulación de los desechos sólidos domiciliarios?",
+                "¿Conoce los beneficios de reutilizar un residuo domiciliario?",
+                "¿La falta de información es un obstáculo para la correcta gestión de los residuos sólidos domiciliario?"
+            ],
+            sustentabilidadAmbiental: [
+                "¿Los desechos orgánicos generados en el hogar pueden tener otra funcionalidad?",
+                "¿La acumulación de desechos afectan a la salud de la población?",
+                "¿La reducción, reciclaje y la reutilización de los desechos sólidos puede cuidar al medio ambiente y a la vida silvestre?",
+                "¿Cree que la transformación de desechos sólidos en nuevos productos puede contribuir significativamente a la reducción de la generación de desechos?",
+                "¿Necesita más información acerca de educación ambiental?"
+            ],
+            sustentabilidadEconomica: [
+                "¿En su hogar practica la separación de los desechos para el reciclaje y le representa algún ingreso?",
+                "¿Los desechos sólidos generados en el hogar pueden ser reutilizados para una nueva función o creación de un producto?",
+                "¿Cree que el manejo adecuado de los desechos sólidos domiciliarios podría aportar al desarrollo económico comunitario?",
+                "¿Los emprendimientos en base a la reutilización de los desechos aporta a su economía?",
+                "¿El manejo adecuado de los desechos sólidos domiciliarios ofrece oportunidades para el emprendimiento?"
+            ],
+            desarrolloComunitario: [
+                "¿Es posible reducir la generación de residuos sólidos domiciliarios por medio de eventos de concientización?",
+                "¿Participaría en talleres de buenas prácticas y capacitaciones para el correcto manejo de los desechos sólidos domiciliarios?",
+                "¿El manejo adecuado de los desechos sólidos domiciliarios puede tener un impacto significativo al medio ambiente?",
+                "¿Está dispuesto a participar en un emprendimiento en base al uso de los desechos sólidos?",
+                "¿Participaría a una feria de emprendimientos comunitarios en base a desechos domiciliarios reutilizados?"
+            ]
+        };
+
+        // Opciones de la escala Likert
+        const likertOptions = [
+            "Totalmente desacuerdo",
+            "Desacuerdo",
+            "Indiferente",
+            "De acuerdo",
+            "Totalmente de acuerdo"
+        ];
+
+        // Función para generar preguntas Likert
+        function generateLikertQuestions(containerId, questionsArray, sectionName) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            questionsArray.forEach((question, index) => {
+                const questionId = `${sectionName}_${index}`;
+                
+                const questionElement = document.createElement('div');
+                questionElement.className = 'form-group';
+                
+                const questionLabel = document.createElement('label');
+                questionLabel.textContent = question;
+                questionElement.appendChild(questionLabel);
+                
+                const likertScale = document.createElement('div');
+                likertScale.className = 'likert-scale';
+                
+                likertOptions.forEach((option, optionIndex) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'likert-option';
+                    optionElement.textContent = option;
+                    optionElement.dataset.value = optionIndex + 1;
                     
+                    optionElement.addEventListener('click', function() {
+                        // Deseleccionar todas las opciones en esta pregunta
+                        const allOptions = likertScale.querySelectorAll('.likert-option');
+                        allOptions.forEach(opt => opt.classList.remove('selected'));
+                        
+                        // Seleccionar la opción clickeada
+                        this.classList.add('selected');
+                        
+                        // Actualizar el campo oculto
+                        const hiddenInput = document.getElementById(questionId);
+                        hiddenInput.value = this.dataset.value;
+                    });
+                    
+                    likertScale.appendChild(optionElement);
+                });
+                
+                questionElement.appendChild(likertScale);
+                
+                // Campo oculto para almacenar el valor seleccionado
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.id = questionId;
+                hiddenInput.name = questionId;
+                questionElement.appendChild(hiddenInput);
+                
+                container.appendChild(questionElement);
+            });
+        }
+
+        // Inicializar todas las preguntas
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generar preguntas para cada sección
+            generateLikertQuestions('sociocultural-questions', questions.sociocultural, 'sociocultural');
+            generateLikertQuestions('afectivos-questions', questions.afectivos, 'afectivos');
+            generateLikertQuestions('cognitivos-questions', questions.cognitivos, 'cognitivos');
+            generateLikertQuestions('sustentabilidad-ambiental-questions', questions.sustentabilidadAmbiental, 'sustentabilidadAmbiental');
+            generateLikertQuestions('sustentabilidad-economica-questions', questions.sustentabilidadEconomica, 'sustentabilidadEconomica');
+            generateLikertQuestions('desarrollo-comunitario-questions', questions.desarrolloComunitario, 'desarrolloComunitario');
+            
+            // Configurar pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    
+                    // Actualizar pestañas activas
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Actualizar contenido activo
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // Si es la pestaña de estadísticas, cargar datos
+                    if (tabId === 'stats') {
+                        loadStatistics();
+                    }
+                });
+            });
+            
+            // Configurar envío del formulario
+            document.getElementById('cuestionario-form').addEventListener('submit', handleFormSubmit);
+            
+            // Configurar botón de reinicio
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                document.getElementById('cuestionario-form').reset();
+                
+                // Limpiar selecciones Likert
+                document.querySelectorAll('.likert-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+            });
+            
+            // Validar distribución de edades
+            document.getElementById('num_integrantes_familia').addEventListener('change', validateAgeDistribution);
+            
+            // Cargar estadísticas iniciales
+            loadStatistics();
+        });
+
+        // Validar que la suma de las edades coincida con el número de integrantes
+        function validateAgeDistribution() {
+            const totalMembers = parseInt(document.getElementById('num_integrantes_familia').value) || 0;
+            const age0_10 = parseInt(document.getElementById('edad_0_10').value) || 0;
+            const age11_25 = parseInt(document.getElementById('edad_11_25').value) || 0;
+            const age26_50 = parseInt(document.getElementById('edad_26_50').value) || 0;
+            const age51_90 = parseInt(document.getElementById('edad_51_90').value) || 0;
+            
+            const sumAges = age0_10 + age11_25 + age26_50 + age51_90;
+            
+            if (sumAges !== totalMembers) {
+                alert(`La suma de las edades (${sumAges}) no coincide con el número de integrantes (${totalMembers}). Por favor, ajuste los valores.`);
+            }
+        }
+
+        // Manejar el envío del formulario
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Validar distribución de edades
+            validateAgeDistribution();
+            
+            // Recopilar datos del formulario
+            const formData = new FormData(e.target);
+            const data = {};
+            
+            for (const [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // Agregar fecha y hora actual si no están especificadas
+            if (!data.fecha) {
+                const now = new Date();
+                data.fecha = now.toISOString().split('T')[0];
+            }
+            
+            if (!data.hora) {
+                const now = new Date();
+                data.hora = now.toTimeString().split(' ')[0];
+            }
+            
+            try {
+                // Insertar datos en Supabase
+                const { data: insertedData, error } = await supabase
+                    .from('cuestionario_comportamiento_proambiental_autosustentabilidad')
+                    .insert([data]);
+                
                 if (error) {
                     throw error;
                 }
                 
-                encuestas = data;
-                mostrarDatos();
+                // Mostrar notificación de éxito
+                showNotification('¡Formulario enviado correctamente!');
+                
+                // Reiniciar formulario
+                e.target.reset();
+                
+                // Limpiar selecciones Likert
+                document.querySelectorAll('.likert-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Recargar estadísticas
+                loadStatistics();
+                
             } catch (error) {
-                console.error('Error al cargar datos:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
+                console.error('Error al enviar el formulario:', error);
+                showNotification('Error al enviar el formulario. Intente nuevamente.', true);
             }
         }
-        
-        // Función para mostrar los datos en la página
-        function mostrarDatos() {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
+
+        // Mostrar notificación
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
             
-            // Actualizar resumen general
-            actualizarResumenGeneral();
+            if (isError) {
+                notification.style.backgroundColor = '#d32f2f';
+            } else {
+                notification.style.backgroundColor = '#2e7d32';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Cargar y mostrar estadísticas
+        async function loadStatistics() {
+            try {
+                // Obtener todos los datos de la tabla
+                const { data, error } = await supabase
+                    .from('cuestionario_comportamiento_proambiental_autosustentabilidad')
+                    .select('*');
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (!data || data.length === 0) {
+                    // No hay datos, mostrar valores por defecto
+                    updateStatisticsUI({}, 0);
+                    return;
+                }
+                
+                // Procesar datos para estadísticas
+                const stats = processStatistics(data);
+                updateStatisticsUI(stats, data.length);
+                
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+            }
+        }
+
+        // Procesar datos para generar estadísticas
+        function processStatistics(data) {
+            const stats = {
+                total: data.length,
+                averageAge: 0,
+                averageMembers: 0,
+                ageDistribution: {
+                    '0-10': 0,
+                    '11-25': 0,
+                    '26-50': 0,
+                    '51-90': 0
+                },
+                education: {
+                    'Primaria': 0,
+                    'Secundaria': 0,
+                    'Universidad': 0,
+                    'Postgrado': 0
+                },
+                employment: {
+                    'Desempleado': 0,
+                    'Trabajo Temporal': 0,
+                    'Empleado': 0
+                },
+                income: {
+                    'Menor al sueldo básico': 0,
+                    'Sueldo básico': 0,
+                    'Mayor al sueldo básico': 0
+                },
+                housing: {
+                    'Alquilada': 0,
+                    'Propia': 0,
+                    'Prestada': 0
+                }
+            };
+            
+            let totalAge = 0;
+            let totalMembers = 0;
+            
+            data.forEach(item => {
+                // Calcular promedios
+                totalAge += parseInt(item.edad) || 0;
+                totalMembers += parseInt(item.num_integrantes_familia) || 0;
+                
+                // Distribución por edades
+                stats.ageDistribution['0-10'] += parseInt(item.edad_0_10) || 0;
+                stats.ageDistribution['11-25'] += parseInt(item.edad_11_25) || 0;
+                stats.ageDistribution['26-50'] += parseInt(item.edad_26_50) || 0;
+                stats.ageDistribution['51-90'] += parseInt(item.edad_51_90) || 0;
+                
+                // Educación
+                if (item.educacion_jefe_hogar && stats.education[item.educacion_jefe_hogar] !== undefined) {
+                    stats.education[item.educacion_jefe_hogar]++;
+                }
+                
+                // Empleo
+                if (item.situacion_laboral_jefe_hogar && stats.employment[item.situacion_laboral_jefe_hogar] !== undefined) {
+                    stats.employment[item.situacion_laboral_jefe_hogar]++;
+                }
+                
+                // Ingreso
+                if (item.ingreso_mensual_jefe_hogar && stats.income[item.ingreso_mensual_jefe_hogar] !== undefined) {
+                    stats.income[item.ingreso_mensual_jefe_hogar]++;
+                }
+                
+                // Vivienda
+                if (item.tipo_hogar && stats.housing[item.tipo_hogar] !== undefined) {
+                    stats.housing[item.tipo_hogar]++;
+                }
+            });
+            
+            // Calcular promedios
+            stats.averageAge = totalAge / data.length;
+            stats.averageMembers = totalMembers / data.length;
+            
+            return stats;
+        }
+
+        // Actualizar la interfaz con las estadísticas
+        function updateStatisticsUI(stats, totalSurveys) {
+            // Actualizar valores básicos
+            document.getElementById('total-surveys').textContent = totalSurveys;
+            document.getElementById('average-age').textContent = stats.averageAge ? stats.averageAge.toFixed(1) : '0';
+            document.getElementById('average-members').textContent = stats.averageMembers ? stats.averageMembers.toFixed(1) : '0';
             
             // Crear gráficos
-            crearGraficos();
+            createCharts(stats);
         }
-        
-        // Función para actualizar el resumen general
-        function actualizarResumenGeneral() {
-            const totalEncuestas = encuestas.length;
-            const promedioEdad = totalEncuestas > 0 
-                ? Math.round(encuestas.reduce((sum, e) => sum + (e.edad || 0), 0) / totalEncuestas)
-                : 0;
-            const promedioIntegrantes = totalEncuestas > 0
-                ? Math.round(encuestas.reduce((sum, e) => sum + (e.num_integrantes_familia || 0), 0) / totalEncuestas * 10) / 10
-                : 0;
-                
-            document.getElementById('total-encuestas').textContent = totalEncuestas;
-            document.getElementById('promedio-edad').textContent = promedioEdad;
-            document.getElementById('promedio-integrantes').textContent = promedioIntegrantes;
-        }
-        
-        // Función para crear todos los gráficos
-        function crearGraficos() {
-            // Gráfico de distribución por edad
-            crearGraficoEdad();
-            
-            // Gráfico de integrantes por rango de edad
-            crearGraficoIntegrantesEdad();
-            
-            // Gráficos de características del hogar
-            crearGraficoEducacion();
-            crearGraficoSituacionLaboral();
-            crearGraficoIngreso();
-            crearGraficoTipoHogar();
-            
-            // Gráficos de determinantes socioculturales
-            crearGraficoConoceDesechos();
-            crearGraficoComportamientoAdecuado();
-            
-            // Gráficos de determinantes afectivos
-            crearGraficoPreocupaDesechos();
-            crearGraficoPlanetaFuturasGeneraciones();
-            
-            // Gráficos de sustentabilidad ambiental
-            crearGraficoDesechosOrganicosFuncionalidad();
-            crearGraficoReduccionReciclaje();
-            
-            // Gráficos de sustentabilidad económica
-            crearGraficoSeparacionReciclajeIngreso();
-            crearGraficoOportunidadEmprendimiento();
-            
-            // Gráficos de desarrollo comunitario
-            crearGraficoParticipacionTalleres();
-            crearGraficoParticipacionEmprendimientos();
-        }
-        
-        // Función auxiliar para contar respuestas por categoría
-        function contarRespuestas(campo, categorias) {
-            const conteo = {};
-            categorias.forEach(cat => { conteo[cat] = 0; });
-            
-            encuestas.forEach(encuesta => {
-                const valor = encuesta[campo];
-                if (valor && categorias.includes(valor)) {
-                    conteo[valor]++;
-                }
-            });
-            
-            return conteo;
-        }
-        
-        // Función auxiliar para calcular porcentajes
-        function calcularPorcentajes(conteo, total) {
-            const porcentajes = {};
-            Object.keys(conteo).forEach(key => {
-                porcentajes[key] = total > 0 ? Math.round((conteo[key] / total) * 100) : 0;
-            });
-            return porcentajes;
-        }
-        
-        // Función para crear gráfico de distribución por edad
-        function crearGraficoEdad() {
-            const rangos = ['0-10', '11-25', '26-50', '51-90'];
-            const datos = rangos.map(rango => {
-                return encuestas.filter(e => {
-                    const edad = e.edad;
-                    if (!edad) return false;
-                    
-                    if (rango === '0-10') return edad >= 0 && edad <= 10;
-                    if (rango === '11-25') return edad >= 11 && edad <= 25;
-                    if (rango === '26-50') return edad >= 26 && edad <= 50;
-                    if (rango === '51-90') return edad >= 51 && edad <= 90;
-                    return false;
-                }).length;
-            });
-            
-            const ctx = document.getElementById('edadChart').getContext('2d');
-            charts.edadChart = new Chart(ctx, {
+
+        // Crear gráficos con Chart.js
+        function createCharts(stats) {
+            // Gráfico de distribución por edades
+            const ageCtx = document.getElementById('age-distribution-chart').getContext('2d');
+            new Chart(ageCtx, {
                 type: 'bar',
                 data: {
-                    labels: rangos,
+                    labels: Object.keys(stats.ageDistribution || {}),
                     datasets: [{
-                        label: 'Cantidad de Personas',
-                        data: datos,
+                        label: 'Distribución por Edades',
+                        data: Object.values(stats.ageDistribution || {}),
                         backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(139, 195, 74, 0.7)',
-                            'rgba(205, 220, 57, 0.7)',
-                            'rgba(255, 193, 7, 0.7)'
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)'
                         ],
                         borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(139, 195, 74, 1)',
-                            'rgba(205, 220, 57, 1)',
-                            'rgba(255, 193, 7, 1)'
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -503,115 +932,34 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = datos.reduce((a, b) => a + b, 0);
-                                    const porcentaje = total > 0 ? Math.round((context.raw / total) * 100) : 0;
-                                    return `${context.raw} personas (${porcentaje}%)`;
-                                }
-                            }
-                        }
-                    },
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Rango de Edad'
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
             });
-        }
-        
-        // Función para crear gráfico de integrantes por rango de edad
-        function crearGraficoIntegrantesEdad() {
-            const rangos = ['0-10 años', '11-25 años', '26-50 años', '51-90 años'];
-            const campos = ['edad_0_10', 'edad_11_25', 'edad_26_50', 'edad_51_90'];
             
-            const datos = campos.map(campo => {
-                return encuestas.reduce((sum, e) => sum + (e[campo] || 0), 0);
-            });
-            
-            const ctx = document.getElementById('integrantesEdadChart').getContext('2d');
-            charts.integrantesEdadChart = new Chart(ctx, {
+            // Gráfico de educación (dona)
+            const educationCtx = document.getElementById('education-chart').getContext('2d');
+            new Chart(educationCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: rangos,
+                    labels: Object.keys(stats.education || {}),
                     datasets: [{
-                        data: datos,
+                        label: 'Nivel de Educación',
+                        data: Object.values(stats.education || {}),
                         backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(139, 195, 74, 0.7)',
-                            'rgba(205, 220, 57, 0.7)',
-                            'rgba(255, 193, 7, 0.7)'
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)'
                         ],
                         borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(139, 195, 74, 1)',
-                            'rgba(205, 220, 57, 1)',
-                            'rgba(255, 193, 7, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = datos.reduce((a, b) => a + b, 0);
-                                    const porcentaje = total > 0 ? Math.round((context.raw / total) * 100) : 0;
-                                    return `${context.label}: ${context.raw} personas (${porcentaje}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de nivel de educación
-        function crearGraficoEducacion() {
-            const categorias = ['Primaria', 'Secundaria', 'Universidad', 'Postgrado'];
-            const conteo = contarRespuestas('educacion_jefe_hogar', categorias);
-            const porcentajes = calcularPorcentajes(conteo, encuestas.length);
-            
-            const ctx = document.getElementById('educacionChart').getContext('2d');
-            charts.educacionChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: categorias.map((cat, i) => `${cat} (${porcentajes[cat]}%)`),
-                    datasets: [{
-                        data: Object.values(conteo),
-                        backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(139, 195, 74, 0.7)',
-                            'rgba(205, 220, 57, 0.7)',
-                            'rgba(255, 193, 7, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(139, 195, 74, 1)',
-                            'rgba(205, 220, 57, 1)',
-                            'rgba(255, 193, 7, 1)'
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -626,68 +974,91 @@
                     }
                 }
             });
-        }
-        
-        // Función para crear gráfico de situación laboral
-        function crearGraficoSituacionLaboral() {
-            const categorias = ['Desempleado', 'Trabajo Temporal', 'Empleado'];
-            const conteo = contarRespuestas('situacion_laboral_jefe_hogar', categorias);
-            const porcentajes = calcularPorcentajes(conteo, encuestas.length);
             
-            const ctx = document.getElementById('laboralChart').getContext('2d');
-            charts.laboralChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: categorias.map((cat, i) => `${cat} (${porcentajes[cat]}%)`),
-                    datasets: [{
-                        data: Object.values(conteo),
-                        backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(139, 195, 74, 0.7)',
-                            'rgba(205, 220, 57, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(139, 195, 74, 1)',
-                            'rgba(205, 220, 57, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de ingreso mensual
-        function crearGraficoIngreso() {
-            const categorias = ['Menor al sueldo básico', 'Sueldo básico', 'Mayor al sueldo básico'];
-            const conteo = contarRespuestas('ingreso_mensual_jefe_hogar', categorias);
-            const porcentajes = calcularPorcentajes(conteo, encuestas.length);
-            
-            const ctx = document.getElementById('ingresoChart').getContext('2d');
-            charts.ingresoChart = new Chart(ctx, {
+            // Gráfico de empleo (dona)
+            const employmentCtx = document.getElementById('employment-chart').getContext('2d');
+            new Chart(employmentCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: categorias.map((cat, i) => `${cat} (${porcentajes[cat]}%)`),
+                    labels: Object.keys(stats.employment || {}),
                     datasets: [{
-                        data: Object.values(conteo),
+                        label: 'Situación Laboral',
+                        data: Object.values(stats.employment || {}),
                         backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(139, 195, 74, 0.7)',
-                            'rgba(205, 220, 57, 0.7)'
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
                         ],
                         borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(139, 195, 74, 1)',
-                            'rgba(205, 220, 57, 1)'
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de ingreso (dona)
+            const incomeCtx = document.getElementById('income-chart').getContext('2d');
+            new Chart(incomeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(stats.income || {}),
+                    datasets: [{
+                        label: 'Ingreso Mensual',
+                        data: Object.values(stats.income || {}),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de vivienda (dona)
+            const housingCtx = document.getElementById('housing-chart').getContext('2d');
+            new Chart(housingCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(stats.housing || {}),
+                    datasets: [{
+                        label: 'Tipo de Hogar',
+                        data: Object.values(stats.housing || {}),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -703,275 +1074,6 @@
                 }
             });
         }
-        
-        // Función para crear gráfico de tipo de hogar
-        function crearGraficoTipoHogar() {
-            const categorias = ['Alquilada', 'Propia', 'Prestada'];
-            const conteo = contarRespuestas('tipo_hogar', categorias);
-            const porcentajes = calcularPorcentajes(conteo, encuestas.length);
-            
-            const ctx = document.getElementById('hogarChart').getContext('2d');
-            charts.hogarChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: categorias.map((cat, i) => `${cat} (${porcentajes[cat]}%)`),
-                    datasets: [{
-                        data: Object.values(conteo),
-                        backgroundColor: [
-                            'rgba(76, 175, 80, 0.7)',
-                            'rgba(139, 195, 74, 0.7)',
-                            'rgba(205, 220, 57, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(76, 175, 80, 1)',
-                            'rgba(139, 195, 74, 1)',
-                            'rgba(205, 220, 57, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de conocimiento sobre desechos sólidos
-        function crearGraficoConoceDesechos() {
-            const categorias = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
-            const conteo = contarRespuestas('conoce_desechos_solidos', categorias);
-            
-            const ctx = document.getElementById('conoceDesechosChart').getContext('2d');
-            charts.conoceDesechosChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categorias,
-                    datasets: [{
-                        label: 'Respuestas',
-                        data: Object.values(conteo),
-                        backgroundColor: 'rgba(76, 175, 80, 0.7)',
-                        borderColor: 'rgba(76, 175, 80, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad de Respuestas'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nivel de Acuerdo'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de comportamiento adecuado en la comunidad
-        function crearGraficoComportamientoAdecuado() {
-            const categorias = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
-            const conteo = contarRespuestas('cree_comportamiento_adecuado_manejo', categorias);
-            
-            const ctx = document.getElementById('comportamientoAdecuadoChart').getContext('2d');
-            charts.comportamientoAdecuadoChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categorias,
-                    datasets: [{
-                        label: 'Respuestas',
-                        data: Object.values(conteo),
-                        backgroundColor: 'rgba(139, 195, 74, 0.7)',
-                        borderColor: 'rgba(139, 195, 74, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad de Respuestas'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nivel de Acuerdo'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de preocupación por exceso de desechos
-        function crearGraficoPreocupaDesechos() {
-            const categorias = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
-            const conteo = contarRespuestas('preocupa_exceso_desechos', categorias);
-            
-            const ctx = document.getElementById('preocupaDesechosChart').getContext('2d');
-            charts.preocupaDesechosChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categorias,
-                    datasets: [{
-                        label: 'Respuestas',
-                        data: Object.values(conteo),
-                        backgroundColor: 'rgba(205, 220, 57, 0.7)',
-                        borderColor: 'rgba(205, 220, 57, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad de Respuestas'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nivel de Acuerdo'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de importancia del planeta para futuras generaciones
-        function crearGraficoPlanetaFuturasGeneraciones() {
-            const categorias = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
-            const conteo = contarRespuestas('importancia_planeta_futuras_generaciones', categorias);
-            
-            const ctx = document.getElementById('planetaFuturasGeneracionesChart').getContext('2d');
-            charts.planetaFuturasGeneracionesChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categorias,
-                    datasets: [{
-                        label: 'Respuestas',
-                        data: Object.values(conteo),
-                        backgroundColor: 'rgba(255, 193, 7, 0.7)',
-                        borderColor: 'rgba(255, 193, 7, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad de Respuestas'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nivel de Acuerdo'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de funcionalidad de desechos orgánicos
-        function crearGraficoDesechosOrganicosFuncionalidad() {
-            const categorias = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
-            const conteo = contarRespuestas('desechos_organicos_funcionalidad', categorias);
-            
-            const ctx = document.getElementById('desechosOrganicosFuncionalidadChart').getContext('2d');
-            charts.desechosOrganicosFuncionalidadChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categorias,
-                    datasets: [{
-                        label: 'Respuestas',
-                        data: Object.values(conteo),
-                        backgroundColor: 'rgba(76, 175, 80, 0.7)',
-                        borderColor: 'rgba(76, 175, 80, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad de Respuestas'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nivel de Acuerdo'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Función para crear gráfico de impacto de reducción, reciclaje y reutilización
-        function crearGraficoReduccionReciclaje() {
-            const categorias = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
-            const conteo = contarRespuestas('reduccion_reciclaje_reutilizacion_cuida_ambiente', categorias);
-            
-            const ctx = document.getElementById('reduccionReciclajeChart').getContext('2d');
-            charts.reduccionReciclajeChart = new Chart(ctx, {
-                type: '
+    </script>
+</body>
+</html>
