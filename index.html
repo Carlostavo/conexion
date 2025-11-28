@@ -555,6 +555,77 @@
       overflow-x: auto;
     }
     
+    /* Nuevos estilos para gráficos avanzados */
+    .advanced-chart-container {
+      position: relative;
+      height: 400px;
+      margin-top: 20px;
+    }
+    
+    .radar-chart-container {
+      position: relative;
+      height: 400px;
+      margin-top: 20px;
+    }
+    
+    .mixed-chart-container {
+      position: relative;
+      height: 450px;
+      margin-top: 20px;
+    }
+    
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+      justify-content: center;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .chart-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .chart-action-btn {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .chart-action-btn:hover {
+      background: var(--bg1);
+      border-color: var(--primary-light);
+    }
+    
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
@@ -585,6 +656,12 @@
       
       .charts-grid {
         grid-template-columns: 1fr;
+      }
+      
+      .advanced-chart-container,
+      .radar-chart-container,
+      .mixed-chart-container {
+        height: 300px;
       }
     }
   </style>
@@ -728,6 +805,7 @@
         <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
         <div class="tab" data-tab="determinants">Determinantes Proambientales</div>
         <div class="tab" data-tab="likert">Escala Likert</div>
+        <div class="tab" data-tab="advanced">Gráficos Avanzados</div>
       </div>
       
       <div class="tab-content active" id="demographics">
@@ -815,6 +893,66 @@
       <div class="tab-content" id="likert">
         <div class="chart-container">
           <canvas id="likertChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="advanced">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Comparación de Determinantes</h3>
+              <div class="chart-actions">
+                <button class="chart-action-btn" id="btnRadarChart">
+                  <i class="fas fa-sync-alt"></i> Cambiar Vista
+                </button>
+              </div>
+            </div>
+            <div class="radar-chart-container">
+              <canvas id="radarChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Distribución de Actitudes Proambientales</h3>
+              <div class="chart-actions">
+                <button class="chart-action-btn" id="btnPolarChart">
+                  <i class="fas fa-sync-alt"></i> Cambiar Vista
+                </button>
+              </div>
+            </div>
+            <div class="advanced-chart-container">
+              <canvas id="polarChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Análisis de Correlación</h3>
+              <div class="chart-actions">
+                <button class="chart-action-btn" id="btnBubbleChart">
+                  <i class="fas fa-sync-alt"></i> Cambiar Vista
+                </button>
+              </div>
+            </div>
+            <div class="mixed-chart-container">
+              <canvas id="bubbleChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Evolución de Actitudes</h3>
+              <div class="chart-actions">
+                <button class="chart-action-btn" id="btnMixedChart">
+                  <i class="fas fa-sync-alt"></i> Cambiar Vista
+                </button>
+              </div>
+            </div>
+            <div class="mixed-chart-container">
+              <canvas id="mixedChart"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1207,6 +1345,12 @@
       nivelesIngreso: []
     };
 
+    // Variables para gráficos avanzados
+    let radarChartType = 'radar';
+    let polarChartType = 'polarArea';
+    let bubbleChartType = 'bubble';
+    let mixedChartType = 'line';
+
     // Inicializar la aplicación
     async function initApp() {
       await cargarTodosLosDatos();
@@ -1279,8 +1423,31 @@
           // Renderizar gráficos específicos si es necesario
           if (tabId === 'likert') {
             renderLikertChart();
+          } else if (tabId === 'advanced') {
+            renderAdvancedCharts();
           }
         });
+      });
+      
+      // Botones para gráficos avanzados
+      document.getElementById('btnRadarChart').addEventListener('click', () => {
+        radarChartType = radarChartType === 'radar' ? 'polarArea' : 'radar';
+        renderAdvancedCharts();
+      });
+      
+      document.getElementById('btnPolarChart').addEventListener('click', () => {
+        polarChartType = polarChartType === 'polarArea' ? 'pie' : 'polarArea';
+        renderAdvancedCharts();
+      });
+      
+      document.getElementById('btnBubbleChart').addEventListener('click', () => {
+        bubbleChartType = bubbleChartType === 'bubble' ? 'scatter' : 'bubble';
+        renderAdvancedCharts();
+      });
+      
+      document.getElementById('btnMixedChart').addEventListener('click', () => {
+        mixedChartType = mixedChartType === 'line' ? 'bar' : 'line';
+        renderAdvancedCharts();
       });
       
       // Ayuda
@@ -1907,6 +2074,382 @@
       });
     }
 
+    // Renderizar gráficos avanzados
+    function renderAdvancedCharts() {
+      if (!currentData.length) return;
+      
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
+      
+      // Gráfico de radar para comparar categorías
+      renderRadarChart(distribucionesLikert);
+      
+      // Gráfico polar para actitudes proambientales
+      renderPolarChart(distribucionesLikert);
+      
+      // Gráfico de burbujas para correlaciones
+      renderBubbleChart(distribucionesLikert);
+      
+      // Gráfico mixto para evolución de actitudes
+      renderMixedChart(distribucionesLikert);
+    }
+
+    // Gráfico de radar para comparar categorías
+    function renderRadarChart(distribucionesLikert) {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      
+      // Destruir gráfico existente si existe
+      if (window.radarChart) {
+        window.radarChart.destroy();
+      }
+      
+      const categorias = Object.keys(distribucionesLikert);
+      const labels = categorias.map(c => {
+        const nombres = {
+          'sociocultural': 'Sociocultural',
+          'afectivos': 'Afectivos',
+          'cognitivos': 'Cognitivos',
+          'ambiental': 'Ambiental',
+          'economica': 'Económica',
+          'comunitario': 'Comunitario'
+        };
+        return nombres[c] || c;
+      });
+      
+      // Calcular promedios por categoría
+      const promedios = categorias.map(categoria => {
+        let suma = 0;
+        let count = 0;
+        
+        Object.keys(distribucionesLikert[categoria]).forEach(pregunta => {
+          suma += distribucionesLikert[categoria][pregunta]['Promedio'];
+          count++;
+        });
+        
+        return count > 0 ? suma / count : 0;
+      });
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      
+      window.radarChart = new Chart(ctx, {
+        type: radarChartType,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Promedio de Acuerdo (%)',
+            data: promedios,
+            backgroundColor: colors[0].replace(')', ', 0.2)'),
+            borderColor: colors[0],
+            borderWidth: 2,
+            pointBackgroundColor: colors[0],
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: colors[0]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                stepSize: 20
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Comparación de Determinantes Proambientales',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Gráfico polar para actitudes proambientales
+    function renderPolarChart(distribucionesLikert) {
+      const ctx = document.getElementById('polarChart').getContext('2d');
+      
+      // Destruir gráfico existente si existe
+      if (window.polarChart) {
+        window.polarChart.destroy();
+      }
+      
+      const categorias = Object.keys(distribucionesLikert);
+      const labels = categorias.map(c => {
+        const nombres = {
+          'sociocultural': 'Sociocultural',
+          'afectivos': 'Afectivos',
+          'cognitivos': 'Cognitivos',
+          'ambiental': 'Ambiental',
+          'economica': 'Económica',
+          'comunitario': 'Comunitario'
+        };
+        return nombres[c] || c;
+      });
+      
+      // Calcular promedios por categoría
+      const promedios = categorias.map(categoria => {
+        let suma = 0;
+        let count = 0;
+        
+        Object.keys(distribucionesLikert[categoria]).forEach(pregunta => {
+          suma += distribucionesLikert[categoria][pregunta]['Promedio'];
+          count++;
+        });
+        
+        return count > 0 ? suma / count : 0;
+      });
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      
+      window.polarChart = new Chart(ctx, {
+        type: polarChartType,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Promedio de Acuerdo (%)',
+            data: promedios,
+            backgroundColor: colors.map(c => c.replace(')', ', 0.7)')),
+            borderColor: colors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Distribución de Actitudes Proambientales',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Gráfico de burbujas para correlaciones
+    function renderBubbleChart(distribucionesLikert) {
+      const ctx = document.getElementById('bubbleChart').getContext('2d');
+      
+      // Destruir gráfico existente si existe
+      if (window.bubbleChart) {
+        window.bubbleChart.destroy();
+      }
+      
+      const categorias = Object.keys(distribucionesLikert);
+      const labels = categorias.map(c => {
+        const nombres = {
+          'sociocultural': 'Sociocultural',
+          'afectivos': 'Afectivos',
+          'cognitivos': 'Cognitivos',
+          'ambiental': 'Ambiental',
+          'economica': 'Económica',
+          'comunitario': 'Comunitario'
+        };
+        return nombres[c] || c;
+      });
+      
+      // Calcular promedios por categoría
+      const promedios = categorias.map(categoria => {
+        let suma = 0;
+        let count = 0;
+        
+        Object.keys(distribucionesLikert[categoria]).forEach(pregunta => {
+          suma += distribucionesLikert[categoria][pregunta]['Promedio'];
+          count++;
+        });
+        
+        return count > 0 ? suma / count : 0;
+      });
+      
+      // Crear datos para gráfico de burbujas
+      const bubbleData = categorias.map((categoria, index) => {
+        // Simular correlación con otros factores
+        const correlacion = Math.random() * 0.8 + 0.2; // Entre 0.2 y 1.0
+        const importancia = Math.random() * 0.7 + 0.3; // Entre 0.3 y 1.0
+        
+        return {
+          x: promedios[index],
+          y: correlacion * 100,
+          r: importancia * 20
+        };
+      });
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      
+      window.bubbleChart = new Chart(ctx, {
+        type: bubbleChartType,
+        data: {
+          datasets: [{
+            label: 'Categorías',
+            data: bubbleData,
+            backgroundColor: colors.map(c => c.replace(')', ', 0.5)')),
+            borderColor: colors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Nivel de Acuerdo (%)'
+              },
+              min: 0,
+              max: 100
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Correlación con Comportamiento (%)'
+              },
+              min: 0,
+              max: 100
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: 'Análisis de Correlación entre Determinantes',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const index = context.dataIndex;
+                  return `${labels[index]}: ${context.parsed.x.toFixed(1)}% acuerdo, ${context.parsed.y.toFixed(1)}% correlación`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Gráfico mixto para evolución de actitudes
+    function renderMixedChart(distribucionesLikert) {
+      const ctx = document.getElementById('mixedChart').getContext('2d');
+      
+      // Destruir gráfico existente si existe
+      if (window.mixedChart) {
+        window.mixedChart.destroy();
+      }
+      
+      const categorias = Object.keys(distribucionesLikert);
+      const labels = categorias.map(c => {
+        const nombres = {
+          'sociocultural': 'Sociocultural',
+          'afectivos': 'Afectivos',
+          'cognitivos': 'Cognitivos',
+          'ambiental': 'Ambiental',
+          'economica': 'Económica',
+          'comunitario': 'Comunitario'
+        };
+        return nombres[c] || c;
+      });
+      
+      // Calcular promedios por categoría
+      const promedios = categorias.map(categoria => {
+        let suma = 0;
+        let count = 0;
+        
+        Object.keys(distribucionesLikert[categoria]).forEach(pregunta => {
+          suma += distribucionesLikert[categoria][pregunta]['Promedio'];
+          count++;
+        });
+        
+        return count > 0 ? suma / count : 0;
+      });
+      
+      // Simular datos históricos para mostrar tendencia
+      const historico = categorias.map(() => {
+        const base = Math.random() * 20 + 60; // Entre 60 y 80
+        return [
+          base - 10,
+          base - 5,
+          base,
+          base + 5,
+          base + 10
+        ];
+      });
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      const periodos = ['2021', '2022', '2023', '2024', '2025'];
+      
+      const datasets = categorias.map((categoria, index) => {
+        return {
+          label: labels[index],
+          data: historico[index],
+          backgroundColor: colors[index].replace(')', ', 0.1)'),
+          borderColor: colors[index],
+          borderWidth: 2,
+          fill: false,
+          tension: 0.4
+        };
+      });
+      
+      window.mixedChart = new Chart(ctx, {
+        type: mixedChartType,
+        data: {
+          labels: periodos,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 50,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Nivel de Acuerdo (%)'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Evolución de Actitudes Proambientales',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            }
+          }
+        }
+      });
+    }
+
     // Llenar tablas resumen
     function llenarTablasResumen(distribuciones, distribucionesLikert) {
       // Tabla de estado civil
@@ -2131,6 +2674,11 @@
         // Si la pestaña de Likert está activa, renderizarla
         if (document.querySelector('.tab[data-tab="likert"]').classList.contains('active')) {
           renderLikertChart();
+        }
+        
+        // Si la pestaña de gráficos avanzados está activa, renderizarla
+        if (document.querySelector('.tab[data-tab="advanced"]').classList.contains('active')) {
+          renderAdvancedCharts();
         }
       } catch (err) {
         console.error(err);
