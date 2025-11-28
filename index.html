@@ -696,6 +696,7 @@
       <div class="tabs">
         <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
         <div class="tab" data-tab="determinants">Determinantes Proambientales</div>
+        <div class="tab" data-tab="age-distribution">Distribución por Edades</div>
       </div>
       
       <div class="tab-content active" id="demographics">
@@ -721,6 +722,12 @@
       <div class="tab-content" id="determinants">
         <div class="chart-container">
           <canvas id="determinantsChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="age-distribution">
+        <div class="chart-container">
+          <canvas id="ageChart"></canvas>
         </div>
       </div>
     </div>
@@ -894,7 +901,8 @@
     // Charts
     const demographicsCtx = document.getElementById('demographicsChart').getContext('2d');
     const determinantsCtx = document.getElementById('determinantsChart').getContext('2d');
-    let demographicsChart, determinantsChart;
+    const ageCtx = document.getElementById('ageChart').getContext('2d');
+    let demographicsChart, determinantsChart, ageChart;
 
     // Variables globales para datos
     let currentData = [];
@@ -995,6 +1003,8 @@
           // Renderizar gráficos específicos si es necesario
           if (tabId === 'determinants') {
             renderDeterminantsChart();
+          } else if (tabId === 'age-distribution') {
+            renderAgeChart();
           }
         });
       });
@@ -1106,11 +1116,11 @@
       });
       const dominantCivil = Object.keys(estadosCiviles).reduce((a, b) => estadosCiviles[a] > estadosCiviles[b] ? a : b, '');
       
-      // Distribución por edades
-      const age0_10 = rows.reduce((sum, row) => sum + (row.edad_0_10 || 0), 0);
-      const age11_25 = rows.reduce((sum, row) => sum + (row.edad_11_25 || 0), 0);
-      const age26_50 = rows.reduce((sum, row) => sum + (row.edad_26_50 || 0), 0);
-      const age51_90 = rows.reduce((sum, row) => sum + (row.edad_51_90 || 0), 0);
+      // Distribución por edades - CORREGIDO: contar filas, no sumar valores
+      const age0_10 = rows.filter(row => row.edad_0_10 > 0).length;
+      const age11_25 = rows.filter(row => row.edad_11_25 > 0).length;
+      const age26_50 = rows.filter(row => row.edad_26_50 > 0).length;
+      const age51_90 = rows.filter(row => row.edad_51_90 > 0).length;
       
       return {
         totalRecords,
@@ -1225,97 +1235,23 @@
       };
     }
 
-    // Renderizar gráfico demográfico
-    function renderDemographicsChart(chartType) {
-      if (!currentData.length) return;
-      
-      // Calcular distribuciones
-      const distribuciones = calcularDistribuciones(currentData);
-      
-      const labels = Object.keys(distribuciones);
-      const datasets = [];
-      
-      // Crear datasets para cada categoría
-      Object.keys(distribuciones.edad).forEach(categoria => {
-        datasets.push({
-          label: categoria,
-          data: [distribuciones.edad[categoria]],
-          backgroundColor: getColorForCategory(categoria)
-        });
-      });
-      
-      if (demographicsChart) demographicsChart.destroy();
-      
-      demographicsChart = new Chart(demographicsCtx, {
-        type: chartType,
-        data: {
-          labels: ['Distribución'],
-          datasets: datasets
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                font: {
-                  size: 12
-                }
-              }
-            },
-            title: {
-              display: true,
-              text: 'Distribución Demográfica de Encuestados',
-              font: {
-                size: 16,
-                weight: 'bold'
-              },
-              padding: 20
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
-                }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: {
-                display: true,
-                text: 'Porcentaje (%)',
-                font: {
-                  size: 14,
-                  weight: 'bold'
-                }
-              }
-            }
-          }
-        }
-      });
-    }
-    
-    // Calcular distribuciones para diferentes categorías
+    // Calcular distribuciones para diferentes categorías - CORREGIDO
     function calcularDistribuciones(rows) {
-      // Distribución por edades
-      const totalAge0_10 = rows.reduce((sum, row) => sum + (row.edad_0_10 || 0), 0);
-      const totalAge11_25 = rows.reduce((sum, row) => sum + (row.edad_11_25 || 0), 0);
-      const totalAge26_50 = rows.reduce((sum, row) => sum + (row.edad_26_50 || 0), 0);
-      const totalAge51_90 = rows.reduce((sum, row) => sum + (row.edad_51_90 || 0), 0);
-      const totalAge = totalAge0_10 + totalAge11_25 + totalAge26_50 + totalAge51_90;
+      // Distribución por edades - CORREGIDO: contar filas, no sumar valores
+      const age0_10 = rows.filter(row => row.edad_0_10 > 0).length;
+      const age11_25 = rows.filter(row => row.edad_11_25 > 0).length;
+      const age26_50 = rows.filter(row => row.edad_26_50 > 0).length;
+      const age51_90 = rows.filter(row => row.edad_51_90 > 0).length;
+      const totalAge = age0_10 + age11_25 + age26_50 + age51_90;
       
       const edad = {
-        '0-10 años': totalAge > 0 ? (totalAge0_10 / totalAge) * 100 : 0,
-        '11-25 años': totalAge > 0 ? (totalAge11_25 / totalAge) * 100 : 0,
-        '26-50 años': totalAge > 0 ? (totalAge26_50 / totalAge) * 100 : 0,
-        '51-90 años': totalAge > 0 ? (totalAge51_90 / totalAge) * 100 : 0
+        '0-10 años': totalAge > 0 ? (age0_10 / totalAge) * 100 : 0,
+        '11-25 años': totalAge > 0 ? (age11_25 / totalAge) * 100 : 0,
+        '26-50 años': totalAge > 0 ? (age26_50 / totalAge) * 100 : 0,
+        '51-90 años': totalAge > 0 ? (age51_90 / totalAge) * 100 : 0
       };
       
-      // Distribución por educación
+      // Distribución por educación - CORREGIDO: contar filas
       const educacionCounts = {};
       rows.forEach(row => {
         if (row.educacion_jefe_hogar) {
@@ -1328,7 +1264,7 @@
         educacion[key] = totalEducacion > 0 ? (educacionCounts[key] / totalEducacion) * 100 : 0;
       });
       
-      // Distribución por situación laboral
+      // Distribución por situación laboral - CORREGIDO: contar filas
       const laboralCounts = {};
       rows.forEach(row => {
         if (row.situacion_laboral_jefe_hogar) {
@@ -1341,7 +1277,7 @@
         laboral[key] = totalLaboral > 0 ? (laboralCounts[key] / totalLaboral) * 100 : 0;
       });
       
-      // Distribución por ingreso
+      // Distribución por ingreso - CORREGIDO: contar filas
       const ingresoCounts = {};
       rows.forEach(row => {
         if (row.ingreso_mensual_jefe_hogar) {
@@ -1354,7 +1290,7 @@
         ingreso[key] = totalIngreso > 0 ? (ingresoCounts[key] / totalIngreso) * 100 : 0;
       });
       
-      // Distribución por tipo de hogar
+      // Distribución por tipo de hogar - CORREGIDO: contar filas
       const hogarCounts = {};
       rows.forEach(row => {
         if (row.tipo_hogar) {
@@ -1375,30 +1311,88 @@
         hogar
       };
     }
-    
-    // Obtener color para categoría
-    function getColorForCategory(category) {
-      const colorMap = {
-        '0-10 años': '#4f46e5',
-        '11-25 años': '#0ea5e9',
-        '26-50 años': '#10b981',
-        '51-90 años': '#f59e0b',
-        'Primaria': '#ef4444',
-        'Secundaria': '#8b5cf6',
-        'Universidad': '#06b6d4',
-        'Postgrado': '#84cc16',
-        'Desempleado': '#f97316',
-        'Trabajo Temporal': '#ec4899',
-        'Empleado': '#14b8a6',
-        'Menor al sueldo básico': '#6366f1',
-        'Sueldo básico': '#a855f7',
-        'Mayor al sueldo básico': '#f43f5e',
-        'Alquilada': '#0ea5e9',
-        'Propia': '#10b981',
-        'Prestada': '#f59e0b'
-      };
+
+    // Renderizar gráfico demográfico
+    function renderDemographicsChart(chartType) {
+      if (!currentData.length) return;
       
-      return colorMap[category] || '#64748b';
+      // Calcular distribuciones
+      const distribuciones = calcularDistribuciones(currentData);
+      
+      const labels = Object.keys(distribuciones.edad);
+      const data = Object.values(distribuciones.edad);
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
+      
+      if (demographicsChart) demographicsChart.destroy();
+      
+      demographicsChart = new Chart(demographicsCtx, {
+        type: chartType,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Distribución por Edades (%)',
+            data: data,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace(')', ', 0.8)')),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 12
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Distribución Demográfica de Encuestados por Edades',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed}%`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          },
+          scales: chartType === 'pie' ? {} : {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje (%)',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              }
+            }
+          }
+        }
+      });
     }
 
     // Renderizar gráfico de determinantes
@@ -1488,6 +1482,74 @@
       });
     }
 
+    // Renderizar gráfico de distribución por edades
+    function renderAgeChart() {
+      if (!currentData.length) return;
+      
+      const distribuciones = calcularDistribuciones(currentData);
+      
+      const labels = Object.keys(distribuciones.edad);
+      const data = Object.values(distribuciones.edad);
+      
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'];
+      
+      if (ageChart) ageChart.destroy();
+      
+      ageChart = new Chart(ageCtx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Distribución por Edades (%)',
+            data: data,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace(')', ', 0.8)')),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 12
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: 'Distribución por Grupos de Edad',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              padding: 20
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed}%`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              }
+            }
+          }
+        }
+      });
+    }
+
     // Rellenar tabla resumen y actualizar resúmenes
     function renderResumen(demographics, avanzadas, distribuciones) {
       tbody.innerHTML = '';
@@ -1538,52 +1600,56 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>Edad: ${categoria}</td>
+          <td style="text-align:right">${demographics[`age${categoria.split('-')[0]}_${categoria.split('-')[1].split(' ')[0]}`]}</td>
           <td style="text-align:right">${valor.toFixed(2)}%</td>
-          <td style="text-align:right">${(valor).toFixed(2)}%</td>
         `;
         tbody.appendChild(tr);
       });
       
       Object.keys(distribuciones.educacion).forEach(categoria => {
         const valor = distribuciones.educacion[categoria];
+        const count = currentData.filter(row => row.educacion_jefe_hogar === categoria).length;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>Educación: ${categoria}</td>
+          <td style="text-align:right">${count}</td>
           <td style="text-align:right">${valor.toFixed(2)}%</td>
-          <td style="text-align:right">${(valor).toFixed(2)}%</td>
         `;
         tbody.appendChild(tr);
       });
       
       Object.keys(distribuciones.laboral).forEach(categoria => {
         const valor = distribuciones.laboral[categoria];
+        const count = currentData.filter(row => row.situacion_laboral_jefe_hogar === categoria).length;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>Situación Laboral: ${categoria}</td>
+          <td style="text-align:right">${count}</td>
           <td style="text-align:right">${valor.toFixed(2)}%</td>
-          <td style="text-align:right">${(valor).toFixed(2)}%</td>
         `;
         tbody.appendChild(tr);
       });
       
       Object.keys(distribuciones.ingreso).forEach(categoria => {
         const valor = distribuciones.ingreso[categoria];
+        const count = currentData.filter(row => row.ingreso_mensual_jefe_hogar === categoria).length;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>Ingreso: ${categoria}</td>
+          <td style="text-align:right">${count}</td>
           <td style="text-align:right">${valor.toFixed(2)}%</td>
-          <td style="text-align:right">${(valor).toFixed(2)}%</td>
         `;
         tbody.appendChild(tr);
       });
       
       Object.keys(distribuciones.hogar).forEach(categoria => {
         const valor = distribuciones.hogar[categoria];
+        const count = currentData.filter(row => row.tipo_hogar === categoria).length;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>Tipo de Hogar: ${categoria}</td>
+          <td style="text-align:right">${count}</td>
           <td style="text-align:right">${valor.toFixed(2)}%</td>
-          <td style="text-align:right">${(valor).toFixed(2)}%</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1612,27 +1678,33 @@
           
         case 'csv':
           const distribuciones = calcularDistribuciones(currentData);
+          const demographics = calcularEstadisticasDemograficas(currentData);
           
-          let csvContent = "Categoría,Porcentaje\n";
+          let csvContent = "Categoría,Cantidad,Porcentaje\n";
           
           Object.keys(distribuciones.edad).forEach(categoria => {
-            csvContent += `"Edad: ${categoria}",${distribuciones.edad[categoria].toFixed(2)}\n`;
+            const count = demographics[`age${categoria.split('-')[0]}_${categoria.split('-')[1].split(' ')[0]}`];
+            csvContent += `"Edad: ${categoria}",${count},${distribuciones.edad[categoria].toFixed(2)}\n`;
           });
           
           Object.keys(distribuciones.educacion).forEach(categoria => {
-            csvContent += `"Educación: ${categoria}",${distribuciones.educacion[categoria].toFixed(2)}\n`;
+            const count = currentData.filter(row => row.educacion_jefe_hogar === categoria).length;
+            csvContent += `"Educación: ${categoria}",${count},${distribuciones.educacion[categoria].toFixed(2)}\n`;
           });
           
           Object.keys(distribuciones.laboral).forEach(categoria => {
-            csvContent += `"Situación Laboral: ${categoria}",${distribuciones.laboral[categoria].toFixed(2)}\n`;
+            const count = currentData.filter(row => row.situacion_laboral_jefe_hogar === categoria).length;
+            csvContent += `"Situación Laboral: ${categoria}",${count},${distribuciones.laboral[categoria].toFixed(2)}\n`;
           });
           
           Object.keys(distribuciones.ingreso).forEach(categoria => {
-            csvContent += `"Ingreso: ${categoria}",${distribuciones.ingreso[categoria].toFixed(2)}\n`;
+            const count = currentData.filter(row => row.ingreso_mensual_jefe_hogar === categoria).length;
+            csvContent += `"Ingreso: ${categoria}",${count},${distribuciones.ingreso[categoria].toFixed(2)}\n`;
           });
           
           Object.keys(distribuciones.hogar).forEach(categoria => {
-            csvContent += `"Tipo de Hogar: ${categoria}",${distribuciones.hogar[categoria].toFixed(2)}\n`;
+            const count = currentData.filter(row => row.tipo_hogar === categoria).length;
+            csvContent += `"Tipo de Hogar: ${categoria}",${count},${distribuciones.hogar[categoria].toFixed(2)}\n`;
           });
           
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1666,6 +1738,11 @@
         // Si la pestaña de determinantes está activa, renderizarla
         if (document.querySelector('.tab[data-tab="determinants"]').classList.contains('active')) {
           renderDeterminantsChart();
+        }
+        
+        // Si la pestaña de distribución por edades está activa, renderizarla
+        if (document.querySelector('.tab[data-tab="age-distribution"]').classList.contains('active')) {
+          renderAgeChart();
         }
       } catch (err) {
         console.error(err);
