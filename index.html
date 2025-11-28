@@ -285,7 +285,7 @@
     
     .chart-container-sm {
       position: relative;
-      height: 350px;
+      height: 400px;
       margin-top: 20px;
     }
     
@@ -555,94 +555,6 @@
       overflow-x: auto;
     }
     
-    /* Estilos mejorados para las secciones de determinantes */
-    .determinants-section {
-      margin-bottom: 40px;
-      padding: 24px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      border: 1px solid var(--border);
-    }
-    
-    .determinants-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .determinants-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--primary);
-      color: white;
-    }
-    
-    .determinants-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--primary);
-    }
-    
-    .determinants-description {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-    
-    .questions-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-    
-    .question-item {
-      background: #f8fafc;
-      border-radius: 8px;
-      padding: 16px;
-      border-left: 4px solid var(--primary);
-    }
-    
-    .question-text {
-      font-weight: 500;
-      margin-bottom: 12px;
-      color: #1e293b;
-    }
-    
-    .response-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    
-    .response-option {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    
-    .response-option.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-    
-    .determinants-chart-container {
-      margin-top: 24px;
-      height: 300px;
-    }
-    
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
@@ -672,10 +584,6 @@
       }
       
       .charts-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .questions-container {
         grid-template-columns: 1fr;
       }
     }
@@ -809,20 +717,20 @@
       </div>
     </div>
 
-    <!-- Sección de Determinantes con diseño mejorado -->
+    <!-- Gráficos y visualizaciones -->
     <div class="card">
       <div class="card-title">
         <i class="fas fa-chart-bar"></i>
-        Determinantes Proambientales
+        Visualización de Datos
       </div>
       
       <div class="tabs">
-        <div class="tab" data-tab="demographics">Distribución Demográfica</div>
-        <div class="tab active" data-tab="determinants">Determinantes Proambientales</div>
+        <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
+        <div class="tab" data-tab="determinants">Determinantes Proambientales</div>
         <div class="tab" data-tab="likert">Escala Likert</div>
       </div>
       
-      <div class="tab-content" id="demographics">
+      <div class="tab-content active" id="demographics">
         <div class="charts-grid">
           <div class="chart-card">
             <h3>Distribución por Estado Civil</h3>
@@ -863,470 +771,43 @@
         </div>
       </div>
       
-      <div class="tab-content active" id="determinants">
-        <!-- Determinantes Socioculturales -->
-        <div class="determinants-section">
-          <div class="determinants-header">
-            <div class="determinants-icon">
-              <i class="fas fa-users"></i>
-            </div>
-            <div>
-              <div class="determinants-title">Determinantes Socioculturales</div>
-              <div class="determinants-description">Factores sociales y culturales que influyen en el comportamiento proambiental</div>
+      <div class="tab-content" id="determinants">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Determinantes Socioculturales</h3>
+            <div class="chart-container-sm">
+              <canvas id="socioculturalChart"></canvas>
             </div>
           </div>
-          
-          <div class="questions-container">
-            <div class="question-item">
-              <div class="question-text">¿Cómo se vio, qué son los desechos sólidos domiciliarios?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Cree usted que existe un comportamiento adecuado en el manejo de los desechos sólidos domiciliarios en la comunidad?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Se debe separar los desechos sólidos según su tipo ejemplo: (papel - plástico - orgánico - inorgánico)?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Es importante la correcta clasificación de los desechos sólidos orgánicos e inorgánicos en el hogar?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Cree que el comportamiento de la comunidad influye en deterioro del medio ambiente?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Dedica tiempo para reducir, reutilizar y/o reciclar los desechos sólidos que se generan en el hogar?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Los desechos sólidos son un gran problema para la comunidad?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
+          <div class="chart-card">
+            <h3>Determinantes Afectivos</h3>
+            <div class="chart-container-sm">
+              <canvas id="afectivosChart"></canvas>
             </div>
           </div>
-          
-          <div class="determinants-chart-container">
-            <canvas id="socioculturalChart"></canvas>
-          </div>
-        </div>
-        
-        <!-- Determinantes Afectivos -->
-        <div class="determinants-section">
-          <div class="determinants-header">
-            <div class="determinants-icon">
-              <i class="fas fa-heart"></i>
-            </div>
-            <div>
-              <div class="determinants-title">Determinantes Afectivos</div>
-              <div class="determinants-description">Emociones y sentimientos relacionados con el medio ambiente</div>
+          <div class="chart-card">
+            <h3>Determinantes Cognitivos</h3>
+            <div class="chart-container-sm">
+              <canvas id="cognitivosChart"></canvas>
             </div>
           </div>
-          
-          <div class="questions-container">
-            <div class="question-item">
-              <div class="question-text">¿Le preocupa el exceso de desechos sólidos domiciliarios?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Considera que los desechos sólidos domiciliarios intervienen en las consecuencias climáticas?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Le afecta emocionalmente cuando escucha noticias acerca de los desastres naturales?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Siente frustración debido a la falta de acciones significativas para abordar la generación de los desechos sólidos?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Considera importante pensar en el tipo de planeta que dejaremos a las futuras generaciones?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
+          <div class="chart-card">
+            <h3>Sustentabilidad Ambiental</h3>
+            <div class="chart-container-sm">
+              <canvas id="ambientalChart"></canvas>
             </div>
           </div>
-          
-          <div class="determinants-chart-container">
-            <canvas id="afectivosChart"></canvas>
-          </div>
-        </div>
-        
-        <!-- Determinantes Cognitivos -->
-        <div class="determinants-section">
-          <div class="determinants-header">
-            <div class="determinants-icon">
-              <i class="fas fa-brain"></i>
-            </div>
-            <div>
-              <div class="determinants-title">Determinantes Cognitivos</div>
-              <div class="determinants-description">Conocimientos y creencias sobre el medio ambiente</div>
+          <div class="chart-card">
+            <h3>Sustentabilidad Económica</h3>
+            <div class="chart-container-sm">
+              <canvas id="economicaChart"></canvas>
             </div>
           </div>
-          
-          <div class="questions-container">
-            <div class="question-item">
-              <div class="question-text">¿Es consciente del impacto de los desechos sólidos domiciliarios en el medio ambiente?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
+          <div class="chart-card">
+            <h3>Desarrollo Comunitario</h3>
+            <div class="chart-container-sm">
+              <canvas id="comunitarioChart"></canvas>
             </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Investiga frecuentemente acerca de temas medio ambientales?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Conoce las consecuencias de la acumulación de los desechos sólidos domiciliarios?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Conoce los beneficios de reutilizar un residuo domiciliario?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿La falta de información es un obstáculo para la correcta gestión de los residuos sólidos domiciliario?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="determinants-chart-container">
-            <canvas id="cognitivosChart"></canvas>
-          </div>
-        </div>
-        
-        <!-- Sustentabilidad Ambiental -->
-        <div class="determinants-section">
-          <div class="determinants-header">
-            <div class="determinants-icon">
-              <i class="fas fa-leaf"></i>
-            </div>
-            <div>
-              <div class="determinants-title">Sustentabilidad Ambiental</div>
-              <div class="determinants-description">Prácticas y percepciones sobre la sostenibilidad ambiental</div>
-            </div>
-          </div>
-          
-          <div class="questions-container">
-            <div class="question-item">
-              <div class="question-text">¿Los desechos orgánicos generados en el hogar pueden tener otra funcionalidad?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿La acumulación de desechos afectan a la salud de la población?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿La reducción, reciclaje y la reutilización de los desechos sólidos puede cuidar al medio ambiente y a la vida silvestre?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Cree que la transformación de desechos sólidos en nuevos productos puede contribuir significativamente a la reducción de la generación de desechos?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Necesita más información acerca de educación ambiental?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="determinants-chart-container">
-            <canvas id="ambientalChart"></canvas>
-          </div>
-        </div>
-        
-        <!-- Sustentabilidad Económica -->
-        <div class="determinants-section">
-          <div class="determinants-header">
-            <div class="determinants-icon">
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <div>
-              <div class="determinants-title">Sustentabilidad Económica</div>
-              <div class="determinants-description">Aspectos económicos relacionados con la gestión de residuos</div>
-            </div>
-          </div>
-          
-          <div class="questions-container">
-            <div class="question-item">
-              <div class="question-text">¿En su hogar practica la separación de los desechos para el reciclaje y le representa algún ingreso?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Los desechos sólidos generados en el hogar pueden ser reutilizados para una nueva función o creación de un producto?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Cree que el manejo adecuado de los desechos sólidos domiciliarios podría aportar al desarrollo económico comunitario?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Los emprendimientos en base a la reutilización de los desechos aporta a su economía?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿El manejo adecuado de los desechos sólidos domiciliarios ofrece oportunidades para el emprendimiento?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="determinants-chart-container">
-            <canvas id="economicaChart"></canvas>
-          </div>
-        </div>
-        
-        <!-- Desarrollo Comunitario -->
-        <div class="determinants-section">
-          <div class="determinants-header">
-            <div class="determinants-icon">
-              <i class="fas fa-hands-helping"></i>
-            </div>
-            <div>
-              <div class="determinants-title">Desarrollo Comunitario</div>
-              <div class="determinants-description">Participación comunitaria en la gestión ambiental</div>
-            </div>
-          </div>
-          
-          <div class="questions-container">
-            <div class="question-item">
-              <div class="question-text">¿Es posible reducir la generación de residuos sólidos domiciliarios por medio de eventos de concientización?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Participaría en talleres de buenas prácticas y capacitaciones para el correcto manejo de los desechos sólidos domiciliarios?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿El manejo adecuado de los desechos sólidos domiciliarios puede tener un impacto significativo al medio ambiente?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Está dispuesto a participar en un emprendimiento en base al uso de los desechos sólidos?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-            
-            <div class="question-item">
-              <div class="question-text">¿Participaría a una feria de emprendimientos comunitarios en base a desechos domiciliarios reutilizados?</div>
-              <div class="response-options">
-                <div class="response-option">Totalmente desacuerdo</div>
-                <div class="response-option">Desacuerdo</div>
-                <div class="response-option">Indiferente</div>
-                <div class="response-option">De acuerdo</div>
-                <div class="response-option">Totalmente de acuerdo</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="determinants-chart-container">
-            <canvas id="comunitarioChart"></canvas>
           </div>
         </div>
       </div>
@@ -2305,6 +1786,10 @@
           scales: {
             x: {
               stacked: true,
+              ticks: {
+                maxRotation: 45,
+                minRotation: 0
+              }
             },
             y: {
               stacked: true,
@@ -2325,6 +1810,30 @@
               font: {
                 size: 14,
                 weight: 'bold'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const datasetLabel = context.dataset.label || '';
+                  const value = context.parsed.y;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  return `${datasetLabel}: ${value.toFixed(1)}%`;
+                }
+              }
+            },
+            datalabels: {
+              display: function(context) {
+                // Solo mostrar etiquetas para valores mayores a 5%
+                return context.dataset.data[context.dataIndex] > 5;
+              },
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 10
               }
             }
           }
@@ -2419,6 +1928,30 @@
               font: {
                 size: 16,
                 weight: 'bold'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const datasetLabel = context.dataset.label || '';
+                  const value = context.parsed.y;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  return `${datasetLabel}: ${value.toFixed(1)}%`;
+                }
+              }
+            },
+            datalabels: {
+              display: function(context) {
+                // Solo mostrar etiquetas para valores mayores a 5%
+                return context.dataset.data[context.dataIndex] > 5;
+              },
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 10
               }
             }
           }
