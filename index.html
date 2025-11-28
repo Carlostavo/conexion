@@ -555,21 +555,21 @@
       overflow-x: auto;
     }
     
-    /* Estilos específicos para gráficos de Determinantes Afectivos */
-    .afectivos-charts {
+    /* Estilos específicos para gráficos de categorías */
+    .category-charts {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
       gap: 24px;
       margin-top: 20px;
     }
     
-    .afectivos-chart-container {
+    .category-chart-container {
       position: relative;
       height: 400px;
       margin-top: 20px;
     }
     
-    .afectivos-chart-card {
+    .category-chart-card {
       background: white;
       border-radius: 10px;
       padding: 20px;
@@ -577,7 +577,7 @@
       border: 1px solid var(--border);
     }
     
-    .afectivos-chart-card h3 {
+    .category-chart-card h3 {
       color: var(--primary);
       margin-bottom: 16px;
       font-size: 16px;
@@ -616,11 +616,11 @@
         grid-template-columns: 1fr;
       }
       
-      .afectivos-charts {
+      .category-charts {
         grid-template-columns: 1fr;
       }
       
-      .afectivos-chart-container {
+      .category-chart-container {
         height: 350px;
       }
     }
@@ -765,7 +765,12 @@
         <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
         <div class="tab" data-tab="determinants">Determinantes Proambientales</div>
         <div class="tab" data-tab="likert">Escala Likert</div>
+        <div class="tab" data-tab="sociocultural">Determinantes Socioculturales</div>
         <div class="tab" data-tab="afectivos">Determinantes Afectivos</div>
+        <div class="tab" data-tab="cognitivos">Determinantes Cognitivos</div>
+        <div class="tab" data-tab="ambiental">Sustentabilidad Ambiental</div>
+        <div class="tab" data-tab="economica">Sustentabilidad Económica</div>
+        <div class="tab" data-tab="comunitario">Desarrollo Comunitario</div>
       </div>
       
       <div class="tab-content active" id="demographics">
@@ -856,36 +861,229 @@
         </div>
       </div>
       
+      <!-- Determinantes Socioculturales -->
+      <div class="tab-content" id="sociocultural">
+        <div class="category-charts">
+          <div class="category-chart-card">
+            <h3>¿Conoce usted qué son los desechos sólidos domiciliarios?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart1"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Cree usted que existe un comportamiento adecuado en el manejo de los desechos sólidos domiciliarios en la comunidad?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart2"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Se debe separar los desechos sólidos según su tipo ejemplo: (papel - plástico - orgánico - inorgánico)?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart3"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Es importante la correcta clasificación de los desechos sólidos orgánicos e inorgánicos en el hogar?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart4"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Cree que el comportamiento de la comunidad influye en deterioro del medio ambiente?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart5"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Dedica tiempo para reducir, reutilizar y/o reciclar los desechos sólidos que se generan en el hogar?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart6"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Los desechos sólidos son un gran problema para la comunidad?</h3>
+            <div class="category-chart-container">
+              <canvas id="socioculturalChart7"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Determinantes Afectivos -->
       <div class="tab-content" id="afectivos">
-        <div class="afectivos-charts">
-          <div class="afectivos-chart-card">
+        <div class="category-charts">
+          <div class="category-chart-card">
             <h3>¿Le preocupa el exceso de desechos sólidos domiciliarios?</h3>
-            <div class="afectivos-chart-container">
+            <div class="category-chart-container">
               <canvas id="afectivosChart1"></canvas>
             </div>
           </div>
-          <div class="afectivos-chart-card">
+          <div class="category-chart-card">
             <h3>¿Considera que los desechos sólidos domiciliarios intervienen en las consecuencias climáticas?</h3>
-            <div class="afectivos-chart-container">
+            <div class="category-chart-container">
               <canvas id="afectivosChart2"></canvas>
             </div>
           </div>
-          <div class="afectivos-chart-card">
+          <div class="category-chart-card">
             <h3>¿Le afecta emocionalmente cuando escucha noticias acerca de los desastres naturales?</h3>
-            <div class="afectivos-chart-container">
+            <div class="category-chart-container">
               <canvas id="afectivosChart3"></canvas>
             </div>
           </div>
-          <div class="afectivos-chart-card">
+          <div class="category-chart-card">
             <h3>¿Siente frustración debido a la falta de acciones significativas para abordar la generación de los desechos sólidos?</h3>
-            <div class="afectivos-chart-container">
+            <div class="category-chart-container">
               <canvas id="afectivosChart4"></canvas>
             </div>
           </div>
-          <div class="afectivos-chart-card">
+          <div class="category-chart-card">
             <h3>¿Considera importante pensar en el tipo de planeta que dejaremos a las futuras generaciones?</h3>
-            <div class="afectivos-chart-container">
+            <div class="category-chart-container">
               <canvas id="afectivosChart5"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Determinantes Cognitivos -->
+      <div class="tab-content" id="cognitivos">
+        <div class="category-charts">
+          <div class="category-chart-card">
+            <h3>¿Es consciente del impacto de los desechos sólidos domiciliarios en el medio ambiente?</h3>
+            <div class="category-chart-container">
+              <canvas id="cognitivosChart1"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Investiga frecuentemente acerca de temas medio ambientales?</h3>
+            <div class="category-chart-container">
+              <canvas id="cognitivosChart2"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Conoce las consecuencias de la acumulación de los desechos sólidos domiciliarios?</h3>
+            <div class="category-chart-container">
+              <canvas id="cognitivosChart3"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Conoce los beneficios de reutilizar un residuo domiciliario?</h3>
+            <div class="category-chart-container">
+              <canvas id="cognitivosChart4"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿La falta de información es un obstáculo para la correcta gestión de los residuos sólidos domiciliario?</h3>
+            <div class="category-chart-container">
+              <canvas id="cognitivosChart5"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sustentabilidad Ambiental -->
+      <div class="tab-content" id="ambiental">
+        <div class="category-charts">
+          <div class="category-chart-card">
+            <h3>¿Los desechos orgánicos generados en el hogar pueden tener otra funcionalidad?</h3>
+            <div class="category-chart-container">
+              <canvas id="ambientalChart1"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿La acumulación de desechos afectan a la salud de la población?</h3>
+            <div class="category-chart-container">
+              <canvas id="ambientalChart2"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿La reducción, reciclaje y la reutilización de los desechos sólidos puede cuidar al medio ambiente y a la vida silvestre?</h3>
+            <div class="category-chart-container">
+              <canvas id="ambientalChart3"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Cree que la transformación de desechos sólidos en nuevos productos puede contribuir significativamente a la reducción de la generación de desechos?</h3>
+            <div class="category-chart-container">
+              <canvas id="ambientalChart4"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Necesita más información acerca de educación ambiental?</h3>
+            <div class="category-chart-container">
+              <canvas id="ambientalChart5"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sustentabilidad Económica -->
+      <div class="tab-content" id="economica">
+        <div class="category-charts">
+          <div class="category-chart-card">
+            <h3>¿En su hogar practica la separación de los desechos para el reciclaje y le representa algún ingreso?</h3>
+            <div class="category-chart-container">
+              <canvas id="economicaChart1"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Los desechos sólidos generados en el hogar pueden ser reutilizados para una nueva función o creación de un producto?</h3>
+            <div class="category-chart-container">
+              <canvas id="economicaChart2"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Cree que el manejo adecuado de los desechos sólidos domiciliarios podría aportar al desarrollo económico comunitario?</h3>
+            <div class="category-chart-container">
+              <canvas id="economicaChart3"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Los emprendimientos en base a la reutilización de los desechos aporta a su economía?</h3>
+            <div class="category-chart-container">
+              <canvas id="economicaChart4"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿El manejo adecuado de los desechos sólidos domiciliarios ofrece oportunidades para el emprendimiento?</h3>
+            <div class="category-chart-container">
+              <canvas id="economicaChart5"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Desarrollo Comunitario -->
+      <div class="tab-content" id="comunitario">
+        <div class="category-charts">
+          <div class="category-chart-card">
+            <h3>¿Es posible reducir la generación de residuos sólidos domiciliarios por medio de eventos de concientización?</h3>
+            <div class="category-chart-container">
+              <canvas id="comunitarioChart1"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Participaría en talleres de buenas prácticas y capacitaciones para el correcto manejo de los desechos sólidos domiciliarios?</h3>
+            <div class="category-chart-container">
+              <canvas id="comunitarioChart2"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿El manejo adecuado de los desechos sólidos domiciliarios puede tener un impacto significativo al medio ambiente?</h3>
+            <div class="category-chart-container">
+              <canvas id="comunitarioChart3"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Está dispuesto a participar en un emprendimiento en base al uso de los desechos sólidos?</h3>
+            <div class="category-chart-container">
+              <canvas id="comunitarioChart4"></canvas>
+            </div>
+          </div>
+          <div class="category-chart-card">
+            <h3>¿Participaría a una feria de emprendimientos comunitarios en base a desechos domiciliarios reutilizados?</h3>
+            <div class="category-chart-container">
+              <canvas id="comunitarioChart5"></canvas>
             </div>
           </div>
         </div>
@@ -1352,8 +1550,18 @@
           // Renderizar gráficos específicos si es necesario
           if (tabId === 'likert') {
             renderLikertChart();
+          } else if (tabId === 'sociocultural') {
+            renderSocioculturalCharts();
           } else if (tabId === 'afectivos') {
             renderAfectivosCharts();
+          } else if (tabId === 'cognitivos') {
+            renderCognitivosCharts();
+          } else if (tabId === 'ambiental') {
+            renderAmbientalCharts();
+          } else if (tabId === 'economica') {
+            renderEconomicaCharts();
+          } else if (tabId === 'comunitario') {
+            renderComunitarioCharts();
           }
         });
       });
@@ -1726,6 +1934,40 @@
       renderStackedBarChart('comunitarioChart', distribucionesLikert.comunitario, 'Desarrollo Comunitario');
     }
 
+    // Renderizar gráficos individuales para Determinantes Socioculturales
+    function renderSocioculturalCharts() {
+      if (!currentData.length) return;
+      
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
+      const preguntasSociocultural = [
+        'conoce_desechos_solidos',
+        'cree_comportamiento_adecuado_manejo',
+        'separar_desechos_por_origen',
+        'clasificacion_correcta_desechos',
+        'comportamiento_comunidad_influye',
+        'dedica_tiempo_reducir_reutilizar_reciclar',
+        'desechos_solidos_problema_comunidad'
+      ];
+      
+      const titulosSociocultural = [
+        '¿Conoce usted qué son los desechos sólidos domiciliarios?',
+        '¿Cree usted que existe un comportamiento adecuado en el manejo de los desechos sólidos domiciliarios en la comunidad?',
+        '¿Se debe separar los desechos sólidos según su tipo ejemplo: (papel - plástico - orgánico - inorgánico)?',
+        '¿Es importante la correcta clasificación de los desechos sólidos orgánicos e inorgánicos en el hogar?',
+        '¿Cree que el comportamiento de la comunidad influye en deterioro del medio ambiente?',
+        '¿Dedica tiempo para reducir, reutilizar y/o reciclar los desechos sólidos que se generan en el hogar?',
+        '¿Los desechos sólidos son un gran problema para la comunidad?'
+      ];
+      
+      preguntasSociocultural.forEach((pregunta, index) => {
+        const canvasId = `socioculturalChart${index + 1}`;
+        const titulo = titulosSociocultural[index];
+        const datos = distribucionesLikert.sociocultural[pregunta];
+        
+        renderCategoryChart(canvasId, datos, titulo);
+      });
+    }
+
     // Renderizar gráficos individuales para Determinantes Afectivos
     function renderAfectivosCharts() {
       if (!currentData.length) return;
@@ -1752,12 +1994,132 @@
         const titulo = titulosAfectivos[index];
         const datos = distribucionesLikert.afectivos[pregunta];
         
-        renderAfectivoChart(canvasId, datos, titulo);
+        renderCategoryChart(canvasId, datos, titulo);
       });
     }
 
-    // Función para renderizar gráficos individuales de Determinantes Afectivos
-    function renderAfectivoChart(canvasId, data, title) {
+    // Renderizar gráficos individuales para Determinantes Cognitivos
+    function renderCognitivosCharts() {
+      if (!currentData.length) return;
+      
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
+      const preguntasCognitivos = [
+        'consciente_impacto_desechos_salud',
+        'investiga_temas_ambientales',
+        'consecuencias_acumulacion_desechos',
+        'beneficios_reutilizar_residuo',
+        'falta_informacion_obstaculo_gestion'
+      ];
+      
+      const titulosCognitivos = [
+        '¿Es consciente del impacto de los desechos sólidos domiciliarios en el medio ambiente?',
+        '¿Investiga frecuentemente acerca de temas medio ambientales?',
+        '¿Conoce las consecuencias de la acumulación de los desechos sólidos domiciliarios?',
+        '¿Conoce los beneficios de reutilizar un residuo domiciliario?',
+        '¿La falta de información es un obstáculo para la correcta gestión de los residuos sólidos domiciliario?'
+      ];
+      
+      preguntasCognitivos.forEach((pregunta, index) => {
+        const canvasId = `cognitivosChart${index + 1}`;
+        const titulo = titulosCognitivos[index];
+        const datos = distribucionesLikert.cognitivos[pregunta];
+        
+        renderCategoryChart(canvasId, datos, titulo);
+      });
+    }
+
+    // Renderizar gráficos individuales para Sustentabilidad Ambiental
+    function renderAmbientalCharts() {
+      if (!currentData.length) return;
+      
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
+      const preguntasAmbiental = [
+        'desechos_organicos_funcionalidad',
+        'acumulacion_desechos_afecta_salud',
+        'reduccion_reciclaje_reutilizacion_cuida_ambiente',
+        'transformacion_desechos_nuevos_productos',
+        'necesita_info_educacion_ambiental'
+      ];
+      
+      const titulosAmbiental = [
+        '¿Los desechos orgánicos generados en el hogar pueden tener otra funcionalidad?',
+        '¿La acumulación de desechos afectan a la salud de la población?',
+        '¿La reducción, reciclaje y la reutilización de los desechos sólidos puede cuidar al medio ambiente y a la vida silvestre?',
+        '¿Cree que la transformación de desechos sólidos en nuevos productos puede contribuir significativamente a la reducción de la generación de desechos?',
+        '¿Necesita más información acerca de educación ambiental?'
+      ];
+      
+      preguntasAmbiental.forEach((pregunta, index) => {
+        const canvasId = `ambientalChart${index + 1}`;
+        const titulo = titulosAmbiental[index];
+        const datos = distribucionesLikert.ambiental[pregunta];
+        
+        renderCategoryChart(canvasId, datos, titulo);
+      });
+    }
+
+    // Renderizar gráficos individuales para Sustentabilidad Económica
+    function renderEconomicaCharts() {
+      if (!currentData.length) return;
+      
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
+      const preguntasEconomica = [
+        'practica_separacion_reciclaje_ingreso',
+        'desechos_hogar_reutilizados',
+        'manejo_adecuado_desechos_aporta_desarrollo',
+        'emprendimientos_reutilizacion_aportan_economia',
+        'manejo_adecuado_desechos_oportunidad_emprendimiento'
+      ];
+      
+      const titulosEconomica = [
+        '¿En su hogar practica la separación de los desechos para el reciclaje y le representa algún ingreso?',
+        '¿Los desechos sólidos generados en el hogar pueden ser reutilizados para una nueva función o creación de un producto?',
+        '¿Cree que el manejo adecuado de los desechos sólidos domiciliarios podría aportar al desarrollo económico comunitario?',
+        '¿Los emprendimientos en base a la reutilización de los desechos aporta a su economía?',
+        '¿El manejo adecuado de los desechos sólidos domiciliarios ofrece oportunidades para el emprendimiento?'
+      ];
+      
+      preguntasEconomica.forEach((pregunta, index) => {
+        const canvasId = `economicaChart${index + 1}`;
+        const titulo = titulosEconomica[index];
+        const datos = distribucionesLikert.economica[pregunta];
+        
+        renderCategoryChart(canvasId, datos, titulo);
+      });
+    }
+
+    // Renderizar gráficos individuales para Desarrollo Comunitario
+    function renderComunitarioCharts() {
+      if (!currentData.length) return;
+      
+      const { distribuciones: distribucionesLikert } = calcularDistribucionesLikert(currentData);
+      const preguntasComunitario = [
+        'reducir_residuos_eventos_concientizacion',
+        'participaria_talleres_buenas_practicas',
+        'manejo_adecuado_desechos_impacto_ambiente',
+        'dispuesto_participar_emprendimiento_desechos',
+        'participaria_feria_emprendimientos_desechos'
+      ];
+      
+      const titulosComunitario = [
+        '¿Es posible reducir la generación de residuos sólidos domiciliarios por medio de eventos de concientización?',
+        '¿Participaría en talleres de buenas prácticas y capacitaciones para el correcto manejo de los desechos sólidos domiciliarios?',
+        '¿El manejo adecuado de los desechos sólidos domiciliarios puede tener un impacto significativo al medio ambiente?',
+        '¿Está dispuesto a participar en un emprendimiento en base al uso de los desechos sólidos?',
+        '¿Participaría a una feria de emprendimientos comunitarios en base a desechos domiciliarios reutilizados?'
+      ];
+      
+      preguntasComunitario.forEach((pregunta, index) => {
+        const canvasId = `comunitarioChart${index + 1}`;
+        const titulo = titulosComunitario[index];
+        const datos = distribucionesLikert.comunitario[pregunta];
+        
+        renderCategoryChart(canvasId, datos, titulo);
+      });
+    }
+
+    // Función para renderizar gráficos individuales de categorías
+    function renderCategoryChart(canvasId, data, title) {
       const ctx = document.getElementById(canvasId).getContext('2d');
       
       // Destruir gráfico existente si existe
@@ -1821,10 +2183,13 @@
               font: {
                 weight: 'bold',
                 size: 12
-              }
+              },
+              anchor: 'end',
+              align: 'top'
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     }
 
@@ -2310,9 +2675,24 @@
           renderLikertChart();
         }
         
-        // Si la pestaña de Determinantes Afectivos está activa, renderizarla
+        // Si las pestañas de categorías están activas, renderizarlas
+        if (document.querySelector('.tab[data-tab="sociocultural"]').classList.contains('active')) {
+          renderSocioculturalCharts();
+        }
         if (document.querySelector('.tab[data-tab="afectivos"]').classList.contains('active')) {
           renderAfectivosCharts();
+        }
+        if (document.querySelector('.tab[data-tab="cognitivos"]').classList.contains('active')) {
+          renderCognitivosCharts();
+        }
+        if (document.querySelector('.tab[data-tab="ambiental"]').classList.contains('active')) {
+          renderAmbientalCharts();
+        }
+        if (document.querySelector('.tab[data-tab="economica"]').classList.contains('active')) {
+          renderEconomicaCharts();
+        }
+        if (document.querySelector('.tab[data-tab="comunitario"]').classList.contains('active')) {
+          renderComunitarioCharts();
         }
       } catch (err) {
         console.error(err);
