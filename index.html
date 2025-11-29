@@ -1926,14 +1926,22 @@
             formatter: function(value, context) {
               return value.toFixed(1) + '%';
             },
-            color: '#1e293b',
+            color: function(context) {
+              // Para gráficos de pastel, usar color blanco para mejor contraste
+              return currentChartType === 'pie' ? 'white' : '#1e293b';
+            },
             font: {
               weight: 'bold',
-              size: currentChartType === 'pie' ? 11 : 12
+              size: currentChartType === 'pie' ? 12 : 11
             },
             anchor: currentChartType === 'pie' ? 'center' : 'end',
             align: currentChartType === 'pie' ? 'center' : 'top',
-            offset: currentChartType === 'pie' ? 0 : 5
+            offset: currentChartType === 'pie' ? 0 : 8,
+            clip: false,
+            display: function(context) {
+              // Mostrar etiqueta solo si el valor es mayor a 5% para evitar superposición
+              return context.dataset.data[context.dataIndex] > 5;
+            }
           }
         }
       };
@@ -1963,6 +1971,17 @@
             title: {
               display: true,
               text: 'Porcentaje (%)'
+            },
+            ticks: {
+              callback: function(value) {
+                return value + '%';
+              }
+            }
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 0
             }
           }
         };
@@ -1974,29 +1993,52 @@
             title: {
               display: true,
               text: 'Porcentaje (%)'
+            },
+            ticks: {
+              callback: function(value) {
+                return value + '%';
+              }
+            }
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 0
             }
           }
         };
         chartConfig.data.datasets[0].fill = false;
         chartConfig.data.datasets[0].tension = 0.1;
+        chartConfig.data.datasets[0].pointBackgroundColor = colors.slice(0, labels.length);
+        chartConfig.data.datasets[0].pointBorderColor = colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)'));
+        chartConfig.data.datasets[0].pointRadius = 5;
+        chartConfig.data.datasets[0].pointHoverRadius = 7;
       } else if (currentChartType === 'pie') {
-        // No necesita escalas adicionales
+        // Configuración específica para gráficos de pastel
+        chartConfig.options.plugins.datalabels.backgroundColor = 'rgba(0,0,0,0.7)';
+        chartConfig.options.plugins.datalabels.borderRadius = 4;
+        chartConfig.options.plugins.datalabels.padding = 4;
       } else if (currentChartType === 'radar') {
         chartConfig.options.scales = {
           r: {
             beginAtZero: true,
             max: 100,
             ticks: {
-              stepSize: 20
+              stepSize: 20,
+              callback: function(value) {
+                return value + '%';
+              }
             }
           }
         };
+        chartConfig.data.datasets[0].pointBackgroundColor = colors.slice(0, labels.length);
+        chartConfig.data.datasets[0].pointBorderColor = colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)'));
+        chartConfig.data.datasets[0].pointRadius = 4;
+        chartConfig.data.datasets[0].pointHoverRadius = 6;
       }
       
-      window[canvasId + 'Chart'] = new Chart(ctx, {
-        ...chartConfig,
-        plugins: [ChartDataLabels]
-      });
+      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
+      window[canvasId + 'Chart'].update();
     }
 
     // Renderizar gráficos individuales para Determinantes Socioculturales
@@ -2234,14 +2276,22 @@
             formatter: function(value, context) {
               return value.toFixed(1) + '%';
             },
-            color: '#1e293b',
+            color: function(context) {
+              // Para gráficos de pastel, usar color blanco para mejor contraste
+              return currentChartType === 'pie' ? 'white' : '#1e293b';
+            },
             font: {
               weight: 'bold',
-              size: currentChartType === 'pie' ? 11 : 12
+              size: currentChartType === 'pie' ? 12 : 11
             },
             anchor: currentChartType === 'pie' ? 'center' : 'end',
             align: currentChartType === 'pie' ? 'center' : 'top',
-            offset: currentChartType === 'pie' ? 0 : 5
+            offset: currentChartType === 'pie' ? 0 : 8,
+            clip: false,
+            display: function(context) {
+              // Mostrar etiqueta solo si el valor es mayor a 5% para evitar superposición
+              return context.dataset.data[context.dataIndex] > 5;
+            }
           }
         }
       };
@@ -2271,6 +2321,17 @@
             title: {
               display: true,
               text: 'Porcentaje (%)'
+            },
+            ticks: {
+              callback: function(value) {
+                return value + '%';
+              }
+            }
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 0
             }
           }
         };
@@ -2282,29 +2343,52 @@
             title: {
               display: true,
               text: 'Porcentaje (%)'
+            },
+            ticks: {
+              callback: function(value) {
+                return value + '%';
+              }
+            }
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 0
             }
           }
         };
         chartConfig.data.datasets[0].fill = false;
         chartConfig.data.datasets[0].tension = 0.1;
+        chartConfig.data.datasets[0].pointBackgroundColor = colors;
+        chartConfig.data.datasets[0].pointBorderColor = colors.map(c => c.replace(')', ', 0.8)'));
+        chartConfig.data.datasets[0].pointRadius = 5;
+        chartConfig.data.datasets[0].pointHoverRadius = 7;
       } else if (currentChartType === 'pie') {
-        // No necesita escalas adicionales
+        // Configuración específica para gráficos de pastel
+        chartConfig.options.plugins.datalabels.backgroundColor = 'rgba(0,0,0,0.7)';
+        chartConfig.options.plugins.datalabels.borderRadius = 4;
+        chartConfig.options.plugins.datalabels.padding = 4;
       } else if (currentChartType === 'radar') {
         chartConfig.options.scales = {
           r: {
             beginAtZero: true,
             max: 100,
             ticks: {
-              stepSize: 20
+              stepSize: 20,
+              callback: function(value) {
+                return value + '%';
+              }
             }
           }
         };
+        chartConfig.data.datasets[0].pointBackgroundColor = colors;
+        chartConfig.data.datasets[0].pointBorderColor = colors.map(c => c.replace(')', ', 0.8)'));
+        chartConfig.data.datasets[0].pointRadius = 4;
+        chartConfig.data.datasets[0].pointHoverRadius = 6;
       }
       
-      window[canvasId + 'Chart'] = new Chart(ctx, {
-        ...chartConfig,
-        plugins: [ChartDataLabels]
-      });
+      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
+      window[canvasId + 'Chart'].update();
     }
 
     // Llenar tablas resumen
