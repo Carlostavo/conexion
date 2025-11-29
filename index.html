@@ -743,6 +743,22 @@
         Visualización de Datos
       </div>
       
+      <div class="chart-type-selector">
+        <span style="font-weight: 500; color: var(--muted);">Tipo de gráfico:</span>
+        <div class="chart-type-btn active" data-type="bar">
+          <i class="fas fa-chart-bar"></i> Barras
+        </div>
+        <div class="chart-type-btn" data-type="line">
+          <i class="fas fa-chart-line"></i> Lineal
+        </div>
+        <div class="chart-type-btn" data-type="pie">
+          <i class="fas fa-chart-pie"></i> Circular
+        </div>
+        <div class="chart-type-btn" data-type="radar">
+          <i class="fas fa-bullseye"></i> Radial
+        </div>
+      </div>
+      
       <div class="tabs">
         <div class="tab active" data-tab="demographics">Distribución Demográfica</div>
         <div class="tab" data-tab="sociocultural">Determinantes Socioculturales</div>
@@ -1422,6 +1438,9 @@
       situacionesLaborales: [],
       nivelesIngreso: []
     };
+    
+    // Variable global para el tipo de gráfico actual
+    let currentChartType = 'bar';
 
     // Inicializar la aplicación
     async function initApp() {
@@ -1479,6 +1498,36 @@
           } else if (tabId === 'economica') {
             renderEconomicaCharts();
           } else if (tabId === 'comunitario') {
+            renderComunitarioCharts();
+          }
+        });
+      });
+      
+      // Manejar cambio de tipo de gráfico
+      document.querySelectorAll('.chart-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Actualizar botones activos
+          document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          // Cambiar tipo de gráfico
+          currentChartType = btn.getAttribute('data-type');
+          
+          // Re-renderizar gráficos actuales
+          if (document.querySelector('.tab[data-tab="demographics"]').classList.contains('active')) {
+            const distribuciones = calcularDistribuciones(currentData);
+            renderDemographicsCharts(distribuciones);
+          } else if (document.querySelector('.tab[data-tab="sociocultural"]').classList.contains('active')) {
+            renderSocioculturalCharts();
+          } else if (document.querySelector('.tab[data-tab="afectivos"]').classList.contains('active')) {
+            renderAfectivosCharts();
+          } else if (document.querySelector('.tab[data-tab="cognitivos"]').classList.contains('active')) {
+            renderCognitivosCharts();
+          } else if (document.querySelector('.tab[data-tab="ambiental"]').classList.contains('active')) {
+            renderAmbientalCharts();
+          } else if (document.querySelector('.tab[data-tab="economica"]').classList.contains('active')) {
+            renderEconomicaCharts();
+          } else if (document.querySelector('.tab[data-tab="comunitario"]').classList.contains('active')) {
             renderComunitarioCharts();
           }
         });
@@ -1787,7 +1836,7 @@
       return { distribuciones, promedios };
     }
 
-    // Renderizar gráficos demográficos en barras
+    // Renderizar gráficos demográficos según el tipo seleccionado
     function renderDemographicsCharts(distribuciones) {
       // Gráfico de estado civil
       renderDemographicChart('estadoCivilChart', 
@@ -1832,7 +1881,7 @@
         'Distribución por Tipo de Hogar');
     }
 
-    // Función para renderizar gráficos demográficos en barras
+    // Función para renderizar gráficos demográficos según el tipo seleccionado
     function renderDemographicChart(canvasId, labels, data, counts, title) {
       const ctx = document.getElementById(canvasId).getContext('2d');
       
@@ -1843,8 +1892,55 @@
       
       const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
       
-      window[canvasId + 'Chart'] = new Chart(ctx, {
-        type: 'bar',
+      // Configuración común para todos los tipos de gráficos
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: currentChartType === 'pie' || currentChartType === 'radar',
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: title,
+            font: {
+              size: 14,
+              weight: 'bold'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                let value = context.parsed;
+                if (currentChartType === 'pie' || currentChartType === 'radar') {
+                  value = context.parsed.r || context.parsed;
+                }
+                const count = counts[context.label] || 0;
+                return `${label}: ${value.toFixed(1)}% (${count} personas)`;
+              }
+            }
+          },
+          datalabels: {
+            formatter: function(value, context) {
+              return value.toFixed(1) + '%';
+            },
+            color: '#1e293b',
+            font: {
+              weight: 'bold',
+              size: currentChartType === 'pie' ? 11 : 12
+            },
+            anchor: currentChartType === 'pie' ? 'center' : 'end',
+            align: currentChartType === 'pie' ? 'center' : 'top',
+            offset: currentChartType === 'pie' ? 0 : 5
+          }
+        }
+      };
+      
+      // Configuración específica por tipo de gráfico
+      let chartConfig = {
+        type: currentChartType,
         data: {
           labels: labels,
           datasets: [{
@@ -1855,58 +1951,50 @@
             borderWidth: 1
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: {
-                display: true,
-                text: 'Porcentaje (%)'
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            },
+        options: commonOptions
+      };
+      
+      // Ajustes específicos para cada tipo de gráfico
+      if (currentChartType === 'bar') {
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
             title: {
               display: true,
-              text: title,
-              font: {
-                size: 14,
-                weight: 'bold'
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const label = context.dataset.label || '';
-                  const value = context.parsed.y;
-                  const count = counts[context.label] || 0;
-                  return `${label}: ${value.toFixed(1)}% (${count} personas)`;
-                }
-              }
-            },
-            datalabels: {
-              formatter: function(value) {
-                return value.toFixed(1) + '%';
-              },
-              color: '#1e293b',
-              font: {
-                weight: 'bold',
-                size: 12
-              },
-              anchor: 'end',
-              align: 'top',
-              offset: 5
+              text: 'Porcentaje (%)'
             }
           }
-        },
-        plugins: [ChartDataLabels]
-      });
+        };
+      } else if (currentChartType === 'line') {
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Porcentaje (%)'
+            }
+          }
+        };
+        chartConfig.data.datasets[0].fill = false;
+        chartConfig.data.datasets[0].tension = 0.1;
+      } else if (currentChartType === 'pie') {
+        // No necesita escalas adicionales
+      } else if (currentChartType === 'radar') {
+        chartConfig.options.scales = {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              stepSize: 20
+            }
+          }
+        };
+      }
+      
+      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
+      window[canvasId + 'Chart'].update();
     }
 
     // Renderizar gráficos individuales para Determinantes Socioculturales
@@ -2109,8 +2197,56 @@
       // Calcular cantidades para cada respuesta
       const cantidades = respuestas.map(respuesta => Math.round((data[respuesta] / 100) * total));
       
-      window[canvasId + 'Chart'] = new Chart(ctx, {
-        type: 'bar',
+      // Configuración común para todos los tipos de gráficos
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: currentChartType === 'pie' || currentChartType === 'radar',
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: title,
+            font: {
+              size: 14,
+              weight: 'bold'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                let value = context.parsed;
+                if (currentChartType === 'pie' || currentChartType === 'radar') {
+                  value = context.parsed.r || context.parsed;
+                }
+                const index = context.dataIndex;
+                const cantidad = cantidades[index];
+                return `${label}: ${value.toFixed(1)}% (${cantidad} personas)`;
+              }
+            }
+          },
+          datalabels: {
+            formatter: function(value, context) {
+              return value.toFixed(1) + '%';
+            },
+            color: '#1e293b',
+            font: {
+              weight: 'bold',
+              size: currentChartType === 'pie' ? 11 : 12
+            },
+            anchor: currentChartType === 'pie' ? 'center' : 'end',
+            align: currentChartType === 'pie' ? 'center' : 'top',
+            offset: currentChartType === 'pie' ? 0 : 5
+          }
+        }
+      };
+      
+      // Configuración específica por tipo de gráfico
+      let chartConfig = {
+        type: currentChartType,
         data: {
           labels: respuestas,
           datasets: [{
@@ -2121,59 +2257,50 @@
             borderWidth: 1
           }]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: {
-                display: true,
-                text: 'Porcentaje (%)'
-              }
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            },
+        options: commonOptions
+      };
+      
+      // Ajustes específicos para cada tipo de gráfico
+      if (currentChartType === 'bar') {
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
             title: {
               display: true,
-              text: title,
-              font: {
-                size: 14,
-                weight: 'bold'
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const label = context.dataset.label || '';
-                  const value = context.parsed.y;
-                  const index = context.dataIndex;
-                  const cantidad = cantidades[index];
-                  return `${label}: ${value.toFixed(1)}% (${cantidad} personas)`;
-                }
-              }
-            },
-            datalabels: {
-              formatter: function(value) {
-                return value.toFixed(1) + '%';
-              },
-              color: '#1e293b',
-              font: {
-                weight: 'bold',
-                size: 12
-              },
-              anchor: 'end',
-              align: 'top',
-              offset: 5
+              text: 'Porcentaje (%)'
             }
           }
-        },
-        plugins: [ChartDataLabels]
-      });
+        };
+      } else if (currentChartType === 'line') {
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Porcentaje (%)'
+            }
+          }
+        };
+        chartConfig.data.datasets[0].fill = false;
+        chartConfig.data.datasets[0].tension = 0.1;
+      } else if (currentChartType === 'pie') {
+        // No necesita escalas adicionales
+      } else if (currentChartType === 'radar') {
+        chartConfig.options.scales = {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              stepSize: 20
+            }
+          }
+        };
+      }
+      
+      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
+      window[canvasId + 'Chart'].update();
     }
 
     // Llenar tablas resumen
