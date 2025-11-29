@@ -1993,8 +1993,10 @@
         };
       }
       
-      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
-      window[canvasId + 'Chart'].update();
+      window[canvasId + 'Chart'] = new Chart(ctx, {
+        ...chartConfig,
+        plugins: [ChartDataLabels]
+      });
     }
 
     // Renderizar gráficos individuales para Determinantes Socioculturales
@@ -2299,8 +2301,10 @@
         };
       }
       
-      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
-      window[canvasId + 'Chart'].update();
+      window[canvasId + 'Chart'] = new Chart(ctx, {
+        ...chartConfig,
+        plugins: [ChartDataLabels]
+      });
     }
 
     // Llenar tablas resumen
