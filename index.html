@@ -703,7 +703,7 @@
           </div>
           <div class="summary-value" id="summaryTotal">0</div>
           <div class="summary-subtitle" id="summaryTotalChange">
-            <!-- Texto eliminado según solicitud -->
+            <!-- Eliminado: 0% vs período anterior -->
           </div>
         </div>
         <div class="summary-card">
@@ -743,10 +743,12 @@
         Visualización de Datos
       </div>
       
-      <!-- Selector de tipo de gráfico -->
-      <div class="chart-type-selector">
+      <div class="chart-type-selector" id="chartTypeSelector">
         <div class="chart-type-btn active" data-type="bar">
           <i class="fas fa-chart-bar"></i> Barras
+        </div>
+        <div class="chart-type-btn" data-type="line">
+          <i class="fas fa-chart-line"></i> Lineal
         </div>
         <div class="chart-type-btn" data-type="pie">
           <i class="fas fa-chart-pie"></i> Circular
@@ -754,8 +756,8 @@
         <div class="chart-type-btn" data-type="radar">
           <i class="fas fa-bullseye"></i> Radial
         </div>
-        <div class="chart-type-btn" data-type="line">
-          <i class="fas fa-chart-line"></i> Regresión
+        <div class="chart-type-btn" data-type="scatter">
+          <i class="fas fa-chart-scatter"></i> Regresión
         </div>
       </div>
       
@@ -1412,9 +1414,7 @@
     const selectEducacion = document.getElementById('selectEducacion');
     const selectSituacionLaboral = document.getElementById('selectSituacionLaboral');
     const selectIngreso = document.getElementById('selectIngreso');
-    const btnExport = document.getElementById('btnExport');
-    const btnResetFilters = document.getElementById('btnResetFilters');
-    const exportOptions = document.getElementById('exportOptions');
+    const chartTypeSelector = document.getElementById('chartTypeSelector');
 
     // Elementos de información de filtros
     const estadoCivilInfo = document.getElementById('estadoCivilInfo');
@@ -1442,7 +1442,7 @@
       nivelesIngreso: []
     };
     
-    // Variable para el tipo de gráfico actual
+    // Variable global para el tipo de gráfico actual
     let currentChartType = 'bar';
 
     // Inicializar la aplicación
@@ -1473,23 +1473,20 @@
       });
       
       // Selector de tipo de gráfico
-      document.querySelectorAll('.chart-type-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+      chartTypeSelector.addEventListener('click', function(e) {
+        if (e.target.classList.contains('chart-type-btn')) {
           // Actualizar botones activos
-          document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
+          document.querySelectorAll('.chart-type-btn').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          e.target.classList.add('active');
           
-          // Cambiar tipo de gráfico
-          currentChartType = this.getAttribute('data-type');
+          // Actualizar tipo de gráfico
+          currentChartType = e.target.getAttribute('data-type');
           
-          // Volver a renderizar gráficos
+          // Re-renderizar gráficos
           actualizarGraficos();
-        });
-      });
-      
-      // Ayuda
-      document.getElementById('btnHelp').addEventListener('click', () => {
-        alert('Este panel permite analizar datos del cuestionario de comportamiento proambiental del Cantón Daule. Los filtros se aplican automáticamente. Utilice las diferentes pestañas para explorar diversas visualizaciones y análisis estadísticos.');
+        }
       });
       
       // Manejar pestañas
@@ -1519,6 +1516,11 @@
             renderComunitarioCharts();
           }
         });
+      });
+      
+      // Ayuda
+      document.getElementById('btnHelp').addEventListener('click', () => {
+        alert('Este panel permite analizar datos del cuestionario de comportamiento proambiental del Cantón Daule. Los filtros se aplican automáticamente. Utilice las diferentes pestañas para explorar diversas visualizaciones y análisis estadísticos.');
       });
     }
 
@@ -1900,9 +1902,9 @@
             callbacks: {
               label: function(context) {
                 const label = context.dataset.label || '';
-                const value = context.parsed ? context.parsed.y : context.raw;
-                const index = context.dataIndex;
-                const count = counts[labels[index]] || 0;
+                const value = currentChartType === 'pie' || currentChartType === 'radar' ? 
+                  context.parsed : context.parsed.y;
+                const count = counts[context.label] || 0;
                 return `${label}: ${value.toFixed(1)}% (${count} personas)`;
               }
             }
@@ -1923,112 +1925,53 @@
       };
       
       // Configuración específica por tipo de gráfico
-      let chartConfig;
-      switch(currentChartType) {
-        case 'pie':
-          chartConfig = {
-            type: 'pie',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: data,
-                backgroundColor: colors.slice(0, labels.length),
-                borderColor: colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)')),
-                borderWidth: 1
-              }]
-            },
-            options: commonOptions
-          };
-          break;
-          
-        case 'radar':
-          chartConfig = {
-            type: 'radar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: data,
-                backgroundColor: 'rgba(15, 118, 110, 0.2)',
-                borderColor: 'rgba(15, 118, 110, 1)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgba(15, 118, 110, 1)'
-              }]
-            },
-            options: {
-              ...commonOptions,
-              scales: {
-                r: {
-                  beginAtZero: true,
-                  max: 100,
-                  ticks: {
-                    stepSize: 20
-                  }
-                }
-              }
+      let chartConfig = {
+        type: currentChartType,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Porcentaje (%)',
+            data: data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderColor: colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)')),
+            borderWidth: 1
+          }]
+        },
+        options: commonOptions
+      };
+      
+      // Configuraciones específicas por tipo de gráfico
+      if (currentChartType === 'bar' || currentChartType === 'line') {
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Porcentaje (%)'
             }
-          };
-          break;
-          
-        case 'line':
-          chartConfig = {
-            type: 'line',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: data,
-                backgroundColor: 'rgba(15, 118, 110, 0.2)',
-                borderColor: 'rgba(15, 118, 110, 1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-              }]
-            },
-            options: {
-              ...commonOptions,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  title: {
-                    display: true,
-                    text: 'Porcentaje (%)'
-                  }
-                }
-              }
+          }
+        };
+      } else if (currentChartType === 'scatter') {
+        // Para scatter, necesitamos datos x,y
+        chartConfig.data.datasets[0].data = data.map((value, index) => ({
+          x: index,
+          y: value
+        }));
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Porcentaje (%)'
             }
-          };
-          break;
-          
-        default: // 'bar'
-          chartConfig = {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: data,
-                backgroundColor: colors.slice(0, labels.length),
-                borderColor: colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)')),
-                borderWidth: 1
-              }]
-            },
-            options: {
-              ...commonOptions,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  title: {
-                    display: true,
-                    text: 'Porcentaje (%)'
-                  }
-                }
-              }
-            }
-          };
+          },
+          x: {
+            type: 'category',
+            labels: labels
+          }
+        };
       }
       
       window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
@@ -2254,7 +2197,8 @@
             callbacks: {
               label: function(context) {
                 const label = context.dataset.label || '';
-                const value = context.parsed ? context.parsed.y : context.raw;
+                const value = currentChartType === 'pie' || currentChartType === 'radar' ? 
+                  context.parsed : context.parsed.y;
                 const index = context.dataIndex;
                 const cantidad = cantidades[index];
                 return `${label}: ${value.toFixed(1)}% (${cantidad} personas)`;
@@ -2277,112 +2221,53 @@
       };
       
       // Configuración específica por tipo de gráfico
-      let chartConfig;
-      switch(currentChartType) {
-        case 'pie':
-          chartConfig = {
-            type: 'pie',
-            data: {
-              labels: respuestas,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: valores,
-                backgroundColor: colors,
-                borderColor: colors.map(c => c.replace(')', ', 0.8)')),
-                borderWidth: 1
-              }]
-            },
-            options: commonOptions
-          };
-          break;
-          
-        case 'radar':
-          chartConfig = {
-            type: 'radar',
-            data: {
-              labels: respuestas,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: valores,
-                backgroundColor: 'rgba(15, 118, 110, 0.2)',
-                borderColor: 'rgba(15, 118, 110, 1)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgba(15, 118, 110, 1)'
-              }]
-            },
-            options: {
-              ...commonOptions,
-              scales: {
-                r: {
-                  beginAtZero: true,
-                  max: 100,
-                  ticks: {
-                    stepSize: 20
-                  }
-                }
-              }
+      let chartConfig = {
+        type: currentChartType,
+        data: {
+          labels: respuestas,
+          datasets: [{
+            label: 'Porcentaje (%)',
+            data: valores,
+            backgroundColor: colors,
+            borderColor: colors.map(c => c.replace(')', ', 0.8)')),
+            borderWidth: 1
+          }]
+        },
+        options: commonOptions
+      };
+      
+      // Configuraciones específicas por tipo de gráfico
+      if (currentChartType === 'bar' || currentChartType === 'line') {
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Porcentaje (%)'
             }
-          };
-          break;
-          
-        case 'line':
-          chartConfig = {
-            type: 'line',
-            data: {
-              labels: respuestas,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: valores,
-                backgroundColor: 'rgba(15, 118, 110, 0.2)',
-                borderColor: 'rgba(15, 118, 110, 1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-              }]
-            },
-            options: {
-              ...commonOptions,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  title: {
-                    display: true,
-                    text: 'Porcentaje (%)'
-                  }
-                }
-              }
+          }
+        };
+      } else if (currentChartType === 'scatter') {
+        // Para scatter, necesitamos datos x,y
+        chartConfig.data.datasets[0].data = valores.map((value, index) => ({
+          x: index,
+          y: value
+        }));
+        chartConfig.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Porcentaje (%)'
             }
-          };
-          break;
-          
-        default: // 'bar'
-          chartConfig = {
-            type: 'bar',
-            data: {
-              labels: respuestas,
-              datasets: [{
-                label: 'Porcentaje (%)',
-                data: valores,
-                backgroundColor: colors,
-                borderColor: colors.map(c => c.replace(')', ', 0.8)')),
-                borderWidth: 1
-              }]
-            },
-            options: {
-              ...commonOptions,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  title: {
-                    display: true,
-                    text: 'Porcentaje (%)'
-                  }
-                }
-              }
-            }
-          };
+          },
+          x: {
+            type: 'category',
+            labels: respuestas
+          }
+        };
       }
       
       window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
@@ -2546,10 +2431,10 @@
       const distribuciones = calcularDistribuciones(currentData);
       const distribucionesLikert = calcularDistribucionesLikert(currentData);
       
-      // Renderizar gráficos con el tipo actual
+      // Re-renderizar gráficos
       renderDemographicsCharts(distribuciones);
       
-      // Renderizar gráficos específicos si la pestaña está activa
+      // Re-renderizar gráficos específicos si la pestaña está activa
       if (document.querySelector('.tab[data-tab="sociocultural"]').classList.contains('active')) {
         renderSocioculturalCharts();
       } else if (document.querySelector('.tab[data-tab="afectivos"]').classList.contains('active')) {
