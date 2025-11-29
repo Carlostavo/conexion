@@ -687,25 +687,6 @@
           <div class="filter-info" id="ingresoInfo">Cargando...</div>
         </div>
       </div>
-
-      <div class="action-buttons">
-        <button id="btnResetFilters" class="secondary">
-          <i class="fas fa-undo"></i> Restablecer Filtros
-        </button>
-        <div style="position: relative;">
-          <button id="btnExport" class="secondary">
-            <i class="fas fa-download"></i> Exportar Datos
-          </button>
-          <div class="export-options" id="exportOptions">
-            <div class="export-option" data-type="png">
-              <i class="fas fa-image"></i> Gráfico (PNG)
-            </div>
-            <div class="export-option" data-type="csv">
-              <i class="fas fa-file-csv"></i> Datos (CSV)
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Tarjetas de resumen -->
@@ -722,7 +703,7 @@
           </div>
           <div class="summary-value" id="summaryTotal">0</div>
           <div class="summary-subtitle" id="summaryTotalChange">
-            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
+            <span>Total de registros</span>
           </div>
         </div>
         <div class="summary-card">
@@ -1415,9 +1396,6 @@
     const selectEducacion = document.getElementById('selectEducacion');
     const selectSituacionLaboral = document.getElementById('selectSituacionLaboral');
     const selectIngreso = document.getElementById('selectIngreso');
-    const btnExport = document.getElementById('btnExport');
-    const btnResetFilters = document.getElementById('btnResetFilters');
-    const exportOptions = document.getElementById('exportOptions');
 
     // Elementos de información de filtros
     const estadoCivilInfo = document.getElementById('estadoCivilInfo');
@@ -1472,34 +1450,9 @@
         await actualizar();
       });
       
-      // Botón para restablecer filtros
-      btnResetFilters.addEventListener('click', function() {
-        selectEstadoCivil.value = '';
-        selectEducacion.value = '';
-        selectSituacionLaboral.value = '';
-        selectIngreso.value = '';
-        actualizar();
-      });
-      
-      // Toggle export options
-      btnExport.addEventListener('click', (e) => {
-        e.stopPropagation();
-        exportOptions.classList.toggle('show');
-      });
-      
-      // Cerrar export options al hacer clic fuera
-      document.addEventListener('click', () => {
-        exportOptions.classList.remove('show');
-      });
-      
-      // Manejar opciones de exportación
-      document.querySelectorAll('.export-option').forEach(option => {
-        option.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const type = e.currentTarget.getAttribute('data-type');
-          exportarDatos(type);
-          exportOptions.classList.remove('show');
-        });
+      // Ayuda
+      document.getElementById('btnHelp').addEventListener('click', () => {
+        alert('Este panel permite analizar datos del cuestionario de comportamiento proambiental del Cantón Daule. Los filtros se aplican automáticamente. Utilice las diferentes pestañas para explorar diversas visualizaciones y análisis estadísticos.');
       });
       
       // Manejar pestañas
@@ -1529,11 +1482,6 @@
             renderComunitarioCharts();
           }
         });
-      });
-      
-      // Ayuda
-      document.getElementById('btnHelp').addEventListener('click', () => {
-        alert('Este panel permite analizar datos del cuestionario de comportamiento proambiental del Cantón Daule. Los filtros se aplican automáticamente. Utilice las diferentes pestañas para explorar diversas visualizaciones y análisis estadísticos.');
       });
     }
 
@@ -1952,7 +1900,8 @@
                 size: 12
               },
               anchor: 'end',
-              align: 'top'
+              align: 'top',
+              offset: 5
             }
           }
         },
@@ -2218,7 +2167,8 @@
                 size: 12
               },
               anchor: 'end',
-              align: 'top'
+              align: 'top',
+              offset: 5
             }
           }
         },
@@ -2375,60 +2325,6 @@
       summaryHogarChange.innerHTML = `<span>${hogarPorcentaje.toFixed(1)}% del total</span>`;
       summaryEducacionChange.innerHTML = `<span>${educacionPorcentaje.toFixed(1)}% del total</span>`;
       summaryLaboralChange.innerHTML = `<span>${laboralPorcentaje.toFixed(1)}% del total</span>`;
-    }
-
-    // Exportar datos
-    function exportarDatos(tipo) {
-      if (!currentData.length) {
-        alert('No hay datos para exportar');
-        return;
-      }
-      
-      switch (tipo) {
-        case 'png':
-          // En una implementación real, se exportaría el gráfico activo
-          alert('Seleccione un gráfico específico para exportar como PNG');
-          break;
-          
-        case 'csv':
-          const distribuciones = calcularDistribuciones(currentData);
-          const distribucionesLikert = calcularDistribucionesLikert(currentData);
-          
-          let csvContent = "Categoría,Subcategoría,Cantidad,Porcentaje\n";
-          
-          // Exportar datos demográficos
-          Object.keys(distribuciones).forEach(categoria => {
-            if (categoria !== 'counts') {
-              Object.keys(distribuciones[categoria]).forEach(subcategoria => {
-                const count = distribuciones.counts[categoria][subcategoria] || 0;
-                csvContent += `"${categoria}","${subcategoria}",${count},${distribuciones[categoria][subcategoria].toFixed(2)}\n`;
-              });
-            }
-          });
-          
-          // Exportar datos Likert
-          Object.keys(distribucionesLikert.distribuciones).forEach(categoria => {
-            Object.keys(distribucionesLikert.distribuciones[categoria]).forEach(pregunta => {
-              Object.keys(distribucionesLikert.distribuciones[categoria][pregunta]).forEach(respuesta => {
-                if (respuesta !== 'Promedio') {
-                  const porcentaje = distribucionesLikert.distribuciones[categoria][pregunta][respuesta];
-                  csvContent += `"${categoria}","${pregunta} - ${respuesta}",,${porcentaje.toFixed(2)}\n`;
-                }
-              });
-            });
-          });
-          
-          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.setAttribute('href', url);
-          link.setAttribute('download', 'datos-comportamiento-proambiental.csv');
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          break;
-      }
     }
 
     // Acción principal: obtener datos, procesar y renderizar
