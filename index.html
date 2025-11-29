@@ -1927,19 +1927,43 @@
               return value.toFixed(1) + '%';
             },
             color: function(context) {
-              // Para gráficos de pastel, usar color blanco para mejor contraste
-              return currentChartType === 'pie' ? 'white' : '#1e293b';
+              // Para gráficos de pastel, usar color de contraste
+              if (currentChartType === 'pie') {
+                const backgroundColor = context.dataset.backgroundColor[context.dataIndex];
+                // Determinar si el color es claro u oscuro
+                const rgb = backgroundColor.replace(/[^\d,]/g, '').split(',');
+                const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+                return brightness > 128 ? '#1e293b' : 'white';
+              }
+              return '#1e293b';
             },
             font: {
               weight: 'bold',
-              size: currentChartType === 'pie' ? 12 : 11
+              size: function(context) {
+                // Ajustar tamaño según tipo de gráfico
+                if (currentChartType === 'pie') return 11;
+                if (currentChartType === 'radar') return 10;
+                return 12;
+              }
             },
-            anchor: currentChartType === 'pie' ? 'center' : 'end',
-            align: currentChartType === 'pie' ? 'center' : 'top',
-            offset: currentChartType === 'pie' ? 0 : 8,
+            anchor: function(context) {
+              if (currentChartType === 'pie') return 'center';
+              if (currentChartType === 'radar') return 'center';
+              return 'end';
+            },
+            align: function(context) {
+              if (currentChartType === 'pie') return 'center';
+              if (currentChartType === 'radar') return 'center';
+              return 'top';
+            },
+            offset: function(context) {
+              if (currentChartType === 'pie') return 0;
+              if (currentChartType === 'radar') return 10;
+              return 8;
+            },
             clip: false,
             display: function(context) {
-              // Mostrar etiqueta solo si el valor es mayor a 5% para evitar superposición
+              // Solo mostrar porcentajes mayores a 5% para evitar solapamiento
               return context.dataset.data[context.dataIndex] > 5;
             }
           }
@@ -2009,15 +2033,10 @@
         };
         chartConfig.data.datasets[0].fill = false;
         chartConfig.data.datasets[0].tension = 0.1;
-        chartConfig.data.datasets[0].pointBackgroundColor = colors.slice(0, labels.length);
-        chartConfig.data.datasets[0].pointBorderColor = colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)'));
         chartConfig.data.datasets[0].pointRadius = 5;
         chartConfig.data.datasets[0].pointHoverRadius = 7;
       } else if (currentChartType === 'pie') {
-        // Configuración específica para gráficos de pastel
-        chartConfig.options.plugins.datalabels.backgroundColor = 'rgba(0,0,0,0.7)';
-        chartConfig.options.plugins.datalabels.borderRadius = 4;
-        chartConfig.options.plugins.datalabels.padding = 4;
+        chartConfig.options.plugins.datalabels.padding = 8;
       } else if (currentChartType === 'radar') {
         chartConfig.options.scales = {
           r: {
@@ -2031,8 +2050,6 @@
             }
           }
         };
-        chartConfig.data.datasets[0].pointBackgroundColor = colors.slice(0, labels.length);
-        chartConfig.data.datasets[0].pointBorderColor = colors.slice(0, labels.length).map(c => c.replace(')', ', 0.8)'));
         chartConfig.data.datasets[0].pointRadius = 4;
         chartConfig.data.datasets[0].pointHoverRadius = 6;
       }
@@ -2277,19 +2294,43 @@
               return value.toFixed(1) + '%';
             },
             color: function(context) {
-              // Para gráficos de pastel, usar color blanco para mejor contraste
-              return currentChartType === 'pie' ? 'white' : '#1e293b';
+              // Para gráficos de pastel, usar color de contraste
+              if (currentChartType === 'pie') {
+                const backgroundColor = context.dataset.backgroundColor[context.dataIndex];
+                // Determinar si el color es claro u oscuro
+                const rgb = backgroundColor.replace(/[^\d,]/g, '').split(',');
+                const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+                return brightness > 128 ? '#1e293b' : 'white';
+              }
+              return '#1e293b';
             },
             font: {
               weight: 'bold',
-              size: currentChartType === 'pie' ? 12 : 11
+              size: function(context) {
+                // Ajustar tamaño según tipo de gráfico
+                if (currentChartType === 'pie') return 11;
+                if (currentChartType === 'radar') return 10;
+                return 12;
+              }
             },
-            anchor: currentChartType === 'pie' ? 'center' : 'end',
-            align: currentChartType === 'pie' ? 'center' : 'top',
-            offset: currentChartType === 'pie' ? 0 : 8,
+            anchor: function(context) {
+              if (currentChartType === 'pie') return 'center';
+              if (currentChartType === 'radar') return 'center';
+              return 'end';
+            },
+            align: function(context) {
+              if (currentChartType === 'pie') return 'center';
+              if (currentChartType === 'radar') return 'center';
+              return 'top';
+            },
+            offset: function(context) {
+              if (currentChartType === 'pie') return 0;
+              if (currentChartType === 'radar') return 10;
+              return 8;
+            },
             clip: false,
             display: function(context) {
-              // Mostrar etiqueta solo si el valor es mayor a 5% para evitar superposición
+              // Solo mostrar porcentajes mayores a 5% para evitar solapamiento
               return context.dataset.data[context.dataIndex] > 5;
             }
           }
@@ -2359,15 +2400,10 @@
         };
         chartConfig.data.datasets[0].fill = false;
         chartConfig.data.datasets[0].tension = 0.1;
-        chartConfig.data.datasets[0].pointBackgroundColor = colors;
-        chartConfig.data.datasets[0].pointBorderColor = colors.map(c => c.replace(')', ', 0.8)'));
         chartConfig.data.datasets[0].pointRadius = 5;
         chartConfig.data.datasets[0].pointHoverRadius = 7;
       } else if (currentChartType === 'pie') {
-        // Configuración específica para gráficos de pastel
-        chartConfig.options.plugins.datalabels.backgroundColor = 'rgba(0,0,0,0.7)';
-        chartConfig.options.plugins.datalabels.borderRadius = 4;
-        chartConfig.options.plugins.datalabels.padding = 4;
+        chartConfig.options.plugins.datalabels.padding = 8;
       } else if (currentChartType === 'radar') {
         chartConfig.options.scales = {
           r: {
@@ -2381,8 +2417,6 @@
             }
           }
         };
-        chartConfig.data.datasets[0].pointBackgroundColor = colors;
-        chartConfig.data.datasets[0].pointBorderColor = colors.map(c => c.replace(')', ', 0.8)'));
         chartConfig.data.datasets[0].pointRadius = 4;
         chartConfig.data.datasets[0].pointHoverRadius = 6;
       }
