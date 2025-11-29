@@ -687,6 +687,25 @@
           <div class="filter-info" id="ingresoInfo">Cargando...</div>
         </div>
       </div>
+
+      <div class="action-buttons">
+        <button id="btnResetFilters" class="secondary">
+          <i class="fas fa-undo"></i> Restablecer Filtros
+        </button>
+        <div style="position: relative;">
+          <button id="btnExport" class="secondary">
+            <i class="fas fa-download"></i> Exportar Datos
+          </button>
+          <div class="export-options" id="exportOptions">
+            <div class="export-option" data-type="png">
+              <i class="fas fa-image"></i> Gráfico (PNG)
+            </div>
+            <div class="export-option" data-type="csv">
+              <i class="fas fa-file-csv"></i> Datos (CSV)
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Tarjetas de resumen -->
@@ -703,7 +722,7 @@
           </div>
           <div class="summary-value" id="summaryTotal">0</div>
           <div class="summary-subtitle" id="summaryTotalChange">
-            <!-- Eliminado: 0% vs período anterior -->
+            <i class="fas fa-minus"></i> <span>0% vs período anterior</span>
           </div>
         </div>
         <div class="summary-card">
@@ -741,24 +760,6 @@
       <div class="card-title">
         <i class="fas fa-chart-bar"></i>
         Visualización de Datos
-      </div>
-      
-      <div class="chart-type-selector" id="chartTypeSelector">
-        <div class="chart-type-btn active" data-type="bar">
-          <i class="fas fa-chart-bar"></i> Barras
-        </div>
-        <div class="chart-type-btn" data-type="line">
-          <i class="fas fa-chart-line"></i> Lineal
-        </div>
-        <div class="chart-type-btn" data-type="pie">
-          <i class="fas fa-chart-pie"></i> Circular
-        </div>
-        <div class="chart-type-btn" data-type="radar">
-          <i class="fas fa-bullseye"></i> Radial
-        </div>
-        <div class="chart-type-btn" data-type="scatter">
-          <i class="fas fa-chart-scatter"></i> Regresión
-        </div>
       </div>
       
       <div class="tabs">
@@ -1414,7 +1415,9 @@
     const selectEducacion = document.getElementById('selectEducacion');
     const selectSituacionLaboral = document.getElementById('selectSituacionLaboral');
     const selectIngreso = document.getElementById('selectIngreso');
-    const chartTypeSelector = document.getElementById('chartTypeSelector');
+    const btnExport = document.getElementById('btnExport');
+    const btnResetFilters = document.getElementById('btnResetFilters');
+    const exportOptions = document.getElementById('exportOptions');
 
     // Elementos de información de filtros
     const estadoCivilInfo = document.getElementById('estadoCivilInfo');
@@ -1441,9 +1444,6 @@
       situacionesLaborales: [],
       nivelesIngreso: []
     };
-    
-    // Variable global para el tipo de gráfico actual
-    let currentChartType = 'bar';
 
     // Inicializar la aplicación
     async function initApp() {
@@ -1472,21 +1472,34 @@
         await actualizar();
       });
       
-      // Selector de tipo de gráfico
-      chartTypeSelector.addEventListener('click', function(e) {
-        if (e.target.classList.contains('chart-type-btn')) {
-          // Actualizar botones activos
-          document.querySelectorAll('.chart-type-btn').forEach(btn => {
-            btn.classList.remove('active');
-          });
-          e.target.classList.add('active');
-          
-          // Actualizar tipo de gráfico
-          currentChartType = e.target.getAttribute('data-type');
-          
-          // Re-renderizar gráficos
-          actualizarGraficos();
-        }
+      // Botón para restablecer filtros
+      btnResetFilters.addEventListener('click', function() {
+        selectEstadoCivil.value = '';
+        selectEducacion.value = '';
+        selectSituacionLaboral.value = '';
+        selectIngreso.value = '';
+        actualizar();
+      });
+      
+      // Toggle export options
+      btnExport.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportOptions.classList.toggle('show');
+      });
+      
+      // Cerrar export options al hacer clic fuera
+      document.addEventListener('click', () => {
+        exportOptions.classList.remove('show');
+      });
+      
+      // Manejar opciones de exportación
+      document.querySelectorAll('.export-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const type = e.currentTarget.getAttribute('data-type');
+          exportarDatos(type);
+          exportOptions.classList.remove('show');
+        });
       });
       
       // Manejar pestañas
@@ -1826,7 +1839,7 @@
       return { distribuciones, promedios };
     }
 
-    // Renderizar gráficos demográficos según el tipo seleccionado
+    // Renderizar gráficos demográficos en barras
     function renderDemographicsCharts(distribuciones) {
       // Gráfico de estado civil
       renderDemographicChart('estadoCivilChart', 
@@ -1871,7 +1884,7 @@
         'Distribución por Tipo de Hogar');
     }
 
-    // Función para renderizar gráficos demográficos según el tipo seleccionado
+    // Función para renderizar gráficos demográficos en barras
     function renderDemographicChart(canvasId, labels, data, counts, title) {
       const ctx = document.getElementById(canvasId).getContext('2d');
       
@@ -1882,51 +1895,8 @@
       
       const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
       
-      // Configuración común para todos los tipos de gráficos
-      const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: currentChartType === 'pie' || currentChartType === 'radar'
-          },
-          title: {
-            display: true,
-            text: title,
-            font: {
-              size: 14,
-              weight: 'bold'
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || '';
-                const value = currentChartType === 'pie' || currentChartType === 'radar' ? 
-                  context.parsed : context.parsed.y;
-                const count = counts[context.label] || 0;
-                return `${label}: ${value.toFixed(1)}% (${count} personas)`;
-              }
-            }
-          },
-          datalabels: {
-            formatter: function(value) {
-              return value.toFixed(1) + '%';
-            },
-            color: '#1e293b',
-            font: {
-              weight: 'bold',
-              size: 12
-            },
-            anchor: 'end',
-            align: 'top'
-          }
-        }
-      };
-      
-      // Configuración específica por tipo de gráfico
-      let chartConfig = {
-        type: currentChartType,
+      window[canvasId + 'Chart'] = new Chart(ctx, {
+        type: 'bar',
         data: {
           labels: labels,
           datasets: [{
@@ -1937,44 +1907,57 @@
             borderWidth: 1
           }]
         },
-        options: commonOptions
-      };
-      
-      // Configuraciones específicas por tipo de gráfico
-      if (currentChartType === 'bar' || currentChartType === 'line') {
-        chartConfig.options.scales = {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Porcentaje (%)'
-            }
-          }
-        };
-      } else if (currentChartType === 'scatter') {
-        // Para scatter, necesitamos datos x,y
-        chartConfig.data.datasets[0].data = data.map((value, index) => ({
-          x: index,
-          y: value
-        }));
-        chartConfig.options.scales = {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Porcentaje (%)'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje (%)'
+              }
             }
           },
-          x: {
-            type: 'category',
-            labels: labels
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: title,
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  const value = context.parsed.y;
+                  const count = counts[context.label] || 0;
+                  return `${label}: ${value.toFixed(1)}% (${count} personas)`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#1e293b',
+              font: {
+                weight: 'bold',
+                size: 12
+              },
+              anchor: 'end',
+              align: 'top'
+            }
           }
-        };
-      }
-      
-      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
+        },
+        plugins: [ChartDataLabels]
+      });
     }
 
     // Renderizar gráficos individuales para Determinantes Socioculturales
@@ -2177,52 +2160,8 @@
       // Calcular cantidades para cada respuesta
       const cantidades = respuestas.map(respuesta => Math.round((data[respuesta] / 100) * total));
       
-      // Configuración común para todos los tipos de gráficos
-      const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: currentChartType === 'pie' || currentChartType === 'radar'
-          },
-          title: {
-            display: true,
-            text: title,
-            font: {
-              size: 14,
-              weight: 'bold'
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || '';
-                const value = currentChartType === 'pie' || currentChartType === 'radar' ? 
-                  context.parsed : context.parsed.y;
-                const index = context.dataIndex;
-                const cantidad = cantidades[index];
-                return `${label}: ${value.toFixed(1)}% (${cantidad} personas)`;
-              }
-            }
-          },
-          datalabels: {
-            formatter: function(value) {
-              return value.toFixed(1) + '%';
-            },
-            color: '#1e293b',
-            font: {
-              weight: 'bold',
-              size: 12
-            },
-            anchor: 'end',
-            align: 'top'
-          }
-        }
-      };
-      
-      // Configuración específica por tipo de gráfico
-      let chartConfig = {
-        type: currentChartType,
+      window[canvasId + 'Chart'] = new Chart(ctx, {
+        type: 'bar',
         data: {
           labels: respuestas,
           datasets: [{
@@ -2233,44 +2172,58 @@
             borderWidth: 1
           }]
         },
-        options: commonOptions
-      };
-      
-      // Configuraciones específicas por tipo de gráfico
-      if (currentChartType === 'bar' || currentChartType === 'line') {
-        chartConfig.options.scales = {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Porcentaje (%)'
-            }
-          }
-        };
-      } else if (currentChartType === 'scatter') {
-        // Para scatter, necesitamos datos x,y
-        chartConfig.data.datasets[0].data = valores.map((value, index) => ({
-          x: index,
-          y: value
-        }));
-        chartConfig.options.scales = {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Porcentaje (%)'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Porcentaje (%)'
+              }
             }
           },
-          x: {
-            type: 'category',
-            labels: respuestas
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: title,
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  const value = context.parsed.y;
+                  const index = context.dataIndex;
+                  const cantidad = cantidades[index];
+                  return `${label}: ${value.toFixed(1)}% (${cantidad} personas)`;
+                }
+              }
+            },
+            datalabels: {
+              formatter: function(value) {
+                return value.toFixed(1) + '%';
+              },
+              color: '#1e293b',
+              font: {
+                weight: 'bold',
+                size: 12
+              },
+              anchor: 'end',
+              align: 'top'
+            }
           }
-        };
-      }
-      
-      window[canvasId + 'Chart'] = new Chart(ctx, chartConfig);
+        },
+        plugins: [ChartDataLabels]
+      });
     }
 
     // Llenar tablas resumen
@@ -2424,29 +2377,57 @@
       summaryLaboralChange.innerHTML = `<span>${laboralPorcentaje.toFixed(1)}% del total</span>`;
     }
 
-    // Actualizar gráficos sin recargar datos
-    function actualizarGraficos() {
-      if (!currentData.length) return;
+    // Exportar datos
+    function exportarDatos(tipo) {
+      if (!currentData.length) {
+        alert('No hay datos para exportar');
+        return;
+      }
       
-      const distribuciones = calcularDistribuciones(currentData);
-      const distribucionesLikert = calcularDistribucionesLikert(currentData);
-      
-      // Re-renderizar gráficos
-      renderDemographicsCharts(distribuciones);
-      
-      // Re-renderizar gráficos específicos si la pestaña está activa
-      if (document.querySelector('.tab[data-tab="sociocultural"]').classList.contains('active')) {
-        renderSocioculturalCharts();
-      } else if (document.querySelector('.tab[data-tab="afectivos"]').classList.contains('active')) {
-        renderAfectivosCharts();
-      } else if (document.querySelector('.tab[data-tab="cognitivos"]').classList.contains('active')) {
-        renderCognitivosCharts();
-      } else if (document.querySelector('.tab[data-tab="ambiental"]').classList.contains('active')) {
-        renderAmbientalCharts();
-      } else if (document.querySelector('.tab[data-tab="economica"]').classList.contains('active')) {
-        renderEconomicaCharts();
-      } else if (document.querySelector('.tab[data-tab="comunitario"]').classList.contains('active')) {
-        renderComunitarioCharts();
+      switch (tipo) {
+        case 'png':
+          // En una implementación real, se exportaría el gráfico activo
+          alert('Seleccione un gráfico específico para exportar como PNG');
+          break;
+          
+        case 'csv':
+          const distribuciones = calcularDistribuciones(currentData);
+          const distribucionesLikert = calcularDistribucionesLikert(currentData);
+          
+          let csvContent = "Categoría,Subcategoría,Cantidad,Porcentaje\n";
+          
+          // Exportar datos demográficos
+          Object.keys(distribuciones).forEach(categoria => {
+            if (categoria !== 'counts') {
+              Object.keys(distribuciones[categoria]).forEach(subcategoria => {
+                const count = distribuciones.counts[categoria][subcategoria] || 0;
+                csvContent += `"${categoria}","${subcategoria}",${count},${distribuciones[categoria][subcategoria].toFixed(2)}\n`;
+              });
+            }
+          });
+          
+          // Exportar datos Likert
+          Object.keys(distribucionesLikert.distribuciones).forEach(categoria => {
+            Object.keys(distribucionesLikert.distribuciones[categoria]).forEach(pregunta => {
+              Object.keys(distribucionesLikert.distribuciones[categoria][pregunta]).forEach(respuesta => {
+                if (respuesta !== 'Promedio') {
+                  const porcentaje = distribucionesLikert.distribuciones[categoria][pregunta][respuesta];
+                  csvContent += `"${categoria}","${pregunta} - ${respuesta}",,${porcentaje.toFixed(2)}\n`;
+                }
+              });
+            });
+          });
+          
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'datos-comportamiento-proambiental.csv');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          break;
       }
     }
 
