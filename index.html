@@ -47,6 +47,8 @@
       color: #1e293b;
       line-height: 1.6;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     
     header {
@@ -617,21 +619,16 @@
       border-color: var(--primary);
     }
     
-    /* Mejoras para gráficos y texto opaco */
+    /* Mejoras para gráficos más nítidos */
     canvas {
-      opacity: 1 !important;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
     }
     
-    .chart-card, .question-chart-card {
-      opacity: 1;
-    }
-    
-    .card-title, .category-title, .chart-card h3, .question-chart-card h3 {
-      opacity: 1;
-    }
-    
-    table, th, td {
-      opacity: 1;
+    .chartjs-render-monitor {
+      -webkit-filter: none !important;
+      filter: none !important;
     }
     
     @media (max-width: 768px) {
