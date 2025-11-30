@@ -617,6 +617,23 @@
       border-color: var(--primary);
     }
     
+    /* Mejoras para gráficos y texto opaco */
+    canvas {
+      opacity: 1 !important;
+    }
+    
+    .chart-card, .question-chart-card {
+      opacity: 1;
+    }
+    
+    .card-title, .category-title, .chart-card h3, .question-chart-card h3 {
+      opacity: 1;
+    }
+    
+    table, th, td {
+      opacity: 1;
+    }
+    
     @media (max-width: 768px) {
       .header-content {
         flex-direction: column;
@@ -1428,7 +1445,7 @@
     </div>
 
     <footer>
-      <!-- Texto eliminado como se solicitó -->
+      <p>Panel de Análisis de Comportamiento Proambiental - Cantón Daule</p>
     </footer>
   </main>
 
@@ -1909,8 +1926,7 @@
         window[canvasId + 'Chart'].destroy();
       }
       
-      // Colores más vibrantes para los gráficos
-      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#84cc16', '#06b6d4', '#f97316'];
+      const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
       
       // Determinar tipo de gráfico según selección
       let chartType = currentChartType;
@@ -2267,7 +2283,6 @@
       
       const respuestas = ['Totalmente desacuerdo', 'Desacuerdo', 'Indiferente', 'De acuerdo', 'Totalmente de acuerdo'];
       const valores = respuestas.map(respuesta => data[respuesta]);
-      // Colores más vibrantes para los gráficos de preguntas
       const colors = ['#ef4444', '#f59e0b', '#64748b', '#0ea5e9', '#10b981'];
       
       // Calcular cantidades para cada respuesta
